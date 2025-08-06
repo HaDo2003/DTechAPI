@@ -6,6 +6,8 @@ interface NavItemProps {
   labelFull: string;
   labelShort: string;
   onClick?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   showBadge?: boolean;
   badgeCount?: number;
   phone?: boolean;
@@ -18,6 +20,8 @@ const NavItem: React.FC<NavItemProps> = ({
   labelFull,
   labelShort,
   onClick,
+  onMouseEnter,
+  onMouseLeave,
   showBadge = false,
   badgeCount = 0,
   phone = false,
@@ -28,6 +32,8 @@ const NavItem: React.FC<NavItemProps> = ({
     <li className="nav-item me-2 mt-2">
       <button
         onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
         className={`nav-link active d-flex align-items-center text-light text-decoration-none btn border-0 bg-transparent 
           ${labelFull === 'Account' ? 'dropdown-toggle' : ''}`} 
           style={{ minHeight: '50px' }}
