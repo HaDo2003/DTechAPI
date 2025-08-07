@@ -13,8 +13,9 @@
         margin-bottom: 20px;
     }
 
-    
+
 }
+
 /*=========================================================
 1200px
 ===========================================================*/
@@ -31,17 +32,17 @@
         width: 220px;
     }
 
-        .product-card p.fw-semibold {
-            font-size: 0.8rem;
-            -webkit-line-clamp: 3;
-            height: 3.9rem;
-        }
+    .product-card p.fw-semibold {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 3;
+        height: 3.9rem;
+    }
 
-        /* Price styling */
-        .product-card del {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
+    /* Price styling */
+    .product-card del {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
 
     .custom-container-img {
         height: 210px;
@@ -121,7 +122,7 @@
     .img-logo-small {
         display: block;
     }
-    
+
     .product-card {
         width: 170px;
     }
@@ -178,8 +179,13 @@
         margin-left: 0;
         width: 100%;
     }
+
     .img-logo-small {
-        padding-left: 10px
+        padding-left: 10px;
+        height: auto;
+        max-height: 20%;
+        width: auto;
+        max-width: 25%;
     }
 }
 

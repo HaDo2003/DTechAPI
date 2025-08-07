@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import DTechLogo from '../../../assets/DTechlogo.png';
+import DTechLogo from '../../../../assets/DTechlogo.png';
 import NavItem from './NavItem';
 import MenuItem from './MenuItem';
 import DropDownItem from './DropDownItem';
+import AccountItem from '../AccountItem';
 
 interface CartItem {
     id: string;
@@ -29,7 +30,7 @@ interface SearchHistoryItem {
     timestamp: number;
 }
 
-const LargeHeader: React.FC<HeaderProps> = ({
+const DesktopHeader: React.FC<HeaderProps> = ({
     user = { isAuthenticated: false },
     cartItems = [],
     onSearch,
@@ -143,7 +144,7 @@ const LargeHeader: React.FC<HeaderProps> = ({
     const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     return (
-        <div className="header-large">
+        <>
             {/* Main Header */}
             <div className="header clearfix bg-main">
                 <div className="container py-2">
@@ -268,24 +269,8 @@ const LargeHeader: React.FC<HeaderProps> = ({
                                                     onMouseEnter={() => setActiveDropdown('account')}
                                                     onMouseLeave={handleDropdownMouseLeave}
                                                 >
-                                                    <li>
-                                                        <button
-                                                            onClick={() => handleNavigation('/profile')}
-                                                            className="dropdown-item btn border-0 bg-transparent text-start"
-                                                        >
-                                                            Profile
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button className="dropdown-item btn border-0 bg-transparent text-start">
-                                                            Settings
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button onClick={onLogout} className="dropdown-item btn border-0 bg-transparent text-start">
-                                                            Logout
-                                                        </button>
-                                                    </li>
+                                                    <AccountItem label='Profile' onClick={() => handleNavigation('/profile')} />
+                                                    <AccountItem label='Logout' onClick={() => onLogout} />
                                                 </ul>
 
                                             </>
@@ -296,16 +281,8 @@ const LargeHeader: React.FC<HeaderProps> = ({
                                                     onMouseEnter={() => setActiveDropdown('account')}
                                                     onMouseLeave={handleDropdownMouseLeave}
                                                 >
-                                                    <li>
-                                                        <button onClick={onLogin} className="dropdown-item btn border-0 bg-transparent text-start">
-                                                            Log in
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button onClick={onRegister} className="dropdown-item btn border-0 bg-transparent text-start">
-                                                            Register
-                                                        </button>
-                                                    </li>
+                                                    <AccountItem label='Login' onClick={() => onLogin} />
+                                                    <AccountItem label='Register' onClick={() => onRegister} />
                                                 </ul>
                                             </>
                                         )
@@ -393,8 +370,8 @@ const LargeHeader: React.FC<HeaderProps> = ({
                     </nav>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
-export default LargeHeader;
+export default DesktopHeader;
