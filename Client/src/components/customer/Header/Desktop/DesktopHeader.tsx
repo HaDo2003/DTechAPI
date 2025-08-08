@@ -42,7 +42,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
     const [searchQuery, setSearchQuery] = useState('');
     const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
     const [showSearchHistory, setShowSearchHistory] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [activeSubDropdown, setActiveSubDropdown] = useState<string | null>(null);
 
@@ -124,17 +124,12 @@ const DesktopHeader: React.FC<HeaderProps> = ({
         }
     };
 
-    const handleDropdownMouseEnter = (dropdownName: string) => {
-        setActiveDropdown(dropdownName);
-        setActiveSubDropdown(null);
-    };
-
     const handleDropdownMouseLeave = () => {
         // Add delay to prevent dropdown from closing when moving to submenu
         setTimeout(() => {
             setActiveDropdown(null);
             setActiveSubDropdown(null);
-        }, 100);
+        }, 200);
     };
 
     const handleSubDropdownMouseEnter = (subDropdownName: string) => {
@@ -192,7 +187,6 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                 <div
                                     ref={searchHistoryRef}
                                     className="search-history position-absolute w-100 bg-white border rounded shadow-sm mt-1"
-                                    style={{ zIndex: 1000 }}
                                 >
                                     <div className="search-history-header d-flex justify-content-between align-items-center p-2 border-bottom">
                                         <span className="text-muted small">Recent Searches</span>
@@ -255,39 +249,32 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                 />
 
                                 {/* User Account */}
-                                <NavItem
-                                    icon="fa-user"
-                                    labelFull="Account"
-                                    labelShort="Acc..."
-                                    onMouseEnter={() => handleDropdownMouseEnter('account')}
-                                    isDropdownOpen={activeDropdown === 'account'}
-                                    dropdownContent={
-                                        user.isAuthenticated ? (
-                                            <>
-                                                <ul
-                                                    className="list-unstyled"
-                                                    onMouseEnter={() => setActiveDropdown('account')}
-                                                    onMouseLeave={handleDropdownMouseLeave}
-                                                >
-                                                    <AccountItem label='Profile' onClick={() => handleNavigation('/profile')} />
-                                                    <AccountItem label='Logout' onClick={() => onLogout} />
-                                                </ul>
-
-                                            </>
-                                        ) : (
-                                            <>
-                                                <ul
-                                                    className="list-unstyled"
-                                                    onMouseEnter={() => setActiveDropdown('account')}
-                                                    onMouseLeave={handleDropdownMouseLeave}
-                                                >
-                                                    <AccountItem label='Login' onClick={() => onLogin} />
-                                                    <AccountItem label='Register' onClick={() => onRegister} />
-                                                </ul>
-                                            </>
-                                        )
-                                    }
-                                />
+                                <div
+                                    onMouseEnter={() => setActiveDropdown('account')}
+                                    onMouseLeave={() => setActiveDropdown(null)}
+                                >
+                                    <NavItem
+                                        icon="fa-user"
+                                        labelFull="Account"
+                                        labelShort="Acc..."
+                                        isDropdownOpen={activeDropdown === 'account'}
+                                        dropdownContent={
+                                            <ul className="list-unstyled">
+                                                {user.isAuthenticated ? (
+                                                    <>
+                                                        <AccountItem label='Profile' onClick={() => handleNavigation('/profile')} />
+                                                        <AccountItem label='Logout' onClick={onLogout} />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <AccountItem label='Login' onClick={onLogin} />
+                                                        <AccountItem label='Register' onClick={onRegister} />
+                                                    </>
+                                                )}
+                                            </ul>
+                                        }
+                                    />
+                                </div>
                             </ul>
                         </div>
                     </div>
@@ -298,26 +285,22 @@ const DesktopHeader: React.FC<HeaderProps> = ({
             <div className="mainmenu clearfix bg-main">
                 <div className="container">
                     <nav className="navbar navbar-expand-lg py-1 ps-xl-4">
-                        <button
-                            className="navbar-toggler"
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        >
-                            <i className="fa-solid fa-list" style={{ color: '#ffffff' }}></i>
-                        </button>
-
                         <div className={`collapse navbar-collapse ${isMenuOpen ? 'show' : ''}`}>
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0 w-100 flex-nowrap d-flex gap-custom">
                                 <MenuItem label="Home" path="/" />
-                                <MenuItem label="Introduce" path="/"/>
+                                <MenuItem label="Introduce" path="/" />
                                 <MenuItem label="Laptop" path="/category/laptop" />
                                 <MenuItem label="Smart Phone" path="/category/smart-phone" />
                                 <MenuItem label="Tablet" path="/category/tablet" />
 
                                 {/* Accessory Dropdown */}
-                                <li className="nav-item dropdown">
+                                <li
+                                    className="nav-item dropdown"
+                                    onMouseEnter={() => setActiveDropdown('accessory')}
+                                    onMouseLeave={() => setActiveDropdown(null)}
+                                >
                                     <button
                                         className="nav-link dropdown-toggle text-light btn border-0 bg-transparent"
-                                        onMouseEnter={() => handleDropdownMouseEnter('accessory')}
                                     >
                                         Accessory
                                     </button>
@@ -363,8 +346,8 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                         </ul>
                                     )}
                                 </li>
-                                <MenuItem label="Policy" path="/"/>
-                                <MenuItem label="Contact" path="/contact"/>
+                                <MenuItem label="Policy" path="/" />
+                                <MenuItem label="Contact" path="/contact" />
                             </ul>
                         </div>
                     </nav>

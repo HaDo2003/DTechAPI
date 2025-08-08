@@ -44,7 +44,7 @@ const DropDownItem: React.FC<DropDownItemProps> = ({
             </button>
 
             {activeSubDropdown === label.toLowerCase() && (
-                <ul className="dropdown-menu show position-absolute" style={{ left: '100%', top: 0 }}>
+                <ul className="dropdown-menu show position-absolute ul-position">
                     {subItems.map((subItem, idx) => (
                         <li key={subItem.label + idx}>
                             <button

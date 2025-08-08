@@ -33,9 +33,8 @@ const NavItem: React.FC<NavItemProps> = ({
         onClick={onClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className={`nav-link active d-flex align-items-center text-light text-decoration-none btn border-0 bg-transparent 
+        className={`nav-link active d-flex align-items-center text-light text-decoration-none btn border-0 bg-transparent btn-minheight
           ${labelFull === 'Account' ? 'dropdown-toggle' : ''}`} 
-          style={{ minHeight: '50px' }}
       >
         <div className="me-1 position-relative">
           <i className={`fa-solid ${icon} fa-xl`}></i>

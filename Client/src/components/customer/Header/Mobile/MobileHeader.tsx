@@ -68,7 +68,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                         </div>
 
                         <div className="col-3 mx-auto padding-logo">
-                            <a onClick={() => onNavigate('/')} style={{ cursor: 'pointer' }}>
+                            <a onClick={() => onNavigate('/')} className='cursor-pointer'>
                                 <img src={DTechLogoSmall} alt="DTech Logo" className="img-logo-small" />
                             </a>
                         </div>
@@ -94,8 +94,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                                 <li className="nav-item me-2 mt-2">
                                     <a
                                         onClick={() => onNavigate('/cart')}
-                                        className="nav-link active d-flex align-items-center text-light text-decoration-none"
-                                        style={{ cursor: 'pointer' }}
+                                        className="nav-link active d-flex align-items-center text-light text-decoration-none cursor-pointer"
                                     >
                                         <div className="position-relative me-2">
                                             <i className="fas fa-shopping-cart"></i>
@@ -174,7 +173,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
             <div className={`mainmenu clearfix bg-main ${isMenuOpen ? 'd-block' : 'd-none'}`}>
                 <div className="sidebar-small">
                     <header>
-                        <a onClick={() => onNavigate('/')} className="nav-link active text-light" aria-current="page" style={{ cursor: 'pointer' }}>
+                        <a onClick={() => onNavigate('/')} className="nav-link active text-light cursor-pointer" aria-current="page">
                             Home
                         </a>
                     </header>
