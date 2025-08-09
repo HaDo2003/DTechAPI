@@ -1,14 +1,15 @@
 # DTech
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-8.0-blue)](https://dotnet.microsoft.com/en-us/apps/aspnet)
+[![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-9.0-blue)](https://dotnet.microsoft.com/en-us/apps/aspnet)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13-blue?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-blue?logo=docker)](https://www.docker.com/)
+[![React](https://img.shields.io/badge/React-TS-blue?logo=react&logoColor=61DAFB)](https://reactjs.org/)
 
 DTech is a modern web-based e-commerce platform built with ASP.NET Core. It enables users to browse and purchase technology products seamlessly while providing administrators with tools to manage inventory, orders, and users.
 
 ## 🔧 Technologies Used
 
-- **Frontend**: React, Typescript, Bootstrap
+- **Frontend**: React, Typescript, Bootrap
 - **Backend**: ASP.NET Core API
 - **Database**: PostgreSQL
 - **Real-Time Updates**: SignalR
