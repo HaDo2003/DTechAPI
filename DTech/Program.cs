@@ -2,6 +2,7 @@ using dotenv.net;
 using DTech.Domain.Entities;
 using DTech.Infrastructure.Data;
 using DTech.Infrastructure.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 
 DotEnv.Load();
@@ -13,6 +14,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
@@ -20,8 +30,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(option =>
+    {
+        option.SwaggerEndpoint("/openapi/v1.json", "api");
+    });
 }
-
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

@@ -40,6 +40,8 @@ public partial class Product
 
     public decimal? Discount { get; set; }
 
+    public decimal? PriceAfterDiscount { get; set; }
+
     [Display(Name = "Discount End Date")]
     public DateOnly? EndDateDiscount { get; set; }
 

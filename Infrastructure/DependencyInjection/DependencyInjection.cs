@@ -1,5 +1,9 @@
-﻿using DTech.Domain.Entities;
+﻿using DTech.Application.Interfaces;
+using DTech.Application.Services;
+using DTech.Domain.Entities;
+using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
+using DTech.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +41,11 @@ namespace DTech.Infrastructure.DependencyInjection
             })
             .AddEntityFrameworkStores<DTechDbContext>()
             .AddDefaultTokenProviders();
+
+            services.AddScoped<IHomeService, HomeService>();
+            services.AddScoped<IAdvertisementRepository, AdvertisementRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             return services;
         }
