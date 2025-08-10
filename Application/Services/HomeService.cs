@@ -20,50 +20,22 @@ namespace DTech.Application.Services
             var smartphoneProducts = await GetProductsByCategory("Smart Phone");
             var tabletProducts = await GetProductsByCategory("Tablet");
 
+            var adsDto = advertisements.Select(a => new AdvertisementDto
+            {
+                Id = a.AdvertisementId,
+                Name = a.Name ?? string.Empty,
+                ImageUrl = a.Image ?? string.Empty,
+                Order = a.Order
+            }).ToList();
+
             return new
             {
-                Advertisements = advertisements.Select(a => new AdvertisementDto
-                {
-                    Id = a.AdvertisementId,
-                    Name = a.Name ?? string.Empty,
-                    ImageUrl = a.Image ?? string.Empty,
-                    Order = a.Order
-                }).ToList(),
-
-                HotProducts = hotProducts.Select(p => new ProductDto
-                {
-                    Name = p.Name!,
-                    Price = p.Price,
-                    Discount = p.Discount
-                }).ToList(),
-
-                LaptopProducts = laptopProducts.Select(p => new ProductDto
-                {
-                    Name = p.Name!,
-                    Price = p.Price,
-                    Discount = p.Discount
-                }).ToList(),
-
-                SmartphoneProducts = smartphoneProducts.Select(p => new ProductDto
-                {
-                    Name = p.Name!,
-                    Price = p.Price,
-                    Discount = p.Discount
-                }).ToList(),
-
-                TabletProducts = tabletProducts.Select(p => new ProductDto
-                {
-                    Name = p.Name!,
-                    Price = p.Price,
-                    Discount = p.Discount
-                }).ToList(),
-
-                AccessoriesProducts = accessories.Select(p => new ProductDto
-                {
-                    Name = p.Name!,
-                    Price = p.Price,
-                    Discount = p.Discount
-                }).ToList()
+                Advertisements = adsDto,
+                HotProducts = ReturnDtoProducts(hotProducts),
+                LaptopProducts = ReturnDtoProducts(laptopProducts),
+                SmartphoneProducts = ReturnDtoProducts(smartphoneProducts),
+                TabletProducts = ReturnDtoProducts(tabletProducts),
+                AccessoriesProducts = ReturnDtoProducts(accessories)
             };
         }
 
@@ -74,6 +46,23 @@ namespace DTech.Application.Services
                 return [];
 
             return await productRepo.GetProductsByCategoryIdAsync(new List<int> { categoryId.Value });
+        }
+
+        private static List<ProductDto> ReturnDtoProducts(List<Product> products)
+        {
+            return [.. products.Select(p => new ProductDto
+            {
+                Id = p.ProductId,
+                Name = p.Name!,
+                Photo = p.Photo ?? string.Empty,
+                Slug = p.Slug ?? string.Empty,
+                Price = p.Price,
+                FinalPrice = p.PriceAfterDiscount ?? p.Price,
+                Discount = p.Discount,
+                PromotionalGift = p.PromotionalGift ?? string.Empty,
+                Category = new CategoryDto { Slug = p.Category!.Slug },
+                Brand = new BrandDto { Slug = p.Brand!.Slug }
+            })];
         }
     }
 }
