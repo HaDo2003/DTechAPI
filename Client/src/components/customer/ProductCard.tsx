@@ -1,25 +1,7 @@
 import React from "react";
 import { priceFormatter } from "../../utils/priceFormatter";
-
-interface Category {
-    slug: string;
-}
-
-interface Brand {
-    slug: string;
-}
-
-interface Product {
-    name: string;
-    photo: string;
-    slug: string;
-    price: number;           
-    finalPrice: number;      
-    discount: number;        
-    category: Category;
-    brand: Brand;
-    promotionalGift?: string | null;
-}
+import { type Product } from "../../types/Product";
+import DOMPurify from "../../utils/santitizeConfig";
 
 interface ProductCardProps {
     product: Product;
@@ -84,11 +66,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     </div>
 
                     {product.promotionalGift && (
-                        <div className="custom-text">
-                            {product.promotionalGift.length > 50
-                                ? product.promotionalGift.substring(0, 50) + "..."
-                                : product.promotionalGift}
-                        </div>
+                        <div
+                            className="custom-text"
+                            dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(
+                                    product.promotionalGift.length > 50
+                                        ? product.promotionalGift.substring(0, 50) + "..."
+                                        : product.promotionalGift
+                                ),
+                            }}
+                        />
                     )}
                 </div>
             </a>

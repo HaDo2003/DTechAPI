@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getHomeData, type HomePageData } from "../../services/HomeService";
 import Slider from "../../components/customer/homepage/Slider";
+import ProductGrid from "../../components/customer/ProductGrid";
 
 const HomePage: React.FC = () => {
   const [data, setData] = useState<HomePageData | null>(null);
@@ -18,7 +19,11 @@ const HomePage: React.FC = () => {
   return (
     <div>
       {data && <Slider advertisements={data.advertisements} />}
-      {/* TODO: Add HotProducts, LaptopProducts, etc. */}
+      {data && <ProductGrid products={data.hotProducts} Title="Hot Sales"/>}
+      {data && <ProductGrid products={data.laptopProducts} Title="Laptop"/>}
+      {data && <ProductGrid products={data.smartphoneProducts} Title="Smart Phone"/>}
+      {data && <ProductGrid products={data.tabletProducts} Title="Tablet"/>}
+      {data && <ProductGrid products={data.accessoriesProducts} Title="Accessory"/>}
     </div>
   );
 };
