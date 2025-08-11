@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { getHomeData, type HomePageData } from "../../services/HomeService";
 import Slider from "../../components/customer/homepage/Slider";
 import ProductGrid from "../../components/customer/ProductGrid";
+import FeaturedCategory from "../../components/customer/homepage/FeaturedCategory";
+import Loading from "../../components/shared/Loading";
 
 const HomePage: React.FC = () => {
   const [data, setData] = useState<HomePageData | null>(null);
@@ -14,12 +16,13 @@ const HomePage: React.FC = () => {
     });
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p><Loading/></p>;
 
   return (
     <div>
       {data && <Slider advertisements={data.advertisements} />}
       {data && <ProductGrid products={data.hotProducts} Title="Hot Sales"/>}
+      <FeaturedCategory />
       {data && <ProductGrid products={data.laptopProducts} Title="Laptop"/>}
       {data && <ProductGrid products={data.smartphoneProducts} Title="Smart Phone"/>}
       {data && <ProductGrid products={data.tabletProducts} Title="Tablet"/>}
