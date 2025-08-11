@@ -1,4 +1,5 @@
 ﻿using DTech.Application.Interfaces;
+using DTech.Application.Mapping;
 using DTech.Application.Services;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -42,10 +43,18 @@ namespace DTech.Infrastructure.DependencyInjection
             .AddEntityFrameworkStores<DTechDbContext>()
             .AddDefaultTokenProviders();
 
+            services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+
+            // Register application services
             services.AddScoped<IHomeService, HomeService>();
+            services.AddScoped<IProductService, ProductService>();
+
+            // Register repositories
             services.AddScoped<IAdvertisementRepository, AdvertisementRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             return services;
         }

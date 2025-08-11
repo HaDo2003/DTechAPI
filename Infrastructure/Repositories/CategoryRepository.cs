@@ -1,11 +1,8 @@
-﻿using DTech.Domain.Interfaces;
+﻿using DTech.Domain.Entities;
+using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DTech.Infrastructure.Repositories
 {
@@ -22,6 +19,20 @@ namespace DTech.Infrastructure.Repositories
                 .Select(c => c.CategoryId)
                 .FirstOrDefaultAsync();
             return categoryId;
+        }
+
+        public async Task<Category?> GetCategoryBySlugAsync(string? slug)
+        {
+            if (string.IsNullOrEmpty(slug))
+            {
+                return null;
+            }
+            var category = await context.Categories
+                .AsNoTracking()
+                .Include(c => c.InverseParent)
+                .Include(c => c.Parent)
+                .FirstOrDefaultAsync(c => c.Slug == slug);
+            return category;
         }
     }
 }

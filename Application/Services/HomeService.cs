@@ -52,12 +52,12 @@ namespace DTech.Application.Services
         {
             return [.. products.Select(p => new ProductDto
             {
-                Id = p.ProductId,
+                ProductId = p.ProductId,
                 Name = p.Name!,
                 Photo = p.Photo ?? string.Empty,
                 Slug = p.Slug ?? string.Empty,
                 Price = p.Price,
-                FinalPrice = p.PriceAfterDiscount ?? p.Price,
+                PriceAfterDiscount = p.PriceAfterDiscount ?? p.Price,
                 Discount = p.Discount,
                 PromotionalGift = p.PromotionalGift ?? string.Empty,
                 Category = new CategoryDto { Slug = p.Category!.Slug },
