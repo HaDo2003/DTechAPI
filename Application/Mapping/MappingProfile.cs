@@ -7,6 +7,7 @@ namespace DTech.Application.Mapping
     public class MappingProfile : Profile
     {
         public MappingProfile() {
+            CreateMap<Advertisement, AdvertisementDto>();
             CreateMap<Category, CategoryDto>();
             CreateMap<Brand, BrandDto>();
             CreateMap<Specification, SpecificationDto>();

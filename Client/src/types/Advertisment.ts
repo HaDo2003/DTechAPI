@@ -1,6 +1,6 @@
 export interface Advertisement {
-  id: number;
+  advertisementId: number;
   name: string;
-  imageUrl: string;
+  image: string;
   order: number;
 }

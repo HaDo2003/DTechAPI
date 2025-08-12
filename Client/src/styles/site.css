@@ -1158,6 +1158,23 @@ Product Comment
     font-size: 12px;
     color: green;
 }
+
+/*star rating*/
+.w-30-star {
+    width: 30px;;
+}
+.w-60-star {
+    width: 60px;
+}
+.h-8-progress {
+    height: 8px;
+}
+.star-filled {
+    color: orange;
+}
+.star-empty {
+    color: lightgray;
+}
 /*=========================================================
 Cart
 ===========================================================*/

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CustomerLayout from './layouts/CustomerLayout';
 import Home from './pages/customer/Home';
 import NotFound from './pages/customer/NotFound';
+import ProductDetail from './pages/customer/ProductDetail';
 
 
 function App() {
@@ -15,7 +16,9 @@ function App() {
         {/* Customer side */}
         <Route element={<CustomerLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path=":categorySlug/:brandSlug/:slug" element={<ProductDetail />} />
           <Route path="*" element={<NotFound />} />
+          
         </Route>
 
         {/* You can add AdminLayout here later */}

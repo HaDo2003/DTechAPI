@@ -16,7 +16,7 @@ const HomePage: React.FC = () => {
     });
   }, []);
 
-  if (loading) return <p><Loading/></p>;
+  if (loading) return <Loading/>;
 
   return (
     <div>

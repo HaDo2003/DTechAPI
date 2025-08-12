@@ -32,6 +32,14 @@
           "user-select"
         ]
       }
-    ]
+    ],
+    "axe/aria": [
+      "default",
+      {
+        "aria-progressbar-name": "off",
+        "aria-valid-attr-value": "off"
+      }
+    ],
+    "no-inline-styles": "off"
   }
 }

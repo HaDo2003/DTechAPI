@@ -66,7 +66,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, Title }) => {
             className="product-slider d-flex overflow-auto hide-scrollbar"
             >
             {products.slice(0, 10).map((product) => (
-                <div key={product.id} className="slider-item flex-shrink-0">
+                <div key={product.productId} className="slider-item flex-shrink-0">
                 <ProductCard product={product} />
                 </div>
             ))}

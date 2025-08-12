@@ -2,13 +2,14 @@ import React from "react";
 import { priceFormatter } from "../../utils/priceFormatter";
 import { type Product } from "../../types/Product";
 import DOMPurify from "../../utils/santitizeConfig";
+import { Link } from "react-router-dom";
 
 interface ProductCardProps {
     product: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-    const formattedFinalPrice = priceFormatter(product.finalPrice);
+    const formattedFinalPrice = priceFormatter(product.priceAfterDiscount);
     const formattedOriginalPrice = priceFormatter(product.price);
     const discountPercent = product.discount?.toFixed(1).replace(/\.0$/, "");
     const categorySlug = product.category.slug;
@@ -24,8 +25,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 </div>
             )}
 
-            <a
-                href={`/product/${categorySlug}/${brandSlug}/${product.slug}`}
+            <Link
+                to={`/${categorySlug}/${brandSlug}/${product.slug}`}
                 className="text-decoration-none"
             >
                 <div className="custom-container-img">
@@ -78,7 +79,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                         />
                     )}
                 </div>
-            </a>
+            </Link>
         </div>
     );
 };

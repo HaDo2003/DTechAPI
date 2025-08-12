@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import DesktopHeader from "../components/customer/header/desktop/DesktopHeader";
 import MobileHeader from "../components/customer/header/mobile/MobileHeader";
 import Footer from "../components/customer/footer/Footer";
-// import Breadcrumb from "../components/customer/Breadcrumb";
+import Breadcrumb from "../components/customer/Breadcrumb";
 // import ChatBox from "../components/customer/ChatBox";
 
 const CustomerLayout: React.FC = () => {
@@ -17,8 +17,9 @@ const CustomerLayout: React.FC = () => {
           <MobileHeader />
         </div>
       </div>
-      {/* <Breadcrumb /> */}
+      
       <main className="container padding-custom">
+        <Breadcrumb />
         <Outlet /> {/* Renders child route components here */}
       </main>
       <div className="">

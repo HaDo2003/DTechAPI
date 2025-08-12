@@ -24,8 +24,8 @@ const Slider: React.FC<SliderProps> = ({ advertisements }) => {
 
       <div className="carousel-inner">
         {advertisements.map((slider, i) => (
-          <div key={slider.id} className={`carousel-item ${i === 0 ? "active" : ""} c-item`}>
-            <img src={slider.imageUrl} className="d-block w-100" alt={slider.name} />
+          <div key={slider.advertisementId} className={`carousel-item ${i === 0 ? "active" : ""} c-item`}>
+            <img src={slider.image} className="d-block w-100" alt={slider.name} />
           </div>
         ))}
       </div>
