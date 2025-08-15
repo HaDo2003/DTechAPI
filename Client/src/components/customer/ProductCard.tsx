@@ -3,6 +3,7 @@ import { priceFormatter } from "../../utils/priceFormatter";
 import { type Product } from "../../types/Product";
 import DOMPurify from "../../utils/santitizeConfig";
 import { Link } from "react-router-dom";
+import { addToRecentlyViewed } from "../../utils/recentlyViewed";
 
 interface ProductCardProps {
     product: Product;
@@ -11,15 +12,21 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const formattedFinalPrice = priceFormatter(product.priceAfterDiscount);
     const formattedOriginalPrice = priceFormatter(product.price);
-    const discountPercent = product.discount?.toFixed(1).replace(/\.0$/, "");
+    const discountPercent = product.discount?.toFixed(0);
     const categorySlug = product.category.slug;
     const brandSlug = product.brand.slug;
+    const handleView = () => {
+        addToRecentlyViewed(product.productId);
+    };
 
     return (
-        <div className="card h-100 product-card position-relative border-0">
+        <div
+            className="card h-100 product-card position-relative border-0"
+            onClick={handleView}
+        >
             {product.discount > 0 && (
                 <div className="position-absolute end-0 top-0 m-2">
-                    <span className="badge bg-danger rounded-pill">
+                    <span className="badge bg-danger rounded-pill py-1">
                         -{discountPercent}%
                     </span>
                 </div>

@@ -25,8 +25,14 @@ namespace DTech.Application.Services
                 
                 var product = await productRepo.GetBySlugAsync(slug, category.CategoryId, brand.BrandId) 
                     ?? throw new Exception($"Product with slug '{slug}' not found in category '{category.Name}' and brand '{brand.Name}'.");
+
+                var relatedProducts = await productRepo.GetRelatedProductsAsync(product.ProductId, brand.BrandId);
+                
                 await productRepo.IncrementProductViewsAsync(product.ProductId);
+                
                 var productDto = _mapper.Map<ProductDto>(product);
+                productDto.RelatedProducts = _mapper.Map<List<RelatedProductDto>>(relatedProducts);
+                
                 return productDto;
             }
             catch (Exception ex)

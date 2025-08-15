@@ -30,5 +30,6 @@ namespace DTech.Application.DTOs
         public virtual ICollection<ProductImageDto> ProductImages { get; set; } = new List<ProductImageDto>();
 
         public virtual ICollection<SpecificationDto> Specifications { get; set; } = new List<SpecificationDto>();
+        public virtual ICollection<RelatedProductDto> RelatedProducts { get; set; } = new List<RelatedProductDto>();
     }
 }

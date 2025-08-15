@@ -13,6 +13,7 @@ namespace DTech.Application.Mapping
             CreateMap<Specification, SpecificationDto>();
             CreateMap<ProductImage, ProductImageDto>();
             CreateMap<ProductComment, ProductCommentDto>();
+            CreateMap<Product, RelatedProductDto>();
 
             CreateMap<Product, ProductDto>()
             .ForMember(dest => dest.Specifications, opt => opt.MapFrom(src => src.Specifications))

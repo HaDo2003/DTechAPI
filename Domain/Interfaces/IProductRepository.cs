@@ -15,6 +15,7 @@ namespace DTech.Domain.Interfaces
         Task<List<Product>> GetProductsByCategoryIdAsync(List<int> categoryIds);
         Task<Product?> GetBySlugAsync(string? slug, int? categoryId, int? brandId);
         Task<bool> IncrementProductViewsAsync(int? productId);
+        Task<List<Product>> GetRelatedProductsAsync(int? brandId, int? productId);
 
         // Repo for Product Images
         // Repo for Product Comments

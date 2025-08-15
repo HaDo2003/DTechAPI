@@ -101,6 +101,23 @@ namespace DTech.Infrastructure.Repositories
             }
         }
 
+        public async Task<List<Product>> GetRelatedProductsAsync(int? brandId, int? productId)
+        {
+            if (brandId == null || productId == null)
+            {
+                return [];
+            }
+            var products = await context.Products
+                .AsNoTracking()
+                .Include(a => a.Brand)
+                .Include(a => a.Category)
+                .Where(a => a.BrandId == brandId && a.ProductId != productId && a.Status == 1)
+                .OrderByDescending(a => a.ProductId)
+                .Take(5)
+                .ToListAsync();
+            return products;
+        }
+
         // Repo for Product Images
         // Repo for Product Comments
         // Repo for Product Specifications

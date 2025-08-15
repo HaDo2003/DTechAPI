@@ -6,6 +6,10 @@ import { priceFormatter } from "../../utils/priceFormatter";
 import DOMPurify from "dompurify";
 import Loading from "../../components/shared/Loading";
 import NotFound from "./NotFound";
+import ProductGrid from "../../components/customer/ProductGrid";
+import SpecificationsWindow from "../../components/customer/productDetail/SpecificationsWindow";
+import ProductCommentForm, { type CommentFormData } from "../../components/customer/productDetail/ProductCommentForm";
+import ProductInfoItem from "../../components/customer/productDetail/ProductInfoItem";
 
 const ProductDetail: React.FC = () => {
     const { categorySlug, brandSlug, slug } = useParams<{ categorySlug: string; brandSlug: string; slug: string }>();
@@ -17,6 +21,7 @@ const ProductDetail: React.FC = () => {
     const [mainImage, setMainImage] = useState<string>("");
     const [showFullDescription, setShowFullDescription] = useState(false);
     const [showCommentForm, setShowCommentForm] = useState(false);
+    const [isSpecOpen, setIsSpecOpen] = useState(false);
 
     useEffect(() => {
         document.title = "DTech - Product Detail";
@@ -42,10 +47,16 @@ const ProductDetail: React.FC = () => {
     }
     // Price calculations
     const savePrice = product.price - product.priceAfterDiscount;
-    const discountPercent = product.discount?.toFixed(1);
+    const discountPercent = product.discount?.toFixed(0);
     const formattedPriceAfterDiscount = priceFormatter(product.priceAfterDiscount);
     const formattedOriginalPrice = priceFormatter(product.price);
     const formattedSavePrice = priceFormatter(savePrice);
+    let statusText;
+    if (product.statusProduct) {
+        statusText = "In Stock";
+    } else {
+        statusText = "Out of Stock";
+    }
 
     // Description preview
     const preview = product.description?.length > 150
@@ -147,41 +158,12 @@ const ProductDetail: React.FC = () => {
 
                         {/* Product Info Row */}
                         <div className="row gy-2 gx-3 text-start">
-                            <div className="col-6 col-xl-2 d-flex align-items-center">
-                                <p className="product-information mb-0">
-                                    Comments: {product.productComments.length}
-                                </p>
-                            </div>
-                            <div className="col-6 col-xl-2">
-                                <p className="product-information mb-0">
-                                    Views: {product.views}
-                                </p>
-                            </div>
-                            <div className="col-6 col-xl-3">
-                                <p className="product-information mb-0">
-                                    Warranty: {product.warranty} months
-                                </p>
-                            </div>
-                            <div className="col-6 col-xl-3">
-                                <p className="product-information mb-0">
-                                    {/* Status: {
-                                        product.statusProduct !== null
-                                            ? statusProductDictionary[product.statusProduct] || 'Unknown Status'
-                                            : 'Status not set'
-                                    } */}
-                                    Status: {product.statusProduct ? "In Stock" : "Out of Stock"}
-                                </p>
-                            </div>
-                            <div className="col-6 col-xl-5">
-                                <p className="product-information mb-0">
-                                    Date of Manufacture: {product.dateOfManufacture}
-                                </p>
-                            </div>
-                            <div className="col-5 col-xl-4">
-                                <p className="product-information mb-0">
-                                    Made In: {product.madeIn}
-                                </p>
-                            </div>
+                            <ProductInfoItem label="Comment" value={product.productComments.length} sizexl="col-xl-2"/>
+                            <ProductInfoItem label="Views" value={product.views} sizexl="col-xl-2"/>
+                            <ProductInfoItem label="Warranty" value={`${product.warranty} months`} sizexl="col-xl-3"/>
+                            <ProductInfoItem label="Status" value={statusText} sizexl="col-xl-3"/>
+                            <ProductInfoItem label="Date of Manufacture" value={product.dateOfManufacture} sizexl="col-xl-5"/>
+                            <ProductInfoItem label="Made In" value={product.madeIn} sizexl="col-xl-4"/>                            
                         </div>
 
                         {/* Price */}
@@ -261,7 +243,7 @@ const ProductDetail: React.FC = () => {
             {/* Related Products */}
             {product?.relatedProducts?.length > 0 && (
                 <div className="related-products">
-                    {/* Add your related products component here */}
+                    <ProductGrid products={product.relatedProducts} Title="Related Products" />
                 </div>
             )}
 
@@ -276,10 +258,16 @@ const ProductDetail: React.FC = () => {
                                     <h4 className="mb-0">Introducing {product.name}</h4>
                                 </div>
                                 <div className="card-body">
-                                    <div>
-                                        <div dangerouslySetInnerHTML={{
-                                            __html: DOMPurify.sanitize(showFullDescription ? product.description : preview)
-                                        }} />
+                                    <div
+                                        className={`description-container ${showFullDescription ? "expanded" : ""}`}
+                                    >
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: DOMPurify.sanitize(
+                                                    showFullDescription ? product.description : preview
+                                                )
+                                            }}
+                                        />
                                     </div>
 
                                     {product.description && product.description.length > 150 && (
@@ -289,13 +277,37 @@ const ProductDetail: React.FC = () => {
                                                 type="button"
                                                 onClick={handleToggleDescription}
                                             >
-                                                <span>{showFullDescription ? 'See Less' : 'See More'}</span>
+                                                <span>{showFullDescription ? "See Less" : "See More"}</span>
                                                 <span className="ms-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                                        className={`bi ${showFullDescription ? 'bi-chevron-up' : 'bi-chevron-down'}`} viewBox="0 0 16 16">
-                                                        <path fillRule="evenodd"
-                                                            d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
-                                                    </svg>
+                                                    {showFullDescription ? (
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="16"
+                                                            height="16"
+                                                            fill="currentColor"
+                                                            className="bi bi-chevron-up"
+                                                            viewBox="0 0 16 16"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"
+                                                            />
+                                                        </svg>
+                                                    ) : (
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="16"
+                                                            height="16"
+                                                            fill="currentColor"
+                                                            className="bi bi-chevron-down"
+                                                            viewBox="0 0 16 16"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"
+                                                            />
+                                                        </svg>
+                                                    )}
                                                 </span>
                                             </button>
                                         </div>
@@ -361,11 +373,16 @@ const ProductDetail: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    {showCommentForm && (
-                                        <div className="comment-fade">
-                                            {/* Add your comment form component here */}
-                                        </div>
-                                    )}
+
+                                    <div className={`comment-fade ${showCommentForm ? 'show' : 'hide'}`}>
+                                        <ProductCommentForm
+                                            productId={product.productId}
+                                            onSubmit={(data: CommentFormData) => {
+                                                console.log("Comment submitted:", data);
+                                                setShowCommentForm(false);
+                                            }}
+                                        />
+                                    </div>
 
                                     <div>
                                         {product.productComments.map((cmt, index) => (
@@ -438,7 +455,7 @@ const ProductDetail: React.FC = () => {
                                         <div className="mt-3 d-flex justify-content-center">
                                             <button
                                                 className="btn btn-outline-primary rounded-3 d-flex align-items-center justify-content-center"
-                                                onClick={() => console.log('Open specifications window')}
+                                                onClick={() => setIsSpecOpen(true)}
                                             >
                                                 View full specifications
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -459,6 +476,13 @@ const ProductDetail: React.FC = () => {
             <div id="recently-viewed-container">
                 {/* Add your recently viewed component here */}
             </div>
+
+            {/* Overlay Component */}
+            <SpecificationsWindow
+                specifications={product.specifications}
+                isOpen={isSpecOpen}
+                onClose={() => setIsSpecOpen(false)}
+            />
         </>
     );
 };
