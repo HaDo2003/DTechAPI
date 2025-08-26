@@ -8,12 +8,12 @@ const FeaturedCategory: React.FC = () => {
 
             <div className="category-nav">
                 <div className="row text-center">
-                    <FCategory label="Laptop" iconlink="laptop" path="/category/laptop" />
-                    <FCategory label="Smart Phone" iconlink="mobile" path="/category/smartphone" />
-                    <FCategory label="Tablet" iconlink="tablet" path="/category/tablet" />
-                    <FCategory label="Headphone" iconlink="headphones" path="/category/headphone" />
-                    <FCategory label="Keyboard" iconlink="keyboard" path="/category/keyboard" />
-                    <FCategory label="Mouse" iconlink="computer-mouse" path="/category/mouse" />
+                    <FCategory label="Laptop" iconlink="laptop" path="/laptop" />
+                    <FCategory label="Smart Phone" iconlink="mobile" path="/smart-phone" />
+                    <FCategory label="Tablet" iconlink="tablet" path="/tablet" />
+                    <FCategory label="Headphone" iconlink="headphones" path="/headphone" />
+                    <FCategory label="Keyboard" iconlink="keyboard" path="/keyboard" />
+                    <FCategory label="Mouse" iconlink="computer-mouse" path="/mouse" />
                 </div>
             </div>
         </div>

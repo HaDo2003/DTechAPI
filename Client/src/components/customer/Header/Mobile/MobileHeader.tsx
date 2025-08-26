@@ -3,13 +3,13 @@ import DTechLogoSmall from '../../../../assets/DTechlogosmall.png';
 import MainMenuItem from './MainMenuItem';
 import AccessoryItem from './AccessoryItem';
 import AccountItem from '../AccountItem';
+import { useNavigate } from 'react-router-dom';
 
 interface MobileHeaderProps {
     isAuthenticated?: boolean;
     cartItemCount?: number;
     searchQuery?: string;
     onSearch?: (query: string) => void;
-    onNavigate?: (path: string) => void;
 }
 
 const MobileHeader: React.FC<MobileHeaderProps> = ({
@@ -17,7 +17,6 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
     cartItemCount = 0,
     searchQuery = '',
     onSearch = () => { },
-    onNavigate = () => { }
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchInput, setSearchInput] = useState(searchQuery);
@@ -25,7 +24,17 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
     const [searchHistory] = useState<string[]>([]);
     const checkboxRef = useRef<HTMLInputElement>(null);
     const [activeSubDropdown, setActiveSubDropdown] = useState<string | null>(null);
+    const navigate = useNavigate();
 
+    const onNavigate = (path: string) => {
+        navigate(path);
+        setIsMenuOpen(false);
+
+        // Uncheck the checkbox
+        if (checkboxRef.current) {
+            checkboxRef.current.checked = false;
+        }
+    };
     const handleOverlayClick = () => {
         setIsMenuOpen(false);
 
@@ -180,29 +189,30 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
 
                     <ul className="list-unstyled">
                         <MainMenuItem label="Introduce" onClick={() => onNavigate('/')} />
-                        <MainMenuItem label="Laptop" onClick={() => onNavigate('/category/laptop')} />
-                        <MainMenuItem label="Smart Phone" onClick={() => onNavigate('/category/smartphone')} />
-                        <MainMenuItem label="Tablet" onClick={() => onNavigate('/category/tablet')} />
+                        <MainMenuItem label="Laptop" onClick={() => onNavigate('/laptop')} />
+                        <MainMenuItem label="Smart Phone" onClick={() => onNavigate('/smart-phone')} />
+                        <MainMenuItem label="Tablet" onClick={() => onNavigate('/tablet')} />
                         <li className="nav-item dropdown">
                             <a
                                 className="nav-link dropdown-toggle text-light"
                                 href="#"
                                 role="button"
                                 data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                                aria-expanded="false"
+                                onClick={() => onNavigate('/accessory')}>
                                 Accessory
                             </a>
                             <ul className="dropdown-menu">
                                 <AccessoryItem
                                     label="Mouse"
                                     id="mouse1"
-                                    onClick={() => onNavigate('/category/mouse')}
+                                    onClick={() => onNavigate('/mouse')}
                                     onMouseEnter={() => handleSubDropdownMouseEnter('mouse')}
                                     onMouseLeave={() => setActiveSubDropdown(null)}
                                     activeSubDropdown={activeSubDropdown}
                                     subItems={[
-                                        { label: 'Wired Mouse', onClick: () => onNavigate('/category/wired-mouse') },
-                                        { label: 'Wireless Mouse', onClick: () => onNavigate('/category/wireless-mouse') }
+                                        { label: 'Wired Mouse', onClick: () => onNavigate('/wired-mouse') },
+                                        { label: 'Wireless Mouse', onClick: () => onNavigate('/wireless-mouse') }
                                     ]}
                                 />
                                 <AccessoryItem
@@ -213,20 +223,20 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                                     onMouseLeave={() => setActiveSubDropdown(null)}
                                     activeSubDropdown={activeSubDropdown}
                                     subItems={[
-                                        { label: 'Wired Keyboard', onClick: () => onNavigate('/category/wired-keyboard') },
-                                        { label: 'Wireless Keyboard', onClick: () => onNavigate('/category/wireless-keyboard') }
+                                        { label: 'Wired Keyboard', onClick: () => onNavigate('/wired-keyboard') },
+                                        { label: 'Wireless Keyboard', onClick: () => onNavigate('/wireless-keyboard') }
                                     ]}
                                 />
                                 <AccessoryItem
                                     label="Headphone"
                                     id="headphone1"
-                                    onClick={() => onNavigate('/category/headphone')}
+                                    onClick={() => onNavigate('/headphone')}
                                     onMouseEnter={() => handleSubDropdownMouseEnter('headphone')}
                                     onMouseLeave={() => setActiveSubDropdown(null)}
                                     activeSubDropdown={activeSubDropdown}
                                     subItems={[
-                                        { label: 'Wired Headphone', onClick: () => onNavigate('/category/wired-headphone') },
-                                        { label: 'Wireless Headphone', onClick: () => onNavigate('/category/wireless-headphone') }
+                                        { label: 'Wired Headphone', onClick: () => onNavigate('/wired-headphone') },
+                                        { label: 'Wireless Headphone', onClick: () => onNavigate('/wireless-headphone') }
                                     ]}
                                 />
                             </ul>

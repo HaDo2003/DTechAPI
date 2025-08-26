@@ -4,6 +4,7 @@ import NavItem from './NavItem';
 import MenuItem from './MenuItem';
 import DropDownItem from './DropDownItem';
 import AccountItem from '../AccountItem';
+import { useNavigate } from 'react-router-dom';
 
 interface CartItem {
     id: string;
@@ -37,7 +38,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
     onNavigate,
     onLogin,
     onRegister,
-    onLogout
+    onLogout,
 }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
@@ -45,6 +46,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
     const [isMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [activeSubDropdown, setActiveSubDropdown] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const searchInputRef = useRef<HTMLInputElement>(null);
     const searchHistoryRef = useRef<HTMLDivElement>(null);
@@ -289,9 +291,9 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0 w-100 flex-nowrap d-flex gap-custom">
                                 <MenuItem label="Home" path="/" />
                                 <MenuItem label="Introduce" path="/" />
-                                <MenuItem label="Laptop" path="/category/laptop" />
-                                <MenuItem label="Smart Phone" path="/category/smart-phone" />
-                                <MenuItem label="Tablet" path="/category/tablet" />
+                                <MenuItem label="Laptop" path="/laptop" />
+                                <MenuItem label="Smart Phone" path="/smart-phone" />
+                                <MenuItem label="Tablet" path="/tablet" />
 
                                 {/* Accessory Dropdown */}
                                 <li
@@ -301,6 +303,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                 >
                                     <button
                                         className="nav-link dropdown-toggle text-light btn border-0 bg-transparent"
+                                        onClick={() => navigate('/accessory')}
                                     >
                                         Accessory
                                     </button>
@@ -313,33 +316,33 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                         >
                                             <DropDownItem
                                                 label='Mouse'
-                                                path="/category/mouse"
+                                                path="/mouse"
                                                 activeSubDropdown={activeSubDropdown}
                                                 subItems={[
-                                                    { label: "Wired Mouse", path: "/category/wired-mouse" },
-                                                    { label: "Wireless Mouse", path: "/category/wireless-mouse" },
+                                                    { label: "Wired Mouse", path: "/wired-mouse" },
+                                                    { label: "Wireless Mouse", path: "/wireless-mouse" },
                                                 ]}
                                                 onMouseEnter={() => handleSubDropdownMouseEnter('mouse')}
                                             />
 
                                             <DropDownItem
                                                 label='Keyboard'
-                                                path="/category/keyboard"
+                                                path="/keyboard"
                                                 activeSubDropdown={activeSubDropdown}
                                                 subItems={[
-                                                    { label: "Wired Keyboard", path: "/category/wired-keyboard" },
-                                                    { label: "Wireless Keyboard", path: "/category/wireless-keyboard" },
+                                                    { label: "Wired Keyboard", path: "/wired-keyboard" },
+                                                    { label: "Wireless Keyboard", path: "/wireless-keyboard" },
                                                 ]}
                                                 onMouseEnter={() => handleSubDropdownMouseEnter('keyboard')}
                                             />
 
                                             <DropDownItem
                                                 label='Headphone'
-                                                path="/category/headphone"
+                                                path="/headphone"
                                                 activeSubDropdown={activeSubDropdown}
                                                 subItems={[
-                                                    { label: "Wired Headphone", path: "/category/wired-headphone" },
-                                                    { label: "Wireless Headphone", path: "/category/wireless-headphone" },
+                                                    { label: "Wired Headphone", path: "/wired-headphone" },
+                                                    { label: "Wireless Headphone", path: "/wireless-headphone" },
                                                 ]}
                                                 onMouseEnter={() => handleSubDropdownMouseEnter('headphone')}
                                             />
