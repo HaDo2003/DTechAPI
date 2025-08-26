@@ -4,10 +4,12 @@ import Slider from "../../components/customer/homepage/Slider";
 import ProductGrid from "../../components/customer/ProductGrid";
 import FeaturedCategory from "../../components/customer/homepage/FeaturedCategory";
 import Loading from "../../components/shared/Loading";
+import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 
 const HomePage: React.FC = () => {
   const [data, setData] = useState<HomePageData | null>(null);
   const [loading, setLoading] = useState(true);
+  const RVData = useRecentlyViewed();
 
   useEffect(() => {
     getHomeData().then((res) => {
@@ -27,6 +29,7 @@ const HomePage: React.FC = () => {
       {data && <ProductGrid products={data.smartphoneProducts} Title="Smart Phone"/>}
       {data && <ProductGrid products={data.tabletProducts} Title="Tablet"/>}
       {data && <ProductGrid products={data.accessoriesProducts} Title="Accessory"/>}
+      {RVData.length > 0 && <ProductGrid products={RVData} Title="Recently Viewed Products"/>}
     </div>
   );
 };

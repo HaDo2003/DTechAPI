@@ -8,5 +8,9 @@ namespace DTech.Application.Interfaces
         Task<ProductDto> ProductDetailAsync(string categorySlug, string brandSlug, string slug);
 
         Task<List<ProductDto>> GetProductsByCategoryAsync(string? categorySlug, string? sortOrder);
+
+        Task<List<ProductDto>> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, string? sortOrder);
+
+        Task<List<ProductDto>> GetRecentlyViewedProductsAsync(string? ids);
     }
 }

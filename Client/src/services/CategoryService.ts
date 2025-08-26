@@ -16,3 +16,10 @@ export const getCategoryProducts = async (slug: string, sortOrder?: string): Pro
   });
   return res.data;
 };
+
+export const getCategoryBrandProducts = async (categorySlug: string, brandSlug: string, sortOrder?: string): Promise<CategoryPageProps> => {
+  const res = await axios.get<CategoryPageProps>(`/api/Product/${categorySlug}/${brandSlug}`, {
+    params: { sortOrder }
+  });
+  return res.data;
+};

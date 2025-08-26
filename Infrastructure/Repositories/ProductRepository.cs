@@ -22,6 +22,24 @@ namespace DTech.Infrastructure.Repositories
             return [.. products.OrderBy(p => random.Next())];
         }
 
+        public async Task<List<Product>> GetAccessoriesAsync(int brandId)
+        {
+            var products = await context.Products
+                .AsNoTracking()
+                .Include(a => a.Brand)
+                .Include(a => a.Category)
+                .Where(a => a.Category!.Name != "Laptop"
+                    && a.Category!.Name != "Smart Phone"
+                    && a.Category!.Name != "Tablet"
+                    && a.BrandId == brandId
+                    && a.Status == 1)
+                .ToListAsync();
+
+            // Shuffle the list randomly
+            var random = new Random();
+            return [.. products.OrderBy(p => random.Next())];
+        }
+
         public async Task<List<Product>> GetDiscountedProductsAsync()
         {
             var products = await context.Products
@@ -29,6 +47,18 @@ namespace DTech.Infrastructure.Repositories
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
                 .Where(a => a.Discount != null && a.Discount > 0 && a.Status == 1)
+                .OrderByDescending(a => a.Discount)
+                .ToListAsync();
+            return products;
+        }
+
+        public async Task<List<Product>> GetDiscountedProductsAsync(int brandId)
+        {
+            var products = await context.Products
+                .AsNoTracking()
+                .Include(a => a.Brand)
+                .Include(a => a.Category)
+                .Where(a => a.Discount != null && a.Discount > 0 && a.BrandId == brandId && a.Status == 1)
                 .OrderByDescending(a => a.Discount)
                 .ToListAsync();
             return products;
@@ -114,6 +144,37 @@ namespace DTech.Infrastructure.Repositories
                 .Where(a => a.BrandId == brandId && a.ProductId != productId && a.Status == 1)
                 .OrderByDescending(a => a.ProductId)
                 .Take(5)
+                .ToListAsync();
+            return products;
+        }
+
+        public async Task<List<Product>> GetByCategoryAndBrandAsync(int? categoryId, int? brandId)
+        {
+            if (categoryId == null || brandId == null)
+            {
+                return [];
+            }
+            var products = await context.Products
+                .AsNoTracking()
+                .Include(a => a.Brand)
+                .Include(a => a.Category)
+                .Where(a => a.CategoryId == categoryId && a.BrandId == brandId && a.Status == 1)
+                .OrderByDescending(a => a.ProductId)
+                .ToListAsync();
+            return products;
+        }
+
+        public async Task<List<Product>> GetProductsByIdListAsync(List<int> ids)
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                return [];
+            }
+            var products = await context.Products
+                .AsNoTracking()
+                .Include(a => a.Brand)
+                .Include(a => a.Category)
+                .Where(p => ids.Contains(p.ProductId) && p.Status == 1)
                 .ToListAsync();
             return products;
         }

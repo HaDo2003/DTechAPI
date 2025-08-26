@@ -26,6 +26,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path=":categorySlug/:brandSlug/:slug" element={<ProductDetail />} />
           <Route path=":categorySlug" element={<CategoryPage />} />
+          <Route path=":categorySlug/:brandSlug" element={<CategoryPage />} />
           <Route path="contact" element={<ContactPage />} />
           
           {/* Catch-all route for 404 Not Found */}

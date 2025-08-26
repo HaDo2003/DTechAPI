@@ -1,6 +1,8 @@
 ﻿using DTech.Application.DTOs;
 using DTech.Application.Interfaces;
+using DTech.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DTech.API.Controllers
@@ -48,6 +50,36 @@ namespace DTech.API.Controllers
                 CategorySlug = categorySlug
             };
             return Ok(result);
+        }
+
+        [HttpGet("{categorySlug}/{brandSlug}")]
+        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategoryAndBrandAsync(string categorySlug, string brandSlug, [FromQuery] string? sortOrder)
+        {
+            var products = await productService.GetProductsByCategoryAndBrandAsync(categorySlug, brandSlug, sortOrder);
+            if (products == null || products.Count == 0)
+            {
+                return NotFound();
+            }
+
+            var formattedTitle = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+                .ToTitleCase(categorySlug.Replace("-", " "));
+            var result = new CategoryPageDto
+            {
+                Title = formattedTitle,
+                Products = products,
+                Brands = null,
+                InitialSort = sortOrder ?? "default",
+                CategorySlug = categorySlug,
+                //BrandSlug = brandSlug
+            };
+            return Ok(result);
+        }
+
+        [HttpGet("recentlyView")]
+        public async Task<ActionResult> GetProductsByIds([FromQuery] string? ids)
+        {
+            var products = await productService.GetRecentlyViewedProductsAsync(ids);
+            return Ok(products);
         }
     }
 }

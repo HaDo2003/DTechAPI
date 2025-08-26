@@ -1,31 +1,52 @@
-export function addToRecentlyViewed(productId: number) {
-    const cookieName = "recentlyViewed";
-    const maxItems = 5;
+const COOKIE_NAME = "recentlyViewed";
+const MAX_ITEMS = 5;
 
+// Save product to cookie
+export function addToRecentlyViewed(productId: number) {
     let viewed: number[] = [];
 
     // Get cookie
     const cookie = document.cookie
         .split("; ")
-        .find(row => row.startsWith(cookieName + "="));
+        .find((row) => row.startsWith(COOKIE_NAME + "="));
 
     if (cookie) {
         try {
-            viewed = JSON.parse(decodeURIComponent(cookie.split("=")[1])) as number[];
+            viewed = JSON.parse(decodeURIComponent(cookie.split("=")[1]));
         } catch {
             viewed = [];
         }
     }
 
     // Remove if already exists
-    viewed = viewed.filter(id => id !== productId);
+    viewed = viewed.filter((id) => id !== productId);
 
-    // Add new one to beginning
+    // Add to front
     viewed.unshift(productId);
 
-    // Limit to maxItems
-    viewed = viewed.slice(0, maxItems);
+    // Keep only max items
+    if (viewed.length > MAX_ITEMS) {
+        viewed = viewed.slice(0, MAX_ITEMS);
+    }
 
-    // Save cookie for 7 days
-    document.cookie = `${cookieName}=${encodeURIComponent(JSON.stringify(viewed))};path=/;max-age=${60 * 60 * 24 * 7}`;
+    // Save back to cookie (7 days expiry)
+    document.cookie = `${COOKIE_NAME}=${encodeURIComponent(
+        JSON.stringify(viewed)
+    )}; path=/; max-age=${7 * 24 * 60 * 60}`;
+}
+
+// Get list of recently viewed product IDs
+export function getRecentlyViewed(): number[] {
+    const cookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(COOKIE_NAME + "="));
+
+    if (cookie) {
+        try {
+            return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
+        } catch {
+            return [];
+        }
+    }
+    return [];
 }

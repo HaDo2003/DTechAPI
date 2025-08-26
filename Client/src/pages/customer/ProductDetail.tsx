@@ -4,12 +4,16 @@ import { getProductData } from "../../services/ProductService";
 import { type Product } from "../../types/Product";
 import { priceFormatter } from "../../utils/priceFormatter";
 import DOMPurify from "dompurify";
-import Loading from "../../components/shared/Loading";
 import NotFound from "./NotFound";
+
+// Components
 import ProductGrid from "../../components/customer/ProductGrid";
 import SpecificationsWindow from "../../components/customer/productDetail/SpecificationsWindow";
 import ProductCommentForm, { type CommentFormData } from "../../components/customer/productDetail/ProductCommentForm";
 import ProductInfoItem from "../../components/customer/productDetail/ProductInfoItem";
+import Loading from "../../components/shared/Loading";
+
+import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 
 const ProductDetail: React.FC = () => {
     const { categorySlug, brandSlug, slug } = useParams<{ categorySlug: string; brandSlug: string; slug: string }>();
@@ -22,6 +26,7 @@ const ProductDetail: React.FC = () => {
     const [showFullDescription, setShowFullDescription] = useState(false);
     const [showCommentForm, setShowCommentForm] = useState(false);
     const [isSpecOpen, setIsSpecOpen] = useState(false);
+    const RVData = useRecentlyViewed();
 
     useEffect(() => {
         document.title = "DTech - Product Detail";
@@ -158,12 +163,12 @@ const ProductDetail: React.FC = () => {
 
                         {/* Product Info Row */}
                         <div className="row gy-2 gx-3 text-start">
-                            <ProductInfoItem label="Comment" value={product.productComments.length} sizexl="col-xl-2"/>
-                            <ProductInfoItem label="Views" value={product.views} sizexl="col-xl-2"/>
-                            <ProductInfoItem label="Warranty" value={`${product.warranty} months`} sizexl="col-xl-3"/>
-                            <ProductInfoItem label="Status" value={statusText} sizexl="col-xl-3"/>
-                            <ProductInfoItem label="Date of Manufacture" value={product.dateOfManufacture} sizexl="col-xl-5"/>
-                            <ProductInfoItem label="Made In" value={product.madeIn} sizexl="col-xl-4"/>                            
+                            <ProductInfoItem label="Comment" value={product.productComments.length} sizexl="col-xl-2" />
+                            <ProductInfoItem label="Views" value={product.views} sizexl="col-xl-2" />
+                            <ProductInfoItem label="Warranty" value={`${product.warranty} months`} sizexl="col-xl-3" />
+                            <ProductInfoItem label="Status" value={statusText} sizexl="col-xl-3" />
+                            <ProductInfoItem label="Date of Manufacture" value={product.dateOfManufacture} sizexl="col-xl-5" />
+                            <ProductInfoItem label="Made In" value={product.madeIn} sizexl="col-xl-4" />
                         </div>
 
                         {/* Price */}
@@ -473,9 +478,12 @@ const ProductDetail: React.FC = () => {
                 </div>
             </div>
 
-            <div id="recently-viewed-container">
-                {/* Add your recently viewed component here */}
-            </div>
+            {/* Recently Viewed Products */}
+            {RVData.length > 0 && (
+                <div className="recently-view-products">
+                    <ProductGrid products={RVData} Title="Recently Viewed Products" />
+                </div>
+            )}
 
             {/* Overlay Component */}
             <SpecificationsWindow

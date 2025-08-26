@@ -70,16 +70,7 @@ namespace DTech.Application.Services
                         break;
                 }
 
-                products = sortOrder switch
-                {
-                    "newest" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.ProductId)],
-                    "discount" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Discount)],
-                    "name_asc" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.Name)],
-                    "name_desc" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Name)],
-                    "price_asc" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.Price)],
-                    "price_desc" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Price)],
-                    _ => products
-                };
+                products = SortOrders(sortOrder, products);
 
                 var productDto = _mapper.Map<List<ProductDto>>(products);
                 return productDto;
@@ -89,6 +80,100 @@ namespace DTech.Application.Services
                 Console.WriteLine(ex.Message);
                 throw new Exception("An error occurred while fetching products by category.", ex);
             }
+        }
+
+        //Get products by category slug, brand slug and sort order
+        public async Task<List<ProductDto>> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, string? sortOrder)
+        {
+            try
+            {
+                var products = new List<Product>();
+                Category? category = new();
+                Brand? brand = await brandRepo.GetBrandBySlugAsync(brandSlug) 
+                    ?? throw new Exception($"Brand with slug '{brandSlug}' not found."); ;
+
+                switch (categorySlug)
+                {
+                    case "hot-sales":
+                        products = await productRepo.GetDiscountedProductsAsync(brand.BrandId);
+                        break;
+                    case "accessory":
+                        products = await productRepo.GetAccessoriesAsync(brand.BrandId);
+                        break;
+                    default:
+                        category = await categoryRepo.GetCategoryBySlugAsync(categorySlug)
+                                   ?? throw new Exception($"Category with slug '{categorySlug}' not found.");;
+
+                        // Get category IDs: main + all its children
+                        var categoryIds = new List<int> { category.CategoryId };
+
+                        // Include subcategory IDs
+                        if (category.InverseParent != null && category.InverseParent.Count != 0)
+                        {
+                            categoryIds.AddRange(category.InverseParent.Select(c => c.CategoryId));
+                        }
+
+                        products = await productRepo.GetByCategoryAndBrandAsync(category.CategoryId, brand.BrandId);
+                        break;
+                }
+
+                products = SortOrders(sortOrder, products);
+
+                var productDto = _mapper.Map<List<ProductDto>>(products);
+                return productDto;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw new Exception("An error occurred while fetching products by category and brand.", ex);
+            }
+        }
+
+        //Get recently viewed products by their IDs
+        public async Task<List<ProductDto>> GetRecentlyViewedProductsAsync(string? ids)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(ids))
+                {
+                    return [];
+                }
+                var idList = ids.Split(',')
+                                .Select(id => int.TryParse(id, out var parsedId) ? parsedId : (int?)null)
+                                .Where(id => id.HasValue)
+                                .Select(id => id.Value)
+                                .ToList();
+                if (idList.Count == 0)
+                {
+                    return [];
+                }
+                var products = await productRepo.GetProductsByIdListAsync(idList);
+                // Sort products based on the order of IDs in the input string
+                var sortedProducts = idList.Select(id => products.FirstOrDefault(p => p.ProductId == id))
+                                           .Where(p => p != null)
+                                           .ToList()!;
+                var productDto = _mapper.Map<List<ProductDto>>(sortedProducts);
+                return productDto;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw new Exception("An error occurred while fetching recently viewed products.", ex);
+            }
+        }
+
+        private static List<Product> SortOrders(string? sortOrder, List<Product> products)
+        {
+            return sortOrder switch
+            {
+                "newest" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.ProductId)],
+                "discount" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Discount)],
+                "name_asc" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.Name)],
+                "name_desc" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Name)],
+                "price_asc" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.Price)],
+                "price_desc" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Price)],
+                _ => products
+            };
         }
     }
 }

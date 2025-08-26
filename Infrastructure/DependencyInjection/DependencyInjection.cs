@@ -5,6 +5,7 @@ using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using DTech.Infrastructure.Repositories;
+using DTech.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -48,6 +49,8 @@ namespace DTech.Infrastructure.DependencyInjection
             // Register application services
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
             // Register repositories
             services.AddScoped<IAdvertisementRepository, AdvertisementRepository>();

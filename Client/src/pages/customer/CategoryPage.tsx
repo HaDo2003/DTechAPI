@@ -3,12 +3,12 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import ProductCard from "../../components/customer/ProductCard";
 import { type Product } from "../../types/Product";
 import { type Brand } from "../../types/Brand";
-import { getCategoryProducts } from "../../services/CategoryService";
+import { getCategoryProducts, getCategoryBrandProducts } from "../../services/CategoryService";
 import Loading from "../../components/shared/Loading";
 
 const CategoryPage: React.FC = () => {
     const navigate = useNavigate();
-    const { categorySlug } = useParams<{ categorySlug: string }>();
+    const { categorySlug, brandSlug } = useParams<{ categorySlug: string; brandSlug?: string }>();
 
     const [products, setProducts] = useState<Product[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
@@ -26,23 +26,41 @@ const CategoryPage: React.FC = () => {
     ];
 
     useEffect(() => {
+        setSortOrder("newest");
+    }, [brandSlug]);
+
+    useEffect(() => {
         if (!categorySlug) return;
+
         setLoading(true);
 
-        getCategoryProducts(categorySlug, sortOrder)
-            .then((data) => {
+        const fetchData = async () => {
+            try {
+                const data = brandSlug
+                    ? await getCategoryBrandProducts(categorySlug, brandSlug, sortOrder)
+                    : await getCategoryProducts(categorySlug, sortOrder);
+
                 setProducts(data.products);
                 setBrands(data.brands ?? []);
                 setTitle(data.title);
-            })
-            .finally(() => setLoading(false));
-    }, [categorySlug, sortOrder]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [categorySlug, brandSlug, sortOrder]);
 
     if (loading) return <Loading />;
 
     const handleSortChange = (value: string) => {
         setSortOrder(value);
-        navigate(`/${categorySlug}?sortOrder=${value}`);
+
+        if (brandSlug) {
+            navigate(`/${categorySlug}/${brandSlug}?sortOrder=${value}`);
+        } else {
+            navigate(`/${categorySlug}?sortOrder=${value}`);
+        }
     };
 
     return (
@@ -59,7 +77,7 @@ const CategoryPage: React.FC = () => {
                             {brands.map((brand) => (
                                 <div className="col" key={brand.slug}>
                                     <Link
-                                        to={`/product/${categorySlug}/${brand.slug}`}
+                                        to={`/${categorySlug}/${brand.slug}`}
                                         className="category-item"
                                     >
                                         <div className="icon-container">
