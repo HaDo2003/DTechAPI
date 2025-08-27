@@ -1,16 +1,20 @@
 ﻿using DTech.Application.Interfaces;
 using DTech.Application.Mapping;
 using DTech.Application.Services;
+using DTech.Application.Settings;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using DTech.Infrastructure.Repositories;
 using DTech.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Text;
 
 namespace DTech.Infrastructure.DependencyInjection
 {
@@ -21,6 +25,7 @@ namespace DTech.Infrastructure.DependencyInjection
             services.AddDbContext<DTechDbContext>(options =>
                 options.UseNpgsql(config.GetConnectionString("DTech")));
 
+            //Identity Configuration
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 // Password settings.
@@ -44,12 +49,42 @@ namespace DTech.Infrastructure.DependencyInjection
             .AddEntityFrameworkStores<DTechDbContext>()
             .AddDefaultTokenProviders();
 
+            // Jwt Authentication
+            var jwtSettings = config.GetSection("Jwt");
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            var key = Encoding.UTF8.GetBytes(jwtKey!) ?? throw new InvalidOperationException("JWT Key not found");
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidAudience = jwtSettings["Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
+            services.Configure<JwtSettings>(
+                config.GetSection("Jwt"));
+
+            //Mapper Configuration
             services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
             // Register application services
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ITokenService, TokenService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
             // Register repositories

@@ -19,6 +19,19 @@ namespace DTech.Application.Mapping
             .ForMember(dest => dest.Specifications, opt => opt.MapFrom(src => src.Specifications))
             .ForMember(dest => dest.ProductImages, opt => opt.MapFrom(src => src.ProductImages))
             .ForMember(dest => dest.ProductComments, opt => opt.MapFrom(src => src.ProductComments));
+
+            CreateMap<RegisterDto, ApplicationUser>()
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Account))
+            .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => "dc11b0b4-44c2-457f-a890-fce0d077dbe0"))
+            .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.FullName))
+            .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(_ => DateTime.Now))
+            .ForMember(dest => dest.Image, opt => opt.MapFrom(_ => "https://res.cloudinary.com/dwbibirzk/image/upload/v1750003485/images_uc75hj.png"));
+
+            CreateMap<RegisterDto, CustomerAddress>()
+            .ForMember(dest => dest.IsDefault, opt => opt.MapFrom(_ => true));
+
+            CreateMap<RegisterDto, Cart>()
+                .ForMember(dest => dest.CustomerId, opt => opt.Ignore());
         }
     }
 }

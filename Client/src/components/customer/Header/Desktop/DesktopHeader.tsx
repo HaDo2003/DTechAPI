@@ -1,29 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import DTechLogo from '../../../../assets/DTechlogo.png';
 import NavItem from './NavItem';
 import MenuItem from './MenuItem';
 import DropDownItem from './DropDownItem';
 import AccountItem from '../AccountItem';
-import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '../../../../features/AuthContext';
+
 
 interface CartItem {
     id: string;
     quantity: number;
 }
 
-interface User {
-    isAuthenticated: boolean;
-    name?: string;
-}
-
 interface HeaderProps {
-    user?: User;
     cartItems?: CartItem[];
     onSearch?: (query: string) => void;
-    onNavigate?: (path: string) => void;
-    onLogin?: () => void;
-    onRegister?: () => void;
-    onLogout?: () => void;
 }
 
 interface SearchHistoryItem {
@@ -32,14 +26,10 @@ interface SearchHistoryItem {
 }
 
 const DesktopHeader: React.FC<HeaderProps> = ({
-    user = { isAuthenticated: false },
     cartItems = [],
     onSearch,
-    onNavigate,
-    onLogin,
-    onRegister,
-    onLogout,
 }) => {
+    const { user, login, logout } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
     const [showSearchHistory, setShowSearchHistory] = useState(false);
@@ -121,9 +111,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
     };
 
     const handleNavigation = (path: string) => {
-        if (onNavigate) {
-            onNavigate(path);
-        }
+        navigate(path);
     };
 
     const handleDropdownMouseLeave = () => {
@@ -262,15 +250,15 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                         isDropdownOpen={activeDropdown === 'account'}
                                         dropdownContent={
                                             <ul className="list-unstyled">
-                                                {user.isAuthenticated ? (
+                                                {user ? (
                                                     <>
                                                         <AccountItem label='Profile' onClick={() => handleNavigation('/profile')} />
-                                                        <AccountItem label='Logout' onClick={onLogout} />
+                                                        <AccountItem label='Logout' onClick={logout} />
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <AccountItem label='Login' onClick={onLogin} />
-                                                        <AccountItem label='Register' onClick={onRegister} />
+                                                        <AccountItem label='Login' onClick={() => handleNavigation('/login')} />
+                                                        <AccountItem label='Register' onClick={() => handleNavigation('/register')} />
                                                     </>
                                                 )}
                                             </ul>

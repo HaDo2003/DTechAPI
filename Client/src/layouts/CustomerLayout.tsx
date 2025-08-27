@@ -6,9 +6,12 @@ import Footer from "../components/customer/footer/Footer";
 import Breadcrumb from "../components/customer/Breadcrumb";
 // import ChatBox from "../components/customer/ChatBox";
 
+import { AuthDebugger } from "../features/AuthContext";
+
 const CustomerLayout: React.FC = () => {
   return (
     <div className="customer-layout">
+      <AuthDebugger />
       <div className="">
         <div className="d-none d-lg-block fixed-top">
           <DesktopHeader />
@@ -17,7 +20,7 @@ const CustomerLayout: React.FC = () => {
           <MobileHeader />
         </div>
       </div>
-      
+
       <main className="container padding-custom">
         <Breadcrumb />
         <Outlet /> {/* Renders child route components here */}
