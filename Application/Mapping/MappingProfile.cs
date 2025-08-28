@@ -24,11 +24,17 @@ namespace DTech.Application.Mapping
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Account))
             .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => "dc11b0b4-44c2-457f-a890-fce0d077dbe0"))
             .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.FullName))
-            .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(_ => DateTime.Now))
+            .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
             .ForMember(dest => dest.Image, opt => opt.MapFrom(_ => "https://res.cloudinary.com/dwbibirzk/image/upload/v1750003485/images_uc75hj.png"));
 
             CreateMap<RegisterDto, CustomerAddress>()
-            .ForMember(dest => dest.IsDefault, opt => opt.MapFrom(_ => true));
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.IsDefault, opt => opt.MapFrom(_ => true))
+                .ForMember(dest => dest.ProvinceId, opt => opt.Ignore())
+                .ForMember(dest => dest.WardId, opt => opt.Ignore())     
+                .ForMember(dest => dest.CustomerId, opt => opt.Ignore());
 
             CreateMap<RegisterDto, Cart>()
                 .ForMember(dest => dest.CustomerId, opt => opt.Ignore());

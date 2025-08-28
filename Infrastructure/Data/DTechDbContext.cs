@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DTech.Infrastructure.Data
 {
@@ -78,6 +79,22 @@ namespace DTech.Infrastructure.Data
             modelBuilder.Entity<UserQuizParticipation>()
                 .HasIndex(u => new { u.UserId, u.ParticipationDate })
                 .IsUnique();
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetValueConverter(new ValueConverter<DateTime, DateTime>(
+                            v => v.ToUniversalTime(),
+                            v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                        ));
+                    }
+                }
+            }
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

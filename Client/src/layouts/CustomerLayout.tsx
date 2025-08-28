@@ -6,12 +6,9 @@ import Footer from "../components/customer/footer/Footer";
 import Breadcrumb from "../components/customer/Breadcrumb";
 // import ChatBox from "../components/customer/ChatBox";
 
-import { AuthDebugger } from "../features/AuthContext";
-
 const CustomerLayout: React.FC = () => {
   return (
     <div className="customer-layout">
-      <AuthDebugger />
       <div className="">
         <div className="d-none d-lg-block fixed-top">
           <DesktopHeader />

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/customer/Input";
 import OAuthButton from "../../components/customer/auth/OAuthButton";
+import { useAuth } from "../../context/AuthContext";
+import { authService } from "../../services/AuthService";
 
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -15,11 +17,29 @@ const Register: React.FC = () => {
         password: "",
         confirmPassword: ""
     });
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Replace with your API call (axios.post to /api/auth/register)
-        console.log(formData);
+        try {
+            if (formData.password !== formData.confirmPassword) {
+                alert("Passwords do not match");
+                return;
+            }
+            const { confirmPassword, ...registerData } = formData;
+            const res = await authService.register(registerData);
+            if (res.success) {
+                alert("Registration successful");
+                login(res);
+                navigate("/");
+            } else {
+                alert(res.message || "Registration failed");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Registration failed, please try again, " + err);
+        }
     };
 
     return (
@@ -66,6 +86,7 @@ const Register: React.FC = () => {
                     {/* Gender */}
                     <Input
                         placeholder="Gender"
+                        value={formData.gender}
                         onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                     />
 

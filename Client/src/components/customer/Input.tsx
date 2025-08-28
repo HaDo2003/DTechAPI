@@ -30,7 +30,7 @@ const Input: React.FC<InputProps> = ({ type, placeholder, required, value, onCha
                                         className="custom-radio"
                                         checked={value === g}
                                         onChange={onChange}
-                                        required={g === "Male"}
+                                        required
                                     />
                                     <label className="custom-label-radio" htmlFor={g}>
                                         {g}

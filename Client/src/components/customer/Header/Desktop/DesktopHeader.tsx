@@ -7,7 +7,7 @@ import MenuItem from './MenuItem';
 import DropDownItem from './DropDownItem';
 import AccountItem from '../AccountItem';
 
-import { useAuth } from '../../../../features/AuthContext';
+import { useAuth } from '../../../../context/AuthContext';
 
 
 interface CartItem {
@@ -29,7 +29,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
     cartItems = [],
     onSearch,
 }) => {
-    const { user, login, logout } = useAuth();
+    const { user, logout } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
     const [showSearchHistory, setShowSearchHistory] = useState(false);

@@ -4,7 +4,7 @@ import Input from "../../components/customer/Input";
 import OAuthButton from "../../components/customer/auth/OAuthButton";
 import { authService } from "../../services/AuthService";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../features/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Login: React.FC = () => {
     const [account, setAccount] = useState("");
@@ -16,13 +16,15 @@ const Login: React.FC = () => {
         e.preventDefault();
         try {
             const res = await authService.login({ account, password });
-            if (res && res.role === "Customer") {
+            if (res.success) {
                 login(res);
                 navigate("/");
+            } else {
+                alert(res.message || "Login failed");
             }
         } catch (err: any) {
             console.error(err);
-            alert("Invalid credentials");
+            alert("Something went wrong. Please try again.");
         }
     };
 

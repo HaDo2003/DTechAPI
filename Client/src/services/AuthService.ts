@@ -1,57 +1,51 @@
 import axios from "axios";
-import { jwtDecoder } from "../utils/jwtDecoder";
-
-export interface LoginRequest {
-    account: string;
-    password: string;
-}
-
-export interface LoginResponse {
-    token: string;
-    userId: string;
-    userName: string;
-    role: string;
-}
-
-export interface RegisterRequest {
-    fullName: string;
-    account: string;
-    email: string;
-    phoneNumber: string;
-    gender?: string;
-    dateOfBirth?: string;
-    address?: string;
-    password: string;
-}
-
-export const login = async (data: LoginRequest): Promise<LoginResponse> => {
-    const response = await axios.post<LoginResponse>("/api/auth/login", data);
-    return response.data;
-}
-
-export const register = async (data: RegisterRequest): Promise<void> => {
-    await axios.post("/api/auth/register", data);
-};
-
-const TOKEN_KEY = "jwt_token";
+import { type LoginRequest, type LoginResponse } from "../types/Login";
+import { type RegisterRequest } from "../types/Register";
 
 export const authService = {
-  async login(credentials: LoginRequest) {
-    const { token } = await login(credentials);
-    localStorage.setItem(TOKEN_KEY, token);
-    const res = jwtDecoder(token);
-    return res;
+  async login(credentials: LoginRequest): Promise<LoginResponse> {
+    try {
+      const response = await axios.post<LoginResponse>("/api/auth/login", credentials);
+      return { ...response.data, success: true };
+    }catch (err: any) {
+      if (axios.isAxiosError(err)) {
+        // Backend usually sends error in err.response.data
+        const message =
+          err.response?.data?.message ||
+          err.response?.data ||
+          "Login failed. Please try again.";
+
+        return { success: false, message };
+      }
+
+      return { success: false, message: "Unexpected error occurred" };
+    }
+    
   },
 
-  logout() {
-    localStorage.removeItem(TOKEN_KEY);
+  async register(data: RegisterRequest): Promise<LoginResponse> {
+    try {
+      const response = await axios.post("/api/auth/register", data);
+      return { ...response.data, success: true };
+    } catch (err: any) {
+      if (axios.isAxiosError(err)) {
+        const message =
+          err.response?.data?.message ||
+          err.response?.data ||
+          "Registration failed. Please try again.";
+
+        return { success: false, message };
+      }
+
+      return { success: false, message: "Unexpected error occurred" };
+    }
   },
 
-  getToken() {
-    return localStorage.getItem(TOKEN_KEY);
+  async forgotPassword(email: string): Promise<void> {
+    await axios.post("/api/auth/forgot-password", { email });
   },
 
-  isLoggedIn() {
-    return !!localStorage.getItem(TOKEN_KEY);
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    await axios.post("/api/auth/reset-password", { token, newPassword });
   },
 };

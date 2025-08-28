@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { type LoginResponse } from "../services/AuthService";
+import { type LoginResponse } from "../types/Login";
 import { jwtDecoder } from "../utils/jwtDecoder";
 
 interface AuthContextType {

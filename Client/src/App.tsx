@@ -19,7 +19,7 @@ import ResetPassword from './pages/customer/ResetPassword';
 //Utils
 import ScrollToTop from './utils/scrollToTop';
 
-import { AuthProvider } from './features/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (

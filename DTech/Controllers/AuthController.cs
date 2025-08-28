@@ -12,58 +12,34 @@ namespace DTech.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController(
-        UserManager<ApplicationUser> userManager,
-        ICustomerRepository customerRepo,
-        DTechDbContext context,
-        IMapper mapper,
-        ITokenService tokenService
+        IAuthService authService
     ) : ControllerBase
     {
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
-            if (await customerRepo.CheckPhoneAsync(model.PhoneNumber))
-                return BadRequest("Phone number already exists");
+            var response = await authService.RegisterAsync(model);
 
-            var user = mapper.Map<ApplicationUser>(model);
+            if (!response.Success)
+                return BadRequest(new { response.Message });
 
-            using var transaction = await context.Database.BeginTransactionAsync();
-            var result = await userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            // Map RegisterDto → CustomerAddress
-            var address = mapper.Map<CustomerAddress>(model);
-            address.CustomerId = user.Id;
-
-            // Map RegisterDto → Cart
-            var cart = mapper.Map<Cart>(model);
-            cart.CustomerId = user.Id;
-
-            await customerRepo.CreateCustomerAddressAsync(address);
-            await customerRepo.CreateCartAsync(cart);
-            await transaction.CommitAsync();
-
-            //var token = await tokenService.GenerateToken(user);
-            return Ok(new { Message = "User registered successfully" });
+            return Ok(new { response.Token });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
-            var user = await userManager.FindByNameAsync(model.Account);
-            if (user == null)
-                return Unauthorized("Invalid account or password");
+            var response = await authService.LoginAsync(model);
+            if (!response.Success)
+                return Unauthorized(new { response.Message });
 
-            var isPasswordValid = await userManager.CheckPasswordAsync(user, model.Password);
-            if (!isPasswordValid)
-                return Unauthorized("Invalid account or password");
+            return Ok(new { response.Token });
+        }
 
-            var token = tokenService.CreateToken(user);
-
-            return Ok(new { token });
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] string email)
+        {
+            throw new NotImplementedException();
         }
     }
 }
