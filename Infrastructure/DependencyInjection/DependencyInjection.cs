@@ -83,9 +83,11 @@ namespace DTech.Infrastructure.DependencyInjection
             // Register application services
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IEmailService, EmailService>();
+            services.AddTransient<IEmailService, EmailService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+            services.AddHostedService<QueuedHostedService>();
 
             // Register repositories
             services.AddScoped<IAdvertisementRepository, AdvertisementRepository>();

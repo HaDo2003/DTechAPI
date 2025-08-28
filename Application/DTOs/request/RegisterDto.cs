@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DTech.Application.DTOs
+namespace DTech.Application.DTOs.request
 {
     public class RegisterDto
     {

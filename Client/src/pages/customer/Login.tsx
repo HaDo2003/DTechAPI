@@ -5,10 +5,12 @@ import OAuthButton from "../../components/customer/auth/OAuthButton";
 import { authService } from "../../services/AuthService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import AlertForm from "../../components/customer/AlertForm";
 
 const Login: React.FC = () => {
     const [account, setAccount] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const { login } = useAuth();
 
@@ -18,13 +20,13 @@ const Login: React.FC = () => {
             const res = await authService.login({ account, password });
             if (res.success) {
                 login(res);
+                setError(null);
                 navigate("/");
             } else {
-                alert(res.message || "Login failed");
+                setError(res.message || "Login failed");
             }
         } catch (err: any) {
-            console.error(err);
-            alert("Something went wrong. Please try again.");
+            setError("Something went wrong. Please try again.");
         }
     };
 
@@ -32,6 +34,10 @@ const Login: React.FC = () => {
         <div className="row">
             <div className="col-11 col-md-7 col-lg-8 col-xl-5 mx-auto rounded border">
                 <h2 className="text-center py-2">Login</h2>
+                
+                {error && (
+                    <AlertForm message={error} type="error" />
+                )}
 
                 <form onSubmit={handleLogin}>
                     <Input

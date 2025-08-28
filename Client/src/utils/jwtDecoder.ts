@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { type LoginResponse } from "../types/Login";
+import { type LoginResponse } from "../types/Auth";
 
 export interface TokenPayload {
     sub: string;

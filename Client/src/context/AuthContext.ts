@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { type LoginResponse } from "../types/Login";
+import { type LoginResponse } from "../types/Auth";
 import { jwtDecoder } from "../utils/jwtDecoder";
 
 interface AuthContextType {
@@ -18,7 +18,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const token = localStorage.getItem("jwt_token");
         const userData = jwtDecoder(token || "");
         
-        
         if (token && userData) {
             try {
                 setUser(userData);
@@ -27,12 +26,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUser(null);
             }
         } else {
-            console.log("AuthProvider: No token or user data found in localStorage");
+            // console.log("AuthProvider: No token or user data found in localStorage");
         }
     }, []);
 
     const login = (data: LoginResponse) => {
-        localStorage.setItem("jwt_token", data.token);
+        localStorage.setItem("jwt_token", data.token ?? "");
         setUser(data);
     };
 

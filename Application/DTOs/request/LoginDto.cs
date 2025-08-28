@@ -1,4 +1,4 @@
-﻿namespace DTech.Application.DTOs
+﻿namespace DTech.Application.DTOs.request
 {
     public class LoginDto
     {

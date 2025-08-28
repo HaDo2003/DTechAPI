@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DTech.Application.DTOs;
+using DTech.Application.DTOs.request;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -37,9 +37,21 @@ namespace DTech.API.Controllers
         }
 
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] string email)
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto model)
         {
-            throw new NotImplementedException();
+            var response = await authService.ForgotPasswordAsync(model);
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+            return Ok(new { response.Message });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
+        {
+            var response = await authService.ResetPasswordAsync(model);
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+            return Ok(new { response.Message });
         }
     }
 }

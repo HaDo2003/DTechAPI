@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs;
+using DTech.Application.DTOs.request;
 using DTech.Domain.Entities;
 
 namespace DTech.Application.Mapping

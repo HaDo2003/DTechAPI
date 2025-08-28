@@ -4,6 +4,7 @@ import Input from "../../components/customer/Input";
 import OAuthButton from "../../components/customer/auth/OAuthButton";
 import { useAuth } from "../../context/AuthContext";
 import { authService } from "../../services/AuthService";
+import AlertForm from "../../components/customer/AlertForm";
 
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ const Register: React.FC = () => {
         password: "",
         confirmPassword: ""
     });
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const { login } = useAuth();
 
@@ -24,21 +26,21 @@ const Register: React.FC = () => {
         e.preventDefault();
         try {
             if (formData.password !== formData.confirmPassword) {
-                alert("Passwords do not match");
+                setError("Passwords do not match");
                 return;
             }
             const { confirmPassword, ...registerData } = formData;
             const res = await authService.register(registerData);
             if (res.success) {
                 alert("Registration successful");
+                setError(null);
                 login(res);
                 navigate("/");
             } else {
-                alert(res.message || "Registration failed");
+                setError(res.message || "Registration failed");
             }
         } catch (err) {
-            console.error(err);
-            alert("Registration failed, please try again, " + err);
+            setError("Registration failed, please try again, " + err);
         }
     };
 
@@ -46,6 +48,10 @@ const Register: React.FC = () => {
         <div className="row">
             <div className="col-11 col-md-7 col-lg-8 col-xl-5 mx-auto rounded border">
                 <h2 className="text-center py-2">Register New Account</h2>
+
+                {error && (
+                    <AlertForm message={error} type="error" />
+                )}
 
                 <form onSubmit={handleSubmit}>
                     {/* Full Name */}

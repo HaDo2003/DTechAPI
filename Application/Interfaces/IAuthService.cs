@@ -1,4 +1,4 @@
-﻿using DTech.Application.DTOs;
+﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
 
 namespace DTech.Application.Interfaces
@@ -7,5 +7,7 @@ namespace DTech.Application.Interfaces
     {
         Task<AuthResponse> RegisterAsync(RegisterDto model);
         Task<AuthResponse> LoginAsync(LoginDto model);
+        Task<AuthResponse> ForgotPasswordAsync(ForgotPasswordDto model);
+        Task<AuthResponse> ResetPasswordAsync(ResetPasswordDto model);
     }
 }

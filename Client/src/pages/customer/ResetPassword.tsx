@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Input from "../../components/customer/Input";
-import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { authService } from "../../services/AuthService";
+import AlertForm from "../../components/customer/AlertForm";
 import NotFound from "./NotFound";
 
 const ResetPassword: React.FC = () => {
@@ -31,15 +32,17 @@ const ResetPassword: React.FC = () => {
         }
 
         try {
-            await axios.post("/api/authentication/resetpassword", {
-                email,
-                token,
-                newPassword,
-                confirmPassword,
-            });
-
-            setSuccess("Password reset successfully!");
-            setTimeout(() => navigate("/login"), 2000);
+            const response = await authService.resetPassword({ token, email, newPassword });
+            if (response.success) {
+                setSuccess(response.message || "Password has been reset successfully.");
+                setError(null);
+                setTimeout(() => {
+                    navigate("/login");
+                }, 2000);
+            } else {
+                setError(response.message || "Failed to reset password. Please try again.");
+                setSuccess(null);
+            }
         } catch (err: any) {
             setError(err.response?.data?.message || "Failed to reset password");
         }
@@ -51,18 +54,13 @@ const ResetPassword: React.FC = () => {
                 <h2 className="text-center py-2">Reset Password</h2>
 
                 {error && (
-                    <div className="alert alert-danger m-2" role="alert">
-                        {error}
-                    </div>
+                    <AlertForm message={error} type="error" />
                 )}
                 {success && (
-                    <div className="alert alert-success m-2" role="alert">
-                        {success}
-                    </div>
+                    <AlertForm message={success} type="success" />
                 )}
 
                 <form onSubmit={handleSubmit}>
-                    {/* Hidden fields (like Email + Token) */}
                     <input type="hidden" name="email" value={email} />
                     <input type="hidden" name="token" value={token} />
 

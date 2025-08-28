@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { authService } from "../../services/AuthService";
+import AlertForm from "../../components/customer/AlertForm";
 
 const ForgotPassword: React.FC = () => {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!email) {
@@ -13,14 +15,21 @@ const ForgotPassword: React.FC = () => {
             return;
         }
 
-        // TODO: Replace with your API call (axios.post("/api/auth/forgot-password"))
+        try {
+            const response = await authService.forgotPassword({ email });
+            if (response.success) {
+                setMessage(response.message || "OTP has been sent successfully to your email.");
+                setError(null);
+            } else {
+                setError(response.message || "Failed to send OTP. Please try again.");
+                setMessage(null);
+            }
+        } catch (err) {
+            console.error(err);
+            setError("Failed to send OTP. Please try again.");
+            setMessage(null);
+        }
         console.log("Send OTP to:", email);
-
-        // Simulate API response
-        setTimeout(() => {
-            setMessage("OTP has been sent successfully to your email.");
-            setError(null);
-        }, 800);
     };
 
     return (
@@ -30,14 +39,10 @@ const ForgotPassword: React.FC = () => {
 
                 {/* MessageUser replacement */}
                 {message && (
-                    <div className="alert alert-success m-2" role="alert">
-                        {message}
-                    </div>
+                    <AlertForm message={message} type="success" />
                 )}
                 {error && (
-                    <div className="alert alert-danger m-2" role="alert">
-                        {error}
-                    </div>
+                    <AlertForm message={error} type="error" />
                 )}
 
                 <form onSubmit={handleSubmit}>
