@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DTech.Domain.Entities;
 
@@ -37,4 +36,5 @@ public partial class ApplicationUser : IdentityUser
     public virtual ICollection<CustomerCoupon> CustomerCoupons { get; set; } = new List<CustomerCoupon>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public virtual ICollection<WishList> Wishlists { get; set; } = new List<WishList>();
 }

@@ -1,48 +1,85 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { type LoginResponse } from "../types/Auth";
 import { jwtDecoder } from "../utils/jwtDecoder";
 
 interface AuthContextType {
-    user: LoginResponse | null;
-    login: (data: LoginResponse) => void;
+    roles: string | string[];
+    token: string | null;
+    login: (token: string) => void;
     logout: () => void;
+    hasRole: (role: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<LoginResponse | null>(null);
-
-    useEffect(() => {        
-        // Restore from localStorage on refresh
-        const token = localStorage.getItem("jwt_token");
-        const userData = jwtDecoder(token || "");
-        
-        if (token && userData) {
+    const [roles, setRoles] = useState<string[]>(() => {
+        const savedToken = localStorage.getItem("jwt_token");
+        if (savedToken) {
             try {
-                setUser(userData);
-            } catch (error) {
-                localStorage.removeItem("jwt_token");
-                setUser(null);
+                const decoded = jwtDecoder(savedToken);
+                return Array.isArray(decoded) ? decoded : decoded ? [decoded] : [];
+            } catch {
+                return [];
             }
-        } else {
-            // console.log("AuthProvider: No token or user data found in localStorage");
+        }
+        return [];
+    });
+
+    const [token, setToken] = useState<string | null>(() => {
+        return localStorage.getItem("jwt_token");
+    });
+
+    useEffect(() => {
+        const savedToken = localStorage.getItem("jwt_token");
+        if (savedToken) {
+            try {
+                const decoded = jwtDecoder(savedToken);
+                if (!decoded) throw new Error("Invalid token");
+                const userRoles = Array.isArray(decoded)
+                    ? decoded
+                    : decoded
+                        ? [decoded]
+                        : [];
+                setToken(savedToken);
+                setRoles(userRoles);
+            } catch (error) {
+                console.error("Failed to decode token:", error);
+                setToken(null);
+                setRoles([]);
+            }
         }
     }, []);
 
-    const login = (data: LoginResponse) => {
-        localStorage.setItem("jwt_token", data.token ?? "");
-        setUser(data);
+    const login = (newToken: string) => {
+        localStorage.setItem("jwt_token", newToken);
+        try {
+            const decoded = jwtDecoder(newToken);
+            if (!decoded) throw new Error("Invalid token");
+            const userRoles = Array.isArray(decoded)
+                ? decoded
+                : decoded
+                    ? [decoded]
+                    : [];
+            setToken(newToken);
+            setRoles(userRoles);
+        } catch (error) {
+            console.error("Invalid token at login:", error);
+            setToken(null);
+            setRoles([]);
+        }
     };
 
     const logout = () => {
         localStorage.removeItem("jwt_token");
-        setUser(null);
+        setToken(null);
+        setRoles([]);
     };
+
+    const hasRole = (role: string) => roles.includes(role);
 
     return React.createElement(
         AuthContext.Provider,
-        { value: { user, login, logout } },
+        { value: { roles, token, login, logout, hasRole } },
         children
     );
 };
@@ -54,7 +91,7 @@ export const useAuth = () => {
 };
 
 export const AuthDebugger: React.FC = () => {
-    const { user } = useAuth();
+    const { token, roles } = useAuth();
 
     return React.createElement(
         "div",
@@ -69,6 +106,6 @@ export const AuthDebugger: React.FC = () => {
                 zIndex: 9999
             }
         },
-        `User: ${user ? 'Logged in' : 'Not logged in'}`
+        `User: ${token ? 'Logged in' : 'Not logged in'} | Roles: ${roles}`
     );
 };

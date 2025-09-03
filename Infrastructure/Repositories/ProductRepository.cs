@@ -94,7 +94,6 @@ namespace DTech.Infrastructure.Repositories
 
             if (product != null)
             {
-                // Load related collections only when needed
                 product.Specifications = await context.Specifications
                     .Where(s => s.ProductId == product.ProductId)
                     .ToListAsync();

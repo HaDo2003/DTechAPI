@@ -5,10 +5,12 @@ import MobileHeader from "../components/customer/header/mobile/MobileHeader";
 import Footer from "../components/customer/footer/Footer";
 import Breadcrumb from "../components/customer/Breadcrumb";
 // import ChatBox from "../components/customer/ChatBox";
+// import { AuthDebugger } from "../context/AuthContext";
 
 const CustomerLayout: React.FC = () => {
   return (
     <div className="customer-layout">
+      {/* <AuthDebugger /> */}
       <div className="">
         <div className="d-none d-lg-block fixed-top">
           <DesktopHeader />

@@ -1,10 +1,5 @@
-﻿using AutoMapper;
-using DTech.Application.DTOs.request;
+﻿using DTech.Application.DTOs.request;
 using DTech.Application.Interfaces;
-using DTech.Domain.Entities;
-using DTech.Domain.Interfaces;
-using DTech.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DTech.API.Controllers

@@ -22,6 +22,7 @@ namespace DTech.Infrastructure.Data
         public virtual DbSet<Category> Categories { get; set; }
 
         public virtual DbSet<Coupon> Coupons { get; set; }
+        public virtual DbSet<CouponUsed> CouponUseds { get; set; }
 
         public virtual DbSet<CustomerAddress> CustomerAddresses { get; set; }
 

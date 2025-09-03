@@ -6,9 +6,10 @@ interface InputProps {
     required?: boolean;
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    readonly?: boolean;
 }
 
-const Input: React.FC<InputProps> = ({ type, placeholder, required, value, onChange }) => {
+const Input: React.FC<InputProps> = ({ type, placeholder, required, value, onChange, readonly }) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
@@ -30,7 +31,7 @@ const Input: React.FC<InputProps> = ({ type, placeholder, required, value, onCha
                                         className="custom-radio"
                                         checked={value === g}
                                         onChange={onChange}
-                                        required
+                                        required={required}
                                     />
                                     <label className="custom-label-radio" htmlFor={g}>
                                         {g}
@@ -50,6 +51,7 @@ const Input: React.FC<InputProps> = ({ type, placeholder, required, value, onCha
                         {...required && { required: true }}
                         value={value}
                         onChange={onChange}
+                        {...readonly && { readOnly: true }}
                     />
                     {type === "password" && (
                         <i

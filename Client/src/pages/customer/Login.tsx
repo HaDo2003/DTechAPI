@@ -19,7 +19,7 @@ const Login: React.FC = () => {
         try {
             const res = await authService.login({ account, password });
             if (res.success) {
-                login(res);
+                login(res.token!);
                 setError(null);
                 navigate("/");
             } else {

@@ -1,23 +1,25 @@
 import { jwtDecode } from "jwt-decode";
-import { type LoginResponse } from "../types/Auth";
 
 export interface TokenPayload {
     sub: string;
     unique_name: string;
-    role: string;
+    role: string | string[];
     exp: number;
 }
 
-export const jwtDecoder = (token: string): LoginResponse | null => {
+export const jwtDecoder = (token: string): (string | string[]) | null => {
     if (!token || token.split(".").length !== 3) {
         return null;
     }
-    const decoded = jwtDecode<TokenPayload>(token);
-    const res: LoginResponse = {
-        token,
-        userId: decoded.sub,
-        userName: decoded.unique_name,
-        role: decoded.role,
-    };
-    return res;
+    try {
+        const decoded = jwtDecode<TokenPayload>(token);
+
+        if (decoded.exp && decoded.exp < Date.now() / 1000) {
+            return null;
+        }
+
+        return decoded.role;
+    } catch {
+        return null;
+    }
 };

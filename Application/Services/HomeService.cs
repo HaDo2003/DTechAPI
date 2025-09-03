@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DTech.Application.DTOs;
+using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;

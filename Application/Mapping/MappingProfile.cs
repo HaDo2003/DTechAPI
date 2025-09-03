@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DTech.Application.DTOs;
 using DTech.Application.DTOs.request;
+using DTech.Application.DTOs.response;
 using DTech.Domain.Entities;
 
 namespace DTech.Application.Mapping
@@ -39,6 +39,12 @@ namespace DTech.Application.Mapping
 
             CreateMap<RegisterDto, Cart>()
                 .ForMember(dest => dest.CustomerId, opt => opt.Ignore());
+
+            CreateMap<CustomerAddress, CustomerAddressDto>();
+            CreateMap<CustomerCoupon, CustomerCouponDto>();
+            CreateMap<Order, OrderDto>();
+            CreateMap<WishList, WishlistDto>();
+            CreateMap<ApplicationUser, CustomerDto>();
         }
     }
 }

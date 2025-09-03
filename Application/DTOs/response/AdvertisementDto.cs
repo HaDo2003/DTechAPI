@@ -1,5 +1,4 @@
-﻿
-namespace DTech.Application.DTOs
+﻿namespace DTech.Application.DTOs.response
 {
     public class AdvertisementDto
     {

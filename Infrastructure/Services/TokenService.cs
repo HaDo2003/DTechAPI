@@ -20,7 +20,8 @@ namespace DTech.Infrastructure.Services
             {
                 new(JwtRegisteredClaimNames.Sub, user.Id),
                 new(JwtRegisteredClaimNames.UniqueName, user.UserName ?? ""),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(ClaimTypes.NameIdentifier, user.Id)
             };
 
             var roles = userManager.GetRolesAsync(user).Result;

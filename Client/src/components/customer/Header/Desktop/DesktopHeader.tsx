@@ -29,7 +29,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
     cartItems = [],
     onSearch,
 }) => {
-    const { user, logout } = useAuth();
+    const { token, logout } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
     const [showSearchHistory, setShowSearchHistory] = useState(false);
@@ -250,7 +250,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                         isDropdownOpen={activeDropdown === 'account'}
                                         dropdownContent={
                                             <ul className="list-unstyled">
-                                                {user ? (
+                                                {token ? (
                                                     <>
                                                         <AccountItem label='Profile' onClick={() => handleNavigation('/profile')} />
                                                         <AccountItem label='Logout' onClick={logout} />

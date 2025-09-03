@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DTech.Application.DTOs
+namespace DTech.Application.DTOs.response
 {
     public class ProductImageDto
     {

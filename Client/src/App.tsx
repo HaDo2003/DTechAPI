@@ -15,6 +15,7 @@ import Login from './pages/customer/Login';
 import Register from './pages/customer/Register';
 import ForgotPassword from './pages/customer/ForgotPassword';
 import ResetPassword from './pages/customer/ResetPassword';
+import CustomerAccount from './pages/customer/CustomerAccount';
 
 //Utils
 import ScrollToTop from './utils/scrollToTop';
@@ -41,6 +42,9 @@ function App() {
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
 
+            {/* Customer Account */}
+            <Route path="/profile" element={<CustomerAccount />} />
+            
             {/* Static pages */}
             <Route path="contact" element={<ContactPage />} />
 

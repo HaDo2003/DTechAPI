@@ -1,4 +1,4 @@
-﻿using DTech.Application.DTOs;
+﻿using DTech.Application.DTOs.response;
 using DTech.Domain.Entities;
 
 namespace DTech.Application.Interfaces

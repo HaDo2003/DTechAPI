@@ -5,19 +5,20 @@ import AccessoryItem from './AccessoryItem';
 import AccountItem from '../AccountItem';
 import { useNavigate } from 'react-router-dom';
 
+import { useAuth } from '../../../../context/AuthContext';
+
 interface MobileHeaderProps {
-    isAuthenticated?: boolean;
     cartItemCount?: number;
     searchQuery?: string;
     onSearch?: (query: string) => void;
 }
 
 const MobileHeader: React.FC<MobileHeaderProps> = ({
-    isAuthenticated = false,
     cartItemCount = 0,
     searchQuery = '',
     onSearch = () => { },
 }) => {
+    const { token, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchInput, setSearchInput] = useState(searchQuery);
     const [isSearchHistoryVisible] = useState(false);
@@ -135,10 +136,10 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                                         </div>
                                     </a>
                                     <ul className="dropdown-menu">
-                                        {isAuthenticated ? (
+                                        {token ? (
                                             <>
                                                 <AccountItem label='Profile' onClick={() => onNavigate('/profile')} />
-                                                <AccountItem label='Logout' onClick={() => onNavigate('/logout')} />
+                                                <AccountItem label='Logout' onClick={logout} />
                                             </>
                                         ) : (
                                             <>

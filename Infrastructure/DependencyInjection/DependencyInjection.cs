@@ -13,8 +13,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Text;
+using Microsoft.OpenApi.Models;
 
 namespace DTech.Infrastructure.DependencyInjection
 {
@@ -83,9 +83,10 @@ namespace DTech.Infrastructure.DependencyInjection
             // Register application services
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<IProductService, ProductService>();
-            services.AddTransient<IEmailService, EmailService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddTransient<IEmailService, EmailService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddHostedService<QueuedHostedService>();
 

@@ -14,7 +14,8 @@ namespace DTech.Application.Services
         UserManager<ApplicationUser> userManager,
         ITokenService tokenService,
         IEmailService emailService,
-        IBackgroundTaskQueue backgroundTaskQueue
+        IBackgroundTaskQueue backgroundTaskQueue,
+        RoleManager<IdentityRole> roleManager
     ) : IAuthService
     {
         public async Task<AuthResponse> LoginAsync(LoginDto model)
@@ -45,6 +46,12 @@ namespace DTech.Application.Services
                     Success = false,
                     Message = string.Join("; ", result.Errors.Select(e => e.Description))
                 };
+            }
+            var role = await roleManager.FindByIdAsync(user.RoleId);
+            if (role != null)
+            {
+                // Assign the role to the user
+                await userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
             }
 
             CustomerAddress address = new()

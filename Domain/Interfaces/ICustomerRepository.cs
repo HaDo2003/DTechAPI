@@ -8,6 +8,7 @@ namespace DTech.Domain.Interfaces
         Task<bool> CheckAccountAsync(string? account);
         Task<bool> CheckEmailAsync(string? email);
         Task<bool> CheckPhoneAsync(string? phone);
+        Task<ApplicationUser> GetCustomerByIdAsync(string? customerId);
 
         //For CustomerAddress table
         Task<bool> CreateCustomerAddressAsync(CustomerAddress customerAddress);

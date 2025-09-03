@@ -34,7 +34,7 @@ const Register: React.FC = () => {
             if (res.success) {
                 alert("Registration successful");
                 setError(null);
-                login(res);
+                login(res.token!);
                 navigate("/");
             } else {
                 setError(res.message || "Registration failed");

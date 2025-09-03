@@ -1,7 +1,6 @@
-﻿
-using DTech.Domain.Entities;
+﻿using DTech.Domain.Entities;
 
-namespace DTech.Application.DTOs
+namespace DTech.Application.DTOs.response
 {
     public class ProductDto
     {
