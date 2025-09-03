@@ -25,6 +25,14 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.Users.AnyAsync(e => e.PhoneNumber == phone);
         }
+        public async Task<bool> CheckEmailAsync(string? email, string? Id)
+        {
+            return await context.Users.AnyAsync(e => e.Email == email && e.Id != Id);
+        }
+        public async Task<bool> CheckPhoneAsync(string? phone, string? Id)
+        {
+            return await context.Users.AnyAsync(e => e.PhoneNumber == phone && e.Id != Id);
+        }
 
         public async Task<ApplicationUser> GetCustomerByIdAsync(string? customerId)
         {
@@ -62,6 +70,27 @@ namespace DTech.Infrastructure.Repositories
             {
                 throw new InvalidOperationException($"Customer with ID '{customerId}' not found.");
             }
+        }
+        public async Task<bool> UpdateCustomerAsync(ApplicationUser customer)
+        {
+            if (customer == null)
+                return false;
+
+            var existingUser = await context.Users.FindAsync(customer.Id);
+
+            if (existingUser == null)
+                return false;
+
+            // Update only allowed fields
+            existingUser.FullName = customer.FullName;
+            existingUser.Email = customer.Email;
+            existingUser.PhoneNumber = customer.PhoneNumber;
+            existingUser.Image = customer.Image;
+            existingUser.Gender = customer.Gender;
+            existingUser.DateOfBirth = customer.DateOfBirth;
+
+            await context.SaveChangesAsync();
+            return true;
         }
 
         //For CustomerAddress table

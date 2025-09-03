@@ -11,7 +11,7 @@ import Coupons from "../../components/customer/profile/Coupons";
 import Wishlist from "../../components/customer/profile/Wishlists";
 import Address from "../../components/customer/profile/Address";
 import ChangePassword from "../../components/customer/profile/ChangePassword";
-
+import AlertForm from "../../components/customer/AlertForm";
 
 import { useAuth } from "../../context/AuthContext";
 import Loading from "../../components/shared/Loading";
@@ -21,13 +21,12 @@ const CustomerAccount: React.FC = () => {
     const navigate = useNavigate();
     const [customer, setCustomer] = useState<Customer | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
     const tabs: Tab[] = [
-        { key: "profile", label: "Customer Information", content: <Profile customer={customer}/> },
+        { key: "profile", label: "Customer Information", content: <Profile customer={customer} /> },
         { key: "orders", label: "My Order", content: <Orders orders={customer?.orders} /> },
         { key: "coupons", label: "My Coupon", content: <Coupons coupons={customer?.customerCoupons} /> },
-        { key: "wishlist", label: "My Wish Lists", content: <Wishlist wishlists={customer?.wishlists} /> },
+        { key: "wishlist", label: "My Wishlists", content: <Wishlist wishlists={customer?.wishlists} /> },
         { key: "address", label: "Address", content: <Address addresses={customer?.customerAddresses} /> },
         { key: "password", label: "Change Password", content: <ChangePassword /> },
     ];
@@ -43,21 +42,19 @@ const CustomerAccount: React.FC = () => {
         const fetchCustomer = async () => {
             try {
                 if (!token) {
-                    setError("User token is missing. Please login again.");
+                    setAlert({ message: "User token is missing. Please login again.", type: "error" });
                     setLoading(false);
                     return;
                 }
                 const data = await customerService.getCustomerProfile(token);
                 if (data.success) {
                     setCustomer(data);
-                    setSuccess(null);
-                    setError(null);
+                    setAlert(null);
                 } else {
-                    setError(data.message || "Failed to load customer data");
+                    setAlert({ message: data.message || "Failed to load customer data.", type: "error" });
                 }
             } catch (err) {
-                setSuccess(null);
-                setError("An unexpected error occurred");
+                setAlert({ message: "Failed to load customer data, please try again. " + err, type: "error" });
             } finally {
                 setLoading(false);
             }
@@ -69,15 +66,26 @@ const CustomerAccount: React.FC = () => {
     if (loading) return <Loading />;
 
     return (
-        <div className="app-content">
-            <div className="container-fluid">
-                <div className="card">
-                    <div className="card-body py-2">
-                        <Tabs tabs={tabs} defaultActive="profile" fullName={customer?.fullName} onLogout={logout}/>
+        <>
+            <div className="app-content">
+                <div className="container-fluid">
+                    <div className="card">
+                        <div className="card-body py-2">
+                            <Tabs tabs={tabs} defaultActive="profile" fullName={customer?.fullName} onLogout={logout} />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+            
+            {alert && (
+                <AlertForm
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={() => setAlert(null)}
+                />
+            )}
+        </>
+
     );
 };
 

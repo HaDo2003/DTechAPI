@@ -43,7 +43,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setToken(savedToken);
                 setRoles(userRoles);
             } catch (error) {
-                console.error("Failed to decode token:", error);
                 setToken(null);
                 setRoles([]);
             }

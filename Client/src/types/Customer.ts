@@ -4,19 +4,19 @@ import { type CustomerCoupon } from "./CustomerCoupon";
 import { type CustomerWishlist } from "./Wishlist";
 
 export interface Customer {
-    success?: boolean;
-    message?: string;
-    userName?: string;
-    fullName?: string;
-    email?: string;
-    phoneNumber?: string;
-    gender?: string;
-    dateOfBirth?: string;
-    image?: string;    
-    customerAddresses?: CustomerAddress[];
-    customerCoupons?: CustomerCoupon[];
-    wishlists?: CustomerWishlist[];
-    orders?: Order[];
+  success?: boolean;
+  message?: string;
+  userName?: string;
+  fullName?: string;
+  email?: string;
+  phoneNumber?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  image?: string;
+  customerAddresses?: CustomerAddress[];
+  customerCoupons?: CustomerCoupon[];
+  wishlists?: CustomerWishlist[];
+  orders?: Order[];
 }
 
 export interface CustomerProfileForm {
@@ -27,4 +27,10 @@ export interface CustomerProfileForm {
   gender: string;
   dateOfBirth: string;
   image: string;
+  imageUpload?: File;
+}
+
+export interface ChangePasswordForm {
+  oldPassword: string;
+  newPassword: string;
 }

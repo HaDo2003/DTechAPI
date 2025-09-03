@@ -16,8 +16,8 @@ const ResetPassword: React.FC = () => {
 
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+    
 
     if (!token || !email) {
         return <NotFound />;
@@ -27,72 +27,72 @@ const ResetPassword: React.FC = () => {
         e.preventDefault();
 
         if (newPassword !== confirmPassword) {
-            setError("Passwords do not match");
+            setAlert({ message: "Passwords do not match", type: "error" });
             return;
         }
 
         try {
             const response = await authService.resetPassword({ token, email, newPassword });
             if (response.success) {
-                setSuccess(response.message || "Password has been reset successfully.");
-                setError(null);
+                setAlert({ message: "Password reset successful!", type: "success" });
                 setTimeout(() => {
                     navigate("/login");
                 }, 2000);
             } else {
-                setError(response.message || "Failed to reset password. Please try again.");
-                setSuccess(null);
+                setAlert({ message: response.message || "Failed to reset password", type: "error" });
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || "Failed to reset password");
+            setAlert({ message: "Something went wrong. Please try again.", type: "error" });
         }
     };
 
     return (
-        <div className="row">
-            <div className="col-11 col-md-7 col-lg-8 col-xl-5 mx-auto rounded border">
-                <h2 className="text-center py-2">Reset Password</h2>
+        <>
+            <div className="row">
+                <div className="col-11 col-md-7 col-lg-8 col-xl-5 mx-auto rounded border">
+                    <h2 className="text-center py-2">Reset Password</h2>
+                    <form onSubmit={handleSubmit}>
+                        <input type="hidden" name="email" value={email} />
+                        <input type="hidden" name="token" value={token} />
 
-                {error && (
-                    <AlertForm message={error} type="error" />
-                )}
-                {success && (
-                    <AlertForm message={success} type="success" />
-                )}
+                        {/* New Password */}
+                        <Input
+                            type="password"
+                            placeholder="New Password"
+                            required
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
 
-                <form onSubmit={handleSubmit}>
-                    <input type="hidden" name="email" value={email} />
-                    <input type="hidden" name="token" value={token} />
+                        {/* Confirm Password */}
+                        <Input
+                            type="password"
+                            placeholder="Confirm Password"
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
 
-                    {/* New Password */}
-                    <Input
-                        type="password"
-                        placeholder="New Password"
-                        required
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                    />
-
-                    {/* Confirm Password */}
-                    <Input
-                        type="password"
-                        placeholder="Confirm Password"
-                        required
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-
-                    {/* Submit */}
-                    <div className="row m-2 text-center align-content-center">
-                        <div className="form-group">
-                            <button type="submit" className="btn btn-dark w-100 button-hover">
-                                Reset Password
-                            </button>
+                        {/* Submit */}
+                        <div className="row m-2 text-center align-content-center">
+                            <div className="form-group">
+                                <button type="submit" className="btn btn-dark w-100 button-hover">
+                                    Reset Password
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
+            {alert && (
+                <AlertForm
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={() => setAlert(null)}
+                />
+            )}
+        </>
+
     );
 };
 

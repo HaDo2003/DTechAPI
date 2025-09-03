@@ -45,6 +45,10 @@ namespace DTech.Application.Mapping
             CreateMap<Order, OrderDto>();
             CreateMap<WishList, WishlistDto>();
             CreateMap<ApplicationUser, CustomerDto>();
+
+            CreateMap<UpdateProfileDto, ApplicationUser>()
+                .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForMember(dest => dest.UpdatedBy, opt => opt.MapFrom(src => src.FullName));
         }
     }
 }
