@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "@ckeditor/ckeditor5-react": "^11.0.0",
     "@microsoft/signalr": "^9.0.6",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
+    "ckeditor5": "^46.0.3",
     "datatables.net": "^2.3.3",
     "datatables.net-dt": "^2.3.3",
     "dompurify": "^3.2.6",
