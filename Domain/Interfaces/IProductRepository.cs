@@ -1,9 +1,4 @@
 ﻿using DTech.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DTech.Domain.Interfaces
 {
@@ -24,6 +19,7 @@ namespace DTech.Domain.Interfaces
 
         // Repo for Product Images
         // Repo for Product Comments
+        Task<int?> AddProductCommentAsync(ProductComment model);
         // Repo for Product Specifications
     }
 }

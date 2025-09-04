@@ -1,4 +1,5 @@
-﻿using DTech.Application.DTOs.response;
+﻿using DTech.Application.DTOs.request;
+using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -80,6 +81,15 @@ namespace DTech.API.Controllers
         {
             var products = await productService.GetRecentlyViewedProductsAsync(ids);
             return Ok(products);
+        }
+
+        [HttpPost("post-comment")]
+        public async Task<IActionResult> PostCommentAsync([FromBody] ProductCommentRequestDto model)
+        {
+            var response = await productService.PostCommentAsync(model);
+            if(!response.Success)
+                return BadRequest(new { response.Message });
+            return Ok(response);
         }
     }
 }

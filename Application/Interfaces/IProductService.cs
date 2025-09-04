@@ -1,4 +1,5 @@
-﻿using DTech.Application.DTOs.response;
+﻿using DTech.Application.DTOs.request;
+using DTech.Application.DTOs.response;
 using DTech.Domain.Entities;
 
 namespace DTech.Application.Interfaces
@@ -12,5 +13,6 @@ namespace DTech.Application.Interfaces
         Task<List<ProductDto>> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, string? sortOrder);
 
         Task<List<ProductDto>> GetRecentlyViewedProductsAsync(string? ids);
+        Task<ProductCommentDto> PostCommentAsync(ProductCommentRequestDto model);
     }
 }

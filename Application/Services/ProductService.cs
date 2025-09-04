@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
@@ -173,6 +174,21 @@ namespace DTech.Application.Services
                 "price_asc" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.Price)],
                 "price_desc" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Price)],
                 _ => products
+            };
+        }
+
+        public async Task<ProductCommentDto> PostCommentAsync(ProductCommentRequestDto model)
+        {
+            var productComment = _mapper.Map<ProductComment>(model);
+            var commentId = await productRepo.AddProductCommentAsync(productComment);
+            if (commentId == null)
+                return new ProductCommentDto { Success = false, Message = "Failed to post comment" };
+
+            return new ProductCommentDto
+            {
+                Success = true,
+                Message = "Post comment successfully",
+                CommentId = commentId
             };
         }
     }

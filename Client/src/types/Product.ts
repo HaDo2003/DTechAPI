@@ -1,6 +1,6 @@
 import { type Category } from "./Category";
 import { type Brand } from "./Brand";
-import { type ProductComment } from "./ProductComment";
+import { type ProductCommentResponse } from "./ProductComment";
 import { type ProductImage } from "./ProductImage";
 import { type Specification} from "./Specification";
 
@@ -22,7 +22,7 @@ export interface Product {
     description: string;
     category: Category;
     brand: Brand;
-    productComments: ProductComment[];
+    productComments: ProductCommentResponse[];
     productImages: ProductImage[];
     specifications: Specification[];
     relatedProducts: Product[];

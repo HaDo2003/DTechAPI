@@ -62,7 +62,6 @@ const Input: React.FC<InputProps> = ({ type, placeholder, required, value, onCha
                     )}
                 </div>
             }
-
         </div>
     );
 };

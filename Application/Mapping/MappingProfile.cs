@@ -52,6 +52,8 @@ namespace DTech.Application.Mapping
             
             CreateMap<AddAddressDto, CustomerAddress>();
             CreateMap<EditAddressDto, CustomerAddress>();
+            CreateMap<ProductCommentRequestDto, ProductComment>()
+                .ForMember(dest => dest.CmtDate, opt => opt.MapFrom(_ => DateTime.UtcNow));
         }
     }
 }

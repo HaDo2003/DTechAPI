@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecoder } from "../utils/jwtDecoder";
+import { jwtDecoder, type User } from "../utils/jwtDecoder";
 
 interface AuthContextType {
-    roles: string | string[];
+    user: User | null;
     token: string | null;
     login: (token: string) => void;
     logout: () => void;
@@ -12,17 +12,23 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [roles, setRoles] = useState<string[]>(() => {
+    const [user, setUser] = useState<User | null>(() => {
         const savedToken = localStorage.getItem("jwt_token");
         if (savedToken) {
             try {
                 const decoded = jwtDecoder(savedToken);
-                return Array.isArray(decoded) ? decoded : decoded ? [decoded] : [];
+                if (decoded) {
+                    return {
+                        roles: decoded.roles ?? [],
+                        name: decoded.name ?? "",
+                        email: decoded.email ?? "",
+                    };
+                }
             } catch {
-                return [];
+                return null;
             }
         }
-        return [];
+        return null;
     });
 
     const [token, setToken] = useState<string | null>(() => {
@@ -35,16 +41,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
                 const decoded = jwtDecoder(savedToken);
                 if (!decoded) throw new Error("Invalid token");
-                const userRoles = Array.isArray(decoded)
-                    ? decoded
-                    : decoded
-                        ? [decoded]
-                        : [];
                 setToken(savedToken);
-                setRoles(userRoles);
+                setUser(decoded);
             } catch (error) {
                 setToken(null);
-                setRoles([]);
+                setUser(null);
             }
         }
     }, []);
@@ -54,31 +55,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const decoded = jwtDecoder(newToken);
             if (!decoded) throw new Error("Invalid token");
-            const userRoles = Array.isArray(decoded)
-                ? decoded
-                : decoded
-                    ? [decoded]
-                    : [];
             setToken(newToken);
-            setRoles(userRoles);
+            setUser(decoded);
         } catch (error) {
             console.error("Invalid token at login:", error);
             setToken(null);
-            setRoles([]);
+            setUser(null);
         }
     };
 
     const logout = () => {
         localStorage.removeItem("jwt_token");
         setToken(null);
-        setRoles([]);
+        setUser(null);
     };
 
-    const hasRole = (role: string) => roles.includes(role);
-
+    const hasRole = (role: string): boolean => user?.roles.includes(role) ?? false;
+    
     return React.createElement(
         AuthContext.Provider,
-        { value: { roles, token, login, logout, hasRole } },
+        { value: { user, token, login, logout, hasRole } },
         children
     );
 };
@@ -90,7 +86,7 @@ export const useAuth = () => {
 };
 
 export const AuthDebugger: React.FC = () => {
-    const { token, roles } = useAuth();
+    const { token, user } = useAuth();
 
     return React.createElement(
         "div",
@@ -105,6 +101,6 @@ export const AuthDebugger: React.FC = () => {
                 zIndex: 9999
             }
         },
-        `User: ${token ? 'Logged in' : 'Not logged in'} | Roles: ${roles}`
+        `User: ${token ? 'Logged in' : 'Not logged in'} | Name: ${user?.name} | Email: ${user?.email} |Roles: ${user?.roles}`
     );
 };

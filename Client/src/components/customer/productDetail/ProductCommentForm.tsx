@@ -1,30 +1,30 @@
 import React, { useState } from "react";
+import type { ProductCommentRequest } from "../../../types/ProductComment";
+import Input from "../Input";
 
 interface ProductCommentFormProps {
   productId: number;
-  onSubmit: (formData: CommentFormData) => void;
-}
-
-export interface CommentFormData {
-  productId: number;
-  rate: number;
-  name: string;
-  email: string;
-  detail: string;
+  name?: string;
+  email?: string;
+  onSubmit: (formData: ProductCommentRequest) => void;
 }
 
 const ProductCommentForm: React.FC<ProductCommentFormProps> = ({
   productId,
+  name,
+  email,
   onSubmit
 }) => {
-  const [rate, setRate] = useState<number>(0);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [detail, setDetail] = useState("");
-
+  const [formData, setFormData] = useState<ProductCommentRequest>({
+    productId: productId,
+    name: name ?? "",
+    email: email ?? "",
+    detail: "",
+    rate: 5,
+  });
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ productId, rate, name, email, detail });
+    onSubmit(formData);
   };
 
   return (
@@ -48,8 +48,10 @@ const ProductCommentForm: React.FC<ProductCommentFormProps> = ({
                     id={`rating-${i}`}
                     name="rate"
                     value={i}
-                    checked={rate === i}
-                    onChange={() => setRate(i)}
+                    checked={formData.rate === i}
+                    onChange={(e) =>
+                      setFormData({ ...formData, rate: parseInt(e.target.value, 10) })
+                    }
                   />
                   <label htmlFor={`rating-${i}`} className="fa fa-star"></label>
                 </React.Fragment>
@@ -60,31 +62,22 @@ const ProductCommentForm: React.FC<ProductCommentFormProps> = ({
       </div>
 
       {/* Name */}
-      <div className="row m-2">
-        <div className="form-group">
-          <input
-            className="form-control"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-      </div>
+      <Input
+        type="text"
+        placeholder="Name"
+        required
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+      />
 
       {/* Email */}
-      <div className="row m-2">
-        <div className="form-group">
-          <input
-            type="email"
-            className="form-control"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-      </div>
+      <Input
+        type="email"
+        placeholder="Email"
+        required
+        value={formData.email}
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+      />
 
       {/* Comment */}
       <div className="row m-2">
@@ -93,8 +86,8 @@ const ProductCommentForm: React.FC<ProductCommentFormProps> = ({
             className="form-control"
             placeholder="Your Comment"
             rows={3}
-            value={detail}
-            onChange={(e) => setDetail(e.target.value)}
+            value={formData.detail}
+            onChange={(e) => setFormData({ ...formData, detail: e.target.value })}
             required
           ></textarea>
         </div>

@@ -5,9 +5,17 @@ export interface TokenPayload {
     unique_name: string;
     role: string | string[];
     exp: number;
+    name?: string;
+    email?: string;
 }
 
-export const jwtDecoder = (token: string): (string | string[]) | null => {
+export interface User {
+    roles: string | string[];
+    name: string;
+    email: string;
+}
+
+export const jwtDecoder = (token: string): User | null => {
     if (!token || token.split(".").length !== 3) {
         return null;
     }
@@ -18,7 +26,11 @@ export const jwtDecoder = (token: string): (string | string[]) | null => {
             return null;
         }
 
-        return decoded.role;
+        return {
+            roles: decoded.role ?? [],
+            name: decoded.name ?? "",
+            email: decoded.email ?? ""
+        };
     } catch {
         return null;
     }

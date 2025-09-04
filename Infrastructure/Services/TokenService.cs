@@ -1,4 +1,5 @@
-﻿using DTech.Application.Interfaces;
+﻿using CloudinaryDotNet.Actions;
+using DTech.Application.Interfaces;
 using DTech.Application.Settings;
 using DTech.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -21,7 +22,9 @@ namespace DTech.Infrastructure.Services
                 new(JwtRegisteredClaimNames.Sub, user.Id),
                 new(JwtRegisteredClaimNames.UniqueName, user.UserName ?? ""),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new(ClaimTypes.NameIdentifier, user.Id)
+                new(ClaimTypes.NameIdentifier, user.Id),
+                new("email", user.Email ?? ""),
+                new("name", user.FullName ?? "")
             };
 
             var roles = userManager.GetRolesAsync(user).Result;

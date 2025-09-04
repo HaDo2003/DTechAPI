@@ -180,6 +180,16 @@ namespace DTech.Infrastructure.Repositories
 
         // Repo for Product Images
         // Repo for Product Comments
+        public async Task<int?> AddProductCommentAsync(ProductComment model)
+        {
+            if(model != null)
+            {
+                context.ProductComments.Add(model);
+                await context.SaveChangesAsync();
+                return model.CommentId;
+            }
+            return null;
+        }
         // Repo for Product Specifications
     }
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getProductData } from "../../services/ProductService";
+import { productService } from "../../services/ProductService";
 import { type Product } from "../../types/Product";
 import { priceFormatter } from "../../utils/priceFormatter";
 import DOMPurify from "dompurify";
@@ -9,22 +9,28 @@ import NotFound from "./NotFound";
 // Components
 import ProductGrid from "../../components/customer/ProductGrid";
 import SpecificationsWindow from "../../components/customer/productDetail/SpecificationsWindow";
-import ProductCommentForm, { type CommentFormData } from "../../components/customer/productDetail/ProductCommentForm";
+import ProductCommentForm from "../../components/customer/productDetail/ProductCommentForm";
 import ProductInfoItem from "../../components/customer/productDetail/ProductInfoItem";
 import Loading from "../../components/shared/Loading";
+import AlertForm from "../../components/customer/AlertForm";
 
 import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
+import type { ProductCommentRequest, ProductCommentResponse } from "../../types/ProductComment";
+import { useAuth } from "../../context/AuthContext";
 
 const ProductDetail: React.FC = () => {
+    const { user } = useAuth();
     const { categorySlug, brandSlug, slug } = useParams<{ categorySlug: string; brandSlug: string; slug: string }>();
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
 
     // State
     const [quantity, setQuantity] = useState(1);
     const [mainImage, setMainImage] = useState<string>("");
     const [showFullDescription, setShowFullDescription] = useState(false);
     const [showCommentForm, setShowCommentForm] = useState(false);
+    const [commentList, setCommentList] = useState<ProductCommentResponse[]>(product?.productComments ?? [])
     const [isSpecOpen, setIsSpecOpen] = useState(false);
     const RVData = useRecentlyViewed();
 
@@ -32,9 +38,10 @@ const ProductDetail: React.FC = () => {
         document.title = "DTech - Product Detail";
         const fetchProduct = async () => {
             try {
-                const data = await getProductData(categorySlug!, brandSlug!, slug!);
+                const data = await productService.getProductData(categorySlug!, brandSlug!, slug!);
                 setProduct(data);
                 setMainImage(data.photo ?? "");
+                setCommentList(data.productComments ?? []);
             } catch (error) {
                 console.error("Failed to fetch product data:", error);
             } finally {
@@ -112,6 +119,24 @@ const ProductDetail: React.FC = () => {
             <span key={i} className={i < rating ? 'fa fa-star text-warning' : 'fa fa-star text-secondary'}></span>
         ));
     };
+
+    const handleSubmit = async (data: ProductCommentRequest) => {
+        try {
+            console.log("Submit:" + data);
+            const res = await productService.postComment(data);
+            if (res.success) {
+                setAlert({ message: res.message || "Post Comment Successful!", type: "success" });
+                setCommentList(prev => [
+                    ...prev,
+                    { ...data, commentId: res.commentId },
+                ]);
+            } else {
+                setAlert({ message: res.message || "Post Comment Fail!", type: "error" });
+            }
+        } catch (err) {
+            setAlert({ message: "An error occurred during post comment", type: "error" });
+        }
+    }
 
     return (
         <>
@@ -382,23 +407,27 @@ const ProductDetail: React.FC = () => {
                                     <div className={`comment-fade ${showCommentForm ? 'show' : 'hide'}`}>
                                         <ProductCommentForm
                                             productId={product.productId}
-                                            onSubmit={(data: CommentFormData) => {
+                                            name={user?.name}
+                                            email={user?.email}
+                                            onSubmit={async (data: ProductCommentRequest) => {
                                                 console.log("Comment submitted:", data);
+                                                await handleSubmit(data);
                                                 setShowCommentForm(false);
                                             }}
                                         />
                                     </div>
 
                                     <div>
-                                        {product.productComments.map((cmt, index) => (
+                                        {commentList.map((cmt, index) => (
                                             <div key={index} className="mb-2">
                                                 <div className="row">
                                                     <div className="col-md-6 text-start">
                                                         {cmt.name}
                                                     </div>
                                                     <div className="col-md-6 text-end">
-                                                        {new Date(cmt.cmtDate).toLocaleDateString('en-GB')}
-                                                    </div>
+                                                        {cmt.cmtDate
+                                                            ? new Date(cmt.cmtDate).toLocaleDateString("en-GB")
+                                                            : "No date"}                                                    </div>
                                                 </div>
                                                 <div className="cmt-custom px-3 py-2 mb-3">
                                                     <div className="row">
@@ -491,6 +520,14 @@ const ProductDetail: React.FC = () => {
                 isOpen={isSpecOpen}
                 onClose={() => setIsSpecOpen(false)}
             />
+
+            {alert && (
+                <AlertForm
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={() => setAlert(null)}
+                />
+            )}
         </>
     );
 };
