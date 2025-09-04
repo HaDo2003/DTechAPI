@@ -1,8 +1,14 @@
 export interface CustomerAddress {
-    addressId: string;
+    addressId: number | null;
     fullName: string;
     phoneNumber: string;
-    provinceId: string;
+    provinceId: number | null;
     address: string;
     isDefault: boolean;
+}
+
+export interface CustomerAddressResponse {
+    success?: boolean;
+    message?: string;
+    addressId?: number;
 }

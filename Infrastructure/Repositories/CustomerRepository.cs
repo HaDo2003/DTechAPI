@@ -3,6 +3,7 @@ using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace DTech.Infrastructure.Repositories
 {
@@ -93,6 +94,21 @@ namespace DTech.Infrastructure.Repositories
             return true;
         }
 
+        public async Task<bool> UpdateCustomerPasswordAsync(ApplicationUser customer, string? oldPassword, string? newPassword)
+        {
+            if (string.IsNullOrEmpty(oldPassword) || string.IsNullOrEmpty(newPassword))
+            {
+                return false;
+            }
+
+            var result = await userManager.ChangePasswordAsync(customer, oldPassword, newPassword);
+            return result.Succeeded;
+        }
+
+        public async Task<bool> CheckCustomerAsync(string? customerId)
+        {
+            return await context.Users.AnyAsync(c => c.Id == customerId);
+        }
         //For CustomerAddress table
         public async Task<bool> CreateCustomerAddressAsync(CustomerAddress customerAddress)
         {
@@ -104,7 +120,53 @@ namespace DTech.Infrastructure.Repositories
             }
             return false;
         }
-
+        public async Task<int?> AddAddressAsync(CustomerAddress model)
+        {
+            if (model != null)
+            {
+                context.CustomerAddresses.Add(model);
+                await context.SaveChangesAsync();
+                return model.AddressId;
+            }
+            return null;
+        }
+        public async Task<bool> EditAddressAsync(CustomerAddress model)
+        {
+            if (model != null)
+            {
+                context.CustomerAddresses.Update(model);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+        public async Task<bool> DeleteAddressAsync(string customerId, int addressId)
+        {
+            var customerAddress = await context
+                .CustomerAddresses
+                .FirstOrDefaultAsync(ca => ca.AddressId == addressId && ca.CustomerId == customerId);
+            if (customerAddress != null)
+            {
+                try
+                {
+                    context.CustomerAddresses.Remove(customerAddress);
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return false;
+                }
+                catch (DbUpdateException)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
         //For Cart table
         public async Task<bool> CreateCartAsync(Cart cart)
         {

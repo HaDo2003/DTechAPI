@@ -68,5 +68,62 @@ namespace DTech.Application.Services
             
             return new MessageResponse { Success = true, Message = "Profile updated successfully" };
         }
+
+        public async Task<MessageResponse> UpdateNewPasswordAsync(string customerId, ChangePasswordDto model)
+        {
+            var customer = await customerRepo.GetCustomerByIdAsync(customerId);
+            if (customer == null)
+                return new MessageResponse { Success = false, Message = "Customer not found" };
+
+            var isUpdated = await customerRepo.UpdateCustomerPasswordAsync(customer, model.OldPassword, model.NewPassword);
+            if (!isUpdated)
+                return new MessageResponse { Success = false, Message = "Failed to change password" };
+
+            return new MessageResponse { Success = true, Message = "Change Password successfully" };
+        }
+
+        public async Task<AddressResponse> AddAddressAsync(string customerId, AddAddressDto model)
+        {
+            var customer = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customer)
+                return new AddressResponse { Success = false, Message = "Customer not found" };
+
+            var customerAddress = mapper.Map<CustomerAddress>(model);
+            customerAddress.CustomerId = customerId;
+            var addressId = await customerRepo.AddAddressAsync(customerAddress);
+            if (addressId == null)
+                return new AddressResponse { Success = false, Message = "Failed to add new address" };
+
+            return new AddressResponse 
+            { 
+                Success = true, 
+                Message = "Add new address successfully",
+                AddressId = addressId
+            };
+        }
+
+        public async Task<MessageResponse> EditAddressAsync(string customerId, EditAddressDto model)
+        {
+            var customer = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customer)
+                return new MessageResponse { Success = false, Message = "Customer not found" };
+
+            var customerAddress = mapper.Map<CustomerAddress>(model);
+            customerAddress.CustomerId = customerId;
+            var isUpdated = await customerRepo.EditAddressAsync(customerAddress);
+            if (!isUpdated)
+                return new MessageResponse { Success = false, Message = "Failed to edit address" };
+
+            return new MessageResponse { Success = true, Message = "Edit address successfully" };
+        }
+
+        public async Task<MessageResponse> DeleteAddressAsync(string customerId, int addressId)
+        {
+            var isUpdated = await customerRepo.DeleteAddressAsync(customerId, addressId);
+            if (!isUpdated)
+                return new MessageResponse { Success = false, Message = "Failed to delete address" };
+
+            return new MessageResponse { Success = true, Message = "Delete address successfully" };
+        }
     }
 }

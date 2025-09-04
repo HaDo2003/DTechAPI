@@ -1,6 +1,7 @@
 import axios from "axios";
 import { type Customer, type CustomerProfileForm, type ChangePasswordForm } from "../types/Customer";
 import { type MessageResponse } from "../types/MessageReponse";
+import { type CustomerAddress, type CustomerAddressResponse } from "../types/CustomerAddress";
 
 export const customerService = {
     async getCustomerProfile(token: string): Promise<Customer> {
@@ -72,10 +73,99 @@ export const customerService = {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            return {success: true, message: response.data.message || "Change Password successfully"};
-        } catch(err) {
+            return { success: true, message: response.data.message || "Change Password successfully" };
+        } catch (err) {
             if (axios.isAxiosError(err)) {
                 let message: string = "Failed to change password. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
+    },
+
+    async createAddress(token: string, data: CustomerAddress): Promise<CustomerAddressResponse> {
+        try {
+            const { addressId, ...dto } = data;
+            const response = await axios.post<CustomerAddressResponse>("/api/profile/add-new-address", dto, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return {
+                success: true,
+                message: response.data.message || "Add new address successfully",
+                addressId: response.data.addressId,
+            };
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to add new address. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
+    },
+
+    async editAddress(token: string, data: CustomerAddress): Promise<CustomerAddressResponse> {
+        try {
+            const response = await axios.put<CustomerAddressResponse>("/api/profile/edit-address", data, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return { success: true, message: response.data.message || "Edit address successfully" };
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to edit address. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
+    },
+
+    async deleteAddress(token: string, addressId: number | null): Promise<CustomerAddressResponse> {
+        try {
+            if (addressId === null) {
+                return { success: false, message: "Address not exist" };
+            }
+            const response = await axios.delete<CustomerAddressResponse>(
+                `/api/profile/delete-address/${addressId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            return { success: true, message: response.data.message || "Add new address successfully" };
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to add new address. Please try again.";
                 if (typeof err.response?.data === "string") {
                     message = err.response.data;
                 }

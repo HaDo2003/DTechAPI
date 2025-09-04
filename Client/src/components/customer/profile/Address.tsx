@@ -1,5 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { type CustomerAddress } from "../../../types/CustomerAddress";
+import AddressForm from "./AddressForm";
+import { customerService } from "../../../services/CustomerService";
+import AlertForm from "../AlertForm";
+import Loading from "../../shared/Loading";
+import { useAuth } from "../../../context/AuthContext";
 
 type AddressProps = {
     addresses?: CustomerAddress[];
@@ -8,34 +13,108 @@ type AddressProps = {
 const Address: React.FC<AddressProps> = ({
     addresses,
 }) => {
+    const { token } = useAuth();
+    const [addressList, setAddressList] = useState<CustomerAddress[]>(addresses ?? []);
+    const [showForm, setShowForm] = useState(false);
+    const [selectedAddress, setSelectedAddress] = useState<CustomerAddress | null>(null);
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (showForm) {
+            document.body.classList.add("no-scroll");
+        } else {
+            document.body.classList.remove("no-scroll");
+        }
+        return () => {
+            document.body.classList.remove("no-scroll");
+        };
+    }, [showForm]);
+
     const onAddNew = () => {
-        const overlay = document.getElementById("editOverlay");
-        const formContainer = document.getElementById("editAddressForm");
-        if (overlay && formContainer) {
-            overlay.classList.remove("d-none");
-            formContainer.classList.remove("d-none");
-            // Render the EditAddress component here if needed
+        setSelectedAddress(null);
+        setShowForm(true);
+    };
+
+    const onEdit = (address: CustomerAddress) => {
+        setSelectedAddress(address);
+        setShowForm(true);
+    };
+
+    const onDelete = async (addressId: number | null) => {
+        if (!addressId) return;
+        try {
+            setLoading(true);
+            const res = await customerService.deleteAddress(token ?? "", addressId);
+            if (res.success) {
+                setAlert({ message: "Delete address successfully!", type: "success" });
+                setAddressList(prev => prev.filter(addr => addr.addressId !== addressId));
+            } else {
+                setAlert({ message: res.message || "Fail to delete address!", type: "error" });
+            }
+        } catch (err) {
+            setAlert({ message: "Address deleted failed, please try again.", type: "error" });
+        } finally {
+            setLoading(false);
         }
     };
-    const onEdit = (addressId: string) => {
-        const overlay = document.getElementById("editOverlay");
-        const formContainer = document.getElementById("editAddressForm");
-        if (overlay && formContainer) {
-            overlay.classList.remove("d-none");
-            formContainer.classList.remove("d-none");
-            // Render the EditAddress component here with addressId if needed
-        }
-    };
-    const onDelete = (addressId: string) => {
-        // Implement delete functionality here
-        console.log("Delete address with ID:", addressId);
-    }
-    const onSetDefault = (addressId: string) => {
+
+    const onSetDefault = (addressId: number | null) => {
         // Implement set default functionality here
         console.log("Set default address with ID:", addressId);
+    };
+
+    const handleClose = () => {
+        setShowForm(false);
+    };
+
+    const handleSubmit = async (data: CustomerAddress) => {
+        const isEdit = !!selectedAddress;
+        try {
+            setLoading(true);
+            const res = isEdit
+                ? await customerService.editAddress(token ?? "", data)
+                : await customerService.createAddress(token ?? "", data);
+
+            if (res.success) {
+                setAlert({
+                    message: res.message || (isEdit ? "Edit address successfully!" : "Add new address successfully!"),
+                    type: "success",
+                });
+
+                if (isEdit) {
+                    setAddressList(prev =>
+                        prev.map(addr =>
+                            addr.addressId === data.addressId ? { ...addr, ...data } : addr
+                        )
+                    );
+                } else {
+                    setAddressList(prev => [
+                        ...prev,
+                        { ...data, addressId: res.addressId ?? null },
+                    ]);
+                }
+            } else {
+                setAlert({ message: res.message || "Operation failed!", type: "error" });
+            }
+        } catch (err) {
+            setAlert({ message: "Request failed, please try again.", type: "error" });
+        } finally {
+            setLoading(false);
+            setShowForm(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                <Loading />;
+            </div>
+        );
     }
+
     return (
-        <div>
+        <>
             {/* Header row */}
             <div className="row">
                 <div className="col-6 text-start">
@@ -50,8 +129,8 @@ const Address: React.FC<AddressProps> = ({
 
             <hr className="my-4" />
 
-            {addresses && addresses.length > 0 ? (
-                addresses.map((item) => (
+            {addressList && addressList.length > 0 ? (
+                addressList.map((item) => (
                     <div key={item.addressId} className="address-card mb-4 border-bottom pb-3">
                         <div className="d-flex justify-content-between align-items-start">
                             <div>
@@ -64,7 +143,7 @@ const Address: React.FC<AddressProps> = ({
                                     className="text-primary me-3"
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        onEdit(item.addressId);
+                                        onEdit(item);
                                     }}
                                 >
                                     Update
@@ -111,12 +190,18 @@ const Address: React.FC<AddressProps> = ({
             )}
 
             {/* Overlay for edit form (optional, depends on implementation) */}
-            <div id="editOverlay" className="overlay d-none">
-                <div className="mx-auto d-none" id="editAddressForm">
-                    {/* The EditAddress form can be rendered here conditionally */}
-                </div>
-            </div>
-        </div>
+            {showForm && (
+                <AddressForm addressPara={selectedAddress} onSubmit={handleSubmit} onClose={handleClose} />
+            )}
+
+            {alert && (
+                <AlertForm
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={() => setAlert(null)}
+                />
+            )}
+        </>
     );
 };
 

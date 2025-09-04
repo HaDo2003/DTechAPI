@@ -49,6 +49,9 @@ namespace DTech.Application.Mapping
             CreateMap<UpdateProfileDto, ApplicationUser>()
                 .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
                 .ForMember(dest => dest.UpdatedBy, opt => opt.MapFrom(src => src.FullName));
+            
+            CreateMap<AddAddressDto, CustomerAddress>();
+            CreateMap<EditAddressDto, CustomerAddress>();
         }
     }
 }

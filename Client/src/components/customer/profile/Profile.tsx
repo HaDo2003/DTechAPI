@@ -88,7 +88,7 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
                 setLoading(false);
             }
         } catch (err) {
-            setAlert({ message: "Registration failed, please try again.", type: "error" });
+            setAlert({ message: "Profile updated failed, please try again.", type: "error" });
             setLoading(false);
         }
     };

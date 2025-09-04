@@ -8,8 +8,8 @@ type WishlistsProps = {
 const Wishlist: React.FC<WishlistsProps> = ({ wishlists }) => {
   return (
     <div>
-      <h5>Coupons</h5>
-      <p>Total wishlits:</p>
+      <h1>Coming Soon</h1>
+      <p className="d-none">Total wishlits: {wishlists?.length}</p>
     </div>
   );
 };
