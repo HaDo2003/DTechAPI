@@ -122,7 +122,6 @@ const ProductDetail: React.FC = () => {
 
     const handleSubmit = async (data: ProductCommentRequest) => {
         try {
-            console.log("Submit:" + data);
             const res = await productService.postComment(data);
             if (res.success) {
                 setAlert({ message: res.message || "Post Comment Successful!", type: "success" });

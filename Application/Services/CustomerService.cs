@@ -10,7 +10,9 @@ namespace DTech.Application.Services
     public class CustomerService(
         ICustomerRepository customerRepo,
         IMapper mapper,
-        ICloudinaryService cloudinaryService
+        ICloudinaryService cloudinaryService,
+        IBackgroundTaskQueue backgroundTaskQueue,
+        IEmailService emailService
     ) : ICustomerService
     {
         readonly string folderName = "Pre-thesis/Customer";
@@ -125,5 +127,36 @@ namespace DTech.Application.Services
 
             return new MessageResponse { Success = true, Message = "Delete address successfully" };
         }
+        public async Task<MessageResponse> SendContactAsync(ContactDto model)
+        {
+            var contact = mapper.Map<Feedback>(model);
+            var res = await customerRepo.SendContactAsync(contact);
+            if (!res)
+            {
+                return new MessageResponse { Success = false, Message = "Send Contact Fail" };
+            }
+
+            if (!string.IsNullOrEmpty(model.Email))
+            {
+                backgroundTaskQueue.QueueBackgroundWorkItem(async token =>
+                {
+                    string subject = "Thank you for contacting DTech!";
+                    string body = $@"
+                        <html>
+                            <body style='font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;'>
+                                <div style='max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+                                    <h2 style='color: #007bff;'>Hi {model.Name},</h2>
+                                    <p>Thank you for reaching out to <strong>DTech</strong>!</p>
+                                    <p>We've received your message and will get back to you as soon as possible.</p>
+                                    <p style='margin-top: 20px;'>Best regards,<br/>The DTech Team</p>
+                                </div>
+                            </body>
+                        </html>";
+                    await emailService.SendEmailAsync(model.Email, subject, body);
+                });
+            }
+            return new MessageResponse { Success = true, Message = "Send Contact Successfully" };
+        }
+
     }
 }

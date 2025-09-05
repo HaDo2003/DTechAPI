@@ -11,5 +11,6 @@ namespace DTech.Application.Interfaces
         Task<AddressResponse> AddAddressAsync(string customerId, AddAddressDto model);
         Task<MessageResponse> EditAddressAsync(string customerId, EditAddressDto model);
         Task<MessageResponse> DeleteAddressAsync(string customerId, int addressId);
+        Task<MessageResponse> SendContactAsync(ContactDto model);
     }
 }

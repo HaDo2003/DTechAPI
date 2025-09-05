@@ -2,6 +2,7 @@ import axios from "axios";
 import { type Customer, type CustomerProfileForm, type ChangePasswordForm } from "../types/Customer";
 import { type MessageResponse } from "../types/MessageReponse";
 import { type CustomerAddress, type CustomerAddressResponse } from "../types/CustomerAddress";
+import type { Contact } from "../types/Contact";
 
 export const customerService = {
     async getCustomerProfile(token: string): Promise<Customer> {
@@ -166,6 +167,28 @@ export const customerService = {
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 let message: string = "Failed to add new address. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
+    },
+
+    async sendContact(data: Contact): Promise<MessageResponse> {
+        try {
+            const response = await axios.post<MessageResponse>("/api/contact/send-contact", data);
+            return { success: true, message: response.data.message || "Send Contact successfully" };
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to send contact. Please try again.";
                 if (typeof err.response?.data === "string") {
                     message = err.response.data;
                 }

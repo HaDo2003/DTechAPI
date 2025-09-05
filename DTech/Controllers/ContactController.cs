@@ -1,12 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DTech.Application.DTOs.request;
+using DTech.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DTech.API.Controllers
 {
-    public class ContactController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ContactController(
+        ICustomerService customerService
+    ) : ControllerBase
     {
-        public IActionResult Index()
+        [HttpPost("send-contact")]
+        public async Task<IActionResult> SendContactAsync([FromBody] ContactDto model)
         {
-            return View();
+            var response = await customerService.SendContactAsync(model);
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+            return Ok(new { Message = "Send contact successfully." });
         }
     }
 }

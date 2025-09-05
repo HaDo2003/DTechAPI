@@ -178,5 +178,17 @@ namespace DTech.Infrastructure.Repositories
             }
             return false;
         }
+
+        //For feedback table
+        public async Task<bool> SendContactAsync(Feedback model)
+        {
+            if(model != null)
+            {
+                context.Feedbacks.Add(model);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
     }
 }

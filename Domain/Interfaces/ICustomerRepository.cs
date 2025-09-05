@@ -24,5 +24,7 @@ namespace DTech.Domain.Interfaces
         Task<bool> DeleteAddressAsync(string customerId, int addressId);
         //For Cart table
         Task<bool> CreateCartAsync(Cart cart);
+        // For Feedback table
+        Task<bool> SendContactAsync(Feedback model);
     }
 }
