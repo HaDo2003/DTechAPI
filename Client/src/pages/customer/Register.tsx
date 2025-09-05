@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/customer/Input";
-import OAuthButton from "../../components/customer/auth/OAuthButton";
+import FacebookButton from "../../components/customer/auth/FacebookButton";
 import { useAuth } from "../../context/AuthContext";
 import { authService } from "../../services/AuthService";
 import AlertForm from "../../components/customer/AlertForm";
+import GoogleButton from "../../components/customer/auth/GoogleButton";
 
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -159,8 +160,8 @@ const Register: React.FC = () => {
                     </div>
 
                     <div className="d-flex justify-content-between my-2 mx-3 gap-3">
-                        <OAuthButton btncolor="danger" icon="google" />
-                        <OAuthButton btncolor="primary" icon="facebook" />
+                        <GoogleButton />
+                        <FacebookButton />
                     </div>
                 </div>
             </div>

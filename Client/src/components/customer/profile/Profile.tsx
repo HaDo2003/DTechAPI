@@ -113,8 +113,7 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
                             label="User Name"
                             name="userName"
                             type="text"
-                            value={form.userName}
-                            required
+                            value={form.userName ?? ""}
                             readonly
                         />
 
@@ -122,8 +121,7 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
                             label="Full Name"
                             name="fullName"
                             type="text"
-                            value={form.fullName}
-                            required
+                            value={form.fullName ?? ""}
                             onChange={handleChange}
                         />
 
@@ -131,8 +129,7 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
                             label="Email"
                             name="email"
                             type="email"
-                            value={form.email}
-                            required
+                            value={form.email ?? ""}
                             onChange={handleChange}
                         />
 
@@ -140,16 +137,14 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
                             label="Phone Number"
                             name="phoneNumber"
                             type="tel"
-                            value={form.phoneNumber}
-                            required
+                            value={form.phoneNumber ?? ""}
                             onChange={handleChange}
                         />
 
                         <InputWithLabel
                             label="Gender"
                             name="gender"
-                            value={form.gender}
-                            required
+                            value={form.gender ?? ""}
                             onChange={handleChange}
                         />
 
@@ -157,7 +152,7 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
                             label="Date of Birth"
                             name="dateOfBirth"
                             type="date"
-                            value={form.dateOfBirth}
+                            value={form.dateOfBirth ?? ""}
                             onChange={handleChange}
                         />
                     </div>

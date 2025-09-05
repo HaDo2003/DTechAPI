@@ -9,5 +9,7 @@ namespace DTech.Application.Interfaces
         Task<AuthResponse> LoginAsync(LoginDto model);
         Task<AuthResponse> ForgotPasswordAsync(ForgotPasswordDto model);
         Task<AuthResponse> ResetPasswordAsync(ResetPasswordDto model);
+        Task<AuthResponse> AuthenticateWithGoogleAsync(string idToken);
+        Task<AuthResponse> AuthenticateWithFacebookAsync(string accessToken);
     }
 }

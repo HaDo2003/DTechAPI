@@ -104,4 +104,50 @@ export const authService = {
       return { success: false, message };
     }
   },
+
+  async googleLogin(idToken: string): Promise<LoginResponse> {
+    try {
+      const res = await axios.post<LoginResponse>(`/api/auth/signin-google`, {
+        idToken
+      });
+      return { ...res.data, success: true };
+    } catch (err: any) {
+      let message: string = "Failed to sign in with Google. Please try again.";
+
+      if (typeof err.response?.data === "string") {
+        message = err.response.data;
+      }
+      else if (typeof err.response?.data?.message === "string") {
+        message = err.response.data.message;
+      }
+      else {
+        message = JSON.stringify(err.response?.data);
+      }
+
+      return { success: false, message };
+    }
+  },
+
+  async facebookLogin(accessToken: string): Promise<LoginResponse> {
+    try {
+      const res = await axios.post(`/api/auth/signin-facebook`, {
+        AccessToken: accessToken,
+      });
+      return { ...res.data, success: true };
+    } catch (err: any) {
+      let message: string = "Failed to sign in with Google. Please try again.";
+
+      if (typeof err.response?.data === "string") {
+        message = err.response.data;
+      }
+      else if (typeof err.response?.data?.message === "string") {
+        message = err.response.data.message;
+      }
+      else {
+        message = JSON.stringify(err.response?.data);
+      }
+
+      return { success: false, message };
+    }
+  }
 };

@@ -4,7 +4,12 @@ using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
+using Google.Apis.Auth;
+using Google.Apis.Http;
 using Microsoft.AspNetCore.Identity;
+using System.Net.Http.Json;
+using System.Text.Json;
+using IHttpClientFactory = System.Net.Http.IHttpClientFactory;
 
 namespace DTech.Application.Services
 {
@@ -15,7 +20,8 @@ namespace DTech.Application.Services
         ITokenService tokenService,
         IEmailService emailService,
         IBackgroundTaskQueue backgroundTaskQueue,
-        RoleManager<IdentityRole> roleManager
+        RoleManager<IdentityRole> roleManager,
+        IHttpClientFactory httpClientFactory
     ) : IAuthService
     {
         public async Task<AuthResponse> LoginAsync(LoginDto model)
@@ -124,6 +130,105 @@ namespace DTech.Application.Services
                 };
             }
             return new AuthResponse { Success = true, Message = "Password has been reset successfully" };
+        }
+        public async Task<AuthResponse> AuthenticateWithGoogleAsync(string idToken)
+        {
+            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
+
+            var user = await userManager.FindByEmailAsync(payload.Email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = payload.Email,
+                    Email = payload.Email,
+                    FullName = payload.Name,
+                    Image = payload.Picture,
+                    EmailConfirmed = true,
+                    RoleId = "dc11b0b4-44c2-457f-a890-fce0d077dbe0",
+                    CreateDate = DateTime.UtcNow,
+                    CreatedBy = payload.Name
+                };
+
+                var result = await userManager.CreateAsync(user);
+                if (!result.Succeeded)
+                    throw new Exception("Failed to create user");
+
+                var role = await roleManager.FindByIdAsync(user.RoleId);
+                if (role != null)
+                {
+                    await userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
+                }
+
+                Cart cart = new()
+                {
+                    CustomerId = user.Id
+                };
+                await customerRepo.CreateCartAsync(cart);
+            }
+
+            var token = tokenService.CreateToken(user);
+            return new AuthResponse { Success = true, Token = token, Message = "Registration successful" };
+        }
+
+        public async Task<AuthResponse> AuthenticateWithFacebookAsync(string accessToken)
+        {
+            var appId = Environment.GetEnvironmentVariable("FACEBOOK_CLIENT_ID");
+            var appSecret = Environment.GetEnvironmentVariable("FACEBOOK_CLIENT_SECRET");
+
+            using var httpClient = httpClientFactory.CreateClient();
+            var debugUrl = $"https://graph.facebook.com/debug_token?input_token={accessToken}&access_token={appId}|{appSecret}";
+            var debugResponse = await httpClient.GetFromJsonAsync<JsonElement>(debugUrl);
+
+            if (!debugResponse.GetProperty("data").GetProperty("is_valid").GetBoolean())
+                throw new Exception("Invalid Facebook token");
+
+            var userId = debugResponse.GetProperty("data").GetProperty("user_id").GetString();
+
+            
+            var profileUrl = $"https://graph.facebook.com/{userId}?fields=id,name,email,picture&access_token={accessToken}";
+            var profileResponse = await httpClient.GetFromJsonAsync<JsonElement>(profileUrl);
+
+            var email = profileResponse.TryGetProperty("email", out var emailProp) ? emailProp.GetString() : $"{userId}@facebook.com";
+            var name = profileResponse.GetProperty("name").GetString();
+            var picture = profileResponse.GetProperty("picture").GetProperty("data").GetProperty("url").GetString();
+
+            if (email == null)
+                return new AuthResponse { Success = false, Message = "Email not exist" };
+
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = name,
+                    Image = picture,
+                    RoleId = "dc11b0b4-44c2-457f-a890-fce0d077dbe0",
+                    CreateDate = DateTime.UtcNow,
+                    CreatedBy = name
+                };
+
+                var result = await userManager.CreateAsync(user);
+                if (!result.Succeeded)
+                    throw new Exception("Failed to create user");
+
+                var role = await roleManager.FindByIdAsync(user.RoleId);
+                if (role != null)
+                {
+                    await userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
+                }
+
+                Cart cart = new()
+                {
+                    CustomerId = user.Id
+                };
+                await customerRepo.CreateCartAsync(cart);
+            }
+
+            var token = tokenService.CreateToken(user);
+            return new AuthResponse { Success = true, Token = token, Message = "Facebook login successful" };
         }
     }
 }

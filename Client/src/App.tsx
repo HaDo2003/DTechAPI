@@ -21,46 +21,49 @@ import CustomerAccount from './pages/customer/CustomerAccount';
 import ScrollToTop from './utils/scrollToTop';
 
 import { AuthProvider } from './context/AuthContext';
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          {/* Customer side */}
-          <Route element={<CustomerLayout />}>
-            <Route path="/" element={<Home />} />
-            {/*Page Fetch product*/}
-            <Route path=":categorySlug/:brandSlug/:slug" element={<ProductDetail />} />
-            <Route path=":categorySlug" element={<CategoryPage />} />
-            <Route path=":categorySlug/:brandSlug" element={<CategoryPage />} />
+    <GoogleOAuthProvider clientId={clientId}>
+      <AuthProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            {/* Customer side */}
+            <Route element={<CustomerLayout />}>
+              <Route path="/" element={<Home />} />
+              {/*Page Fetch product*/}
+              <Route path=":categorySlug/:brandSlug/:slug" element={<ProductDetail />} />
+              <Route path=":categorySlug" element={<CategoryPage />} />
+              <Route path=":categorySlug/:brandSlug" element={<CategoryPage />} />
 
-            {/* Auth */}
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-            <Route path="forgot-password" element={<ForgotPassword />} />
-            <Route path="reset-password" element={<ResetPassword />} />
+              {/* Auth */}
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
+              <Route path="forgot-password" element={<ForgotPassword />} />
+              <Route path="reset-password" element={<ResetPassword />} />
 
-            {/* Customer Account */}
-            <Route path="/profile" element={<CustomerAccount />} />
-            
-            {/* Static pages */}
-            <Route path="contact" element={<ContactPage />} />
+              {/* Customer Account */}
+              <Route path="/profile" element={<CustomerAccount />} />
 
-            {/* Catch-all route for 404 Not Found */}
-            <Route path="*" element={<NotFound />} />
+              {/* Static pages */}
+              <Route path="contact" element={<ContactPage />} />
 
-          </Route>
+              {/* Catch-all route for 404 Not Found */}
+              <Route path="*" element={<NotFound />} />
 
-          {/* You can add AdminLayout here later */}
-          {/* <Route element={<AdminLayout />}>
+            </Route>
+
+            {/* You can add AdminLayout here later */}
+            {/* <Route element={<AdminLayout />}>
           <Route path="/admin" element={<AdminDashboard />} />
         </Route> */}
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
-
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 

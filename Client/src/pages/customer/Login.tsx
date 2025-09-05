@@ -1,18 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Input from "../../components/customer/Input";
-import OAuthButton from "../../components/customer/auth/OAuthButton";
+import FacebookButton from "../../components/customer/auth/FacebookButton";
 import { authService } from "../../services/AuthService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import AlertForm from "../../components/customer/AlertForm";
+import GoogleButton from "../../components/customer/auth/GoogleButton";
 
 const Login: React.FC = () => {
     const [account, setAccount] = useState("");
     const [password, setPassword] = useState("");
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { token, login } = useAuth();
+
+    useEffect(() => {
+        if (token !== null) {
+            navigate("/");
+            return;
+        }
+    }, [token]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -82,9 +90,9 @@ const Login: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="d-flex justify-content-between my-2 mx-3 gap-3">
-                        <OAuthButton btncolor="danger" icon="google" />
-                        <OAuthButton btncolor="primary" icon="facebook" />
+                    <div className="d-flex flex-column my-2 mx-3 gap-2">
+                        <GoogleButton />
+                        <FacebookButton />
                     </div>
                 </div>
             </div>
