@@ -57,6 +57,21 @@ namespace DTech.Application.Mapping
 
             CreateMap<ContactDto, Feedback>()
                 .ForMember(dest => dest.Fbdate, opt => opt.MapFrom(_ => DateTime.UtcNow));
+
+            CreateMap<DTOs.request.CartProductDto, CartProduct>();
+
+            CreateMap<CartProduct, DTOs.response.CartProductDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Product.Price))
+                .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Product.Discount))
+                .ForMember(dest => dest.PriceAfterDiscount, opt => opt.MapFrom(src => src.Product.PriceAfterDiscount))
+                .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.Product.Photo));
+
+            CreateMap<Cart, CartDto>()
+                .ForMember(dest => dest.CartProducts, opt => opt.MapFrom(src => src.CartProducts));
         }
     }
 }

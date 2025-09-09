@@ -177,6 +177,10 @@ namespace DTech.Infrastructure.Repositories
                 .ToListAsync();
             return products;
         }
+        public async Task<bool> CheckProductByIdAsync(int productId)
+        {
+            return await context.Products.AnyAsync(a => a.ProductId == productId);
+        }
 
         // Repo for Product Images
         // Repo for Product Comments

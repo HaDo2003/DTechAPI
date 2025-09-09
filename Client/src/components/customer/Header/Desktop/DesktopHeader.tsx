@@ -8,15 +8,9 @@ import DropDownItem from './DropDownItem';
 import AccountItem from '../AccountItem';
 
 import { useAuth } from '../../../../context/AuthContext';
-
-
-interface CartItem {
-    id: string;
-    quantity: number;
-}
+import { useCart } from '../../../../context/CartContext';
 
 interface HeaderProps {
-    cartItems?: CartItem[];
     onSearch?: (query: string) => void;
 }
 
@@ -26,10 +20,10 @@ interface SearchHistoryItem {
 }
 
 const DesktopHeader: React.FC<HeaderProps> = ({
-    cartItems = [],
     onSearch,
 }) => {
     const { token, logout } = useAuth();
+    const { cartItemCount } = useCart();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
     const [showSearchHistory, setShowSearchHistory] = useState(false);
@@ -125,8 +119,6 @@ const DesktopHeader: React.FC<HeaderProps> = ({
     const handleSubDropdownMouseEnter = (subDropdownName: string) => {
         setActiveSubDropdown(subDropdownName);
     };
-
-    const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     return (
         <>

@@ -9,11 +9,24 @@ import $ from "jquery";
 import 'datatables.net-dt/css/dataTables.dataTables.min.css';
 import 'datatables.net';
 
+//Provider
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { AuthProvider } from './context/AuthContext.ts';
+import { CartProvider } from './context/CartContext.ts';
+
 // make jQuery available globally
 window.$ = $;
 window.jQuery = $;
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <GoogleOAuthProvider clientId={clientId}>
+      <CartProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </CartProvider>
+    </GoogleOAuthProvider>
   </StrictMode>,
 )

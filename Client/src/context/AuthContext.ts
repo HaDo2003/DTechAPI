@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecoder, type User } from "../utils/jwtDecoder";
+import { useCart } from "./CartContext";
 
 interface AuthContextType {
     user: User | null;
@@ -34,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [token, setToken] = useState<string | null>(() => {
         return localStorage.getItem("jwt_token");
     });
+    const { setCart, fetchCart } = useCart();
 
     useEffect(() => {
         const savedToken = localStorage.getItem("jwt_token");
@@ -57,6 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (!decoded) throw new Error("Invalid token");
             setToken(newToken);
             setUser(decoded);
+            fetchCart();
         } catch (error) {
             console.error("Invalid token at login:", error);
             setToken(null);
@@ -68,6 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem("jwt_token");
         setToken(null);
         setUser(null);
+        setCart(null);
     };
 
     const hasRole = (role: string): boolean => user?.roles.includes(role) ?? false;

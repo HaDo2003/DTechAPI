@@ -1,5 +1,4 @@
 ﻿using DTech.Application.DTOs.request;
-using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

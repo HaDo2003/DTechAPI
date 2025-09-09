@@ -14,8 +14,8 @@ namespace DTech.Domain.Interfaces
         Task<bool> IncrementProductViewsAsync(int? productId);
         Task<List<Product>> GetRelatedProductsAsync(int? brandId, int? productId);
         Task<List<Product>> GetByCategoryAndBrandAsync(int? categoryId, int? brandId);
-
         Task<List<Product>> GetProductsByIdListAsync(List<int> ids);
+        Task<bool> CheckProductByIdAsync(int productId);
 
         // Repo for Product Images
         // Repo for Product Comments

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { productService } from "../../services/ProductService";
 import { type Product } from "../../types/Product";
 import { priceFormatter } from "../../utils/priceFormatter";
@@ -14,12 +14,16 @@ import ProductInfoItem from "../../components/customer/productDetail/ProductInfo
 import Loading from "../../components/shared/Loading";
 import AlertForm from "../../components/customer/AlertForm";
 
+// Service
+import { cartService } from "../../services/CartService";
+
 import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import type { ProductCommentRequest, ProductCommentResponse } from "../../types/ProductComment";
 import { useAuth } from "../../context/AuthContext";
 
 const ProductDetail: React.FC = () => {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
+    const navigate = useNavigate();
     const { categorySlug, brandSlug, slug } = useParams<{ categorySlug: string; brandSlug: string; slug: string }>();
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
@@ -90,14 +94,38 @@ const ProductDetail: React.FC = () => {
     // Event handlers
     const handleQuantityIncrease = () => setQuantity(prev => prev + 1);
     const handleQuantityDecrease = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
-    const handleAddToCart = () => {
-        // Add to cart logic
-        console.log('Adding to cart:', { productId: product.productId, quantity });
+
+    const handleAddToCart = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (token === null) {
+            setAlert({ message: "Please login to add to cart", type: "error" });
+            setTimeout(() => {
+                navigate("/login");
+            }, 5000);
+            return;
+        }
+
+        try {
+            const res = await cartService.addToCart(token, {
+                productId: product.productId,
+                quantity: quantity
+            });
+            if (res.success) {
+                setAlert({ message: res.message || "Added to cart!", type: "success" });
+                setQuantity(1);
+            } else {
+                setAlert({ message: res.message || "Add to cart failed!", type: "error" });
+            }
+        } catch (err) {
+            setAlert({ message: "Add to cart failed, please try again.", type: "error" });
+        }
     };
+
     const handleBuyNow = () => {
         // Buy now logic
         console.log('Buy now:', { productId: product.productId, quantity });
     };
+    
     const handleImageClick = (imageSrc: string) => setMainImage(imageSrc);
     const handleToggleDescription = () => setShowFullDescription(!showFullDescription);
     const handleRateNow = () => setShowCommentForm(!showCommentForm);

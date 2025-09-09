@@ -28,7 +28,7 @@ const SpecificationsWindow: React.FC<SpecificationsOverlayProps> = ({
               onClick={onClose}
               className="btn btn-outline-danger btn-sm rounded-circle fw-bold button-custom"
             >
-              ×
+              x
             </button>
           </div>
         </div>
