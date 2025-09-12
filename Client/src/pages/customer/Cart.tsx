@@ -23,8 +23,16 @@ const CartPage: React.FC = () => {
             navigate("/login");
             return;
         }
-        fetchCart();
-        setLoading(false);
+
+        const loadCart = async () => {
+            const data = await fetchCart();
+            if (data) {
+                setCartData(data);
+            }
+            setLoading(false);
+        };
+
+        loadCart();
     }, [token]);
 
     const handleUpdateQuantity = async (id: number, change: number) => {
@@ -108,7 +116,7 @@ const CartPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <Link to="/checkout" className="btn btn-danger col-12">
+                                <Link to="/check-out" className="btn btn-danger col-12">
                                     Check Out
                                 </Link>
                             </div>

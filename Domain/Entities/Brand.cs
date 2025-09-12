@@ -6,6 +6,7 @@ namespace DTech.Domain.Entities;
 public partial class Brand
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int BrandId { get; set; }
 
     [Required(ErrorMessage = "Please enter name of brand")]

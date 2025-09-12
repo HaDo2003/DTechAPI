@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace DTech.Domain.Entities;
 
 public partial class Order
 {
     [Key]
     [Display(Name = "ID")]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string? OrderId { get; set; }
 
     [Display(Name = "Customer")]

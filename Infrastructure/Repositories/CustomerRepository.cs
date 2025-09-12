@@ -167,6 +167,20 @@ namespace DTech.Infrastructure.Repositories
                 return false;
             }
         }
+        public async Task<List<CustomerAddress>> GetAllAddressesByCustomerIdAsync(string customerId)
+        {
+            return await context.CustomerAddresses
+                .Where(c => c.CustomerId == customerId)
+                .OrderByDescending(c => c.IsDefault)
+                .ToListAsync();
+        }
+        public async Task<CustomerAddress?> GetDefaultAddressByCustomerIdAsync(string customerId)
+        {
+            return await context.CustomerAddresses
+                .Where(c => c.CustomerId == customerId && c.IsDefault == true)
+                .FirstOrDefaultAsync();
+        }
+
         //For Cart table
         public async Task<bool> CreateCartAsync(Cart cart)
         {

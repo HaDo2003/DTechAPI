@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DTech.Domain.Entities
 {
     public partial class Quiz
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int QuizId { get; set; }
         public string? Description { get; set; }
         public string? Answer1 { get; set; }

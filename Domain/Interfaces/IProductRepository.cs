@@ -16,6 +16,7 @@ namespace DTech.Domain.Interfaces
         Task<List<Product>> GetByCategoryAndBrandAsync(int? categoryId, int? brandId);
         Task<List<Product>> GetProductsByIdListAsync(List<int> ids);
         Task<bool> CheckProductByIdAsync(int productId);
+        Task<Product?> GetProductByIdAsync(int productId);
 
         // Repo for Product Images
         // Repo for Product Comments

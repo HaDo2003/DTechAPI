@@ -7,6 +7,7 @@ namespace DTech.Domain.Entities;
 public partial class ProductImage
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ImageId { get; set; }
 
     public int? ProductId { get; set; }

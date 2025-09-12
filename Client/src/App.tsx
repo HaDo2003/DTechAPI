@@ -20,6 +20,9 @@ import CartPage from './pages/customer/Cart';
 
 //Utils
 import ScrollToTop from './utils/scrollToTop';
+import Checkout from './pages/customer/CheckOut';
+import OrderSuccess from './pages/customer/OrderSuccess';
+import OrderFail from './pages/customer/OrderFail';
 
 function App() {
   return (
@@ -29,28 +32,25 @@ function App() {
         {/* Customer side */}
         <Route element={<CustomerLayout />}>
           <Route path="/" element={<Home />} />
-          {/*Page Fetch product*/}
-          <Route path=":categorySlug/:brandSlug/:slug" element={<ProductDetail />} />
-          <Route path=":categorySlug" element={<CategoryPage />} />
-          <Route path=":categorySlug/:brandSlug" element={<CategoryPage />} />
 
-          {/* Auth */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
-
-          {/* Customer Account */}
-          <Route path="/profile" element={<CustomerAccount />} />
-
-          <Route path="/cart" element={<CartPage />} />
-
-          {/* Static pages */}
+          <Route path="profile" element={<CustomerAccount />} />
+          <Route path="cart" element={<CartPage />} />
+          <Route path="check-out" element={<Checkout />} />
+          <Route path="order-success/:orderId" element={<OrderSuccess />} />
+          <Route path="order-success" element={<NotFound />} />
+          <Route path="order-fail" element={<OrderFail />} />
           <Route path="contact" element={<ContactPage />} />
 
-          {/* Catch-all route for 404 Not Found */}
+          <Route path="not-found" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
 
+          <Route path=":categorySlug/:brandSlug/:slug" element={<ProductDetail />} />
+          <Route path=":categorySlug" element={<CategoryPage />} />
+          <Route path=":categorySlug/:brandSlug" element={<CategoryPage />} />
         </Route>
 
         {/* You can add AdminLayout here later */}

@@ -61,7 +61,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("AdvertisementId");
 
-                    b.ToTable("Advertisements", (string)null);
+                    b.ToTable("Advertisements");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.ApplicationUser", b =>
@@ -191,7 +191,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("BrandId");
 
-                    b.ToTable("Brands", (string)null);
+                    b.ToTable("Brands");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Cart", b =>
@@ -209,7 +209,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.CartProduct", b =>
@@ -235,7 +235,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartProducts", (string)null);
+                    b.ToTable("CartProducts");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Category", b =>
@@ -275,7 +275,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Chat", b =>
@@ -304,7 +304,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Chats", (string)null);
+                    b.ToTable("Chats");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Coupon", b =>
@@ -363,7 +363,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("CouponId");
 
-                    b.ToTable("Coupons", (string)null);
+                    b.ToTable("Coupons");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.CouponUsed", b =>
@@ -390,7 +390,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CouponUseds", (string)null);
+                    b.ToTable("CouponUseds");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.CustomerAddress", b =>
@@ -432,7 +432,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("WardId");
 
-                    b.ToTable("CustomerAddresses", (string)null);
+                    b.ToTable("CustomerAddresses");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.CustomerCoupon", b =>
@@ -455,7 +455,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("CustomerCoupons", (string)null);
+                    b.ToTable("CustomerCoupons");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Feedback", b =>
@@ -487,7 +487,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("FeedbackId");
 
-                    b.ToTable("Feedbacks", (string)null);
+                    b.ToTable("Feedbacks");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.MonthlyRecap", b =>
@@ -527,12 +527,13 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MonthlyRecaps", (string)null);
+                    b.ToTable("MonthlyRecaps");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Order", b =>
                 {
                     b.Property<string>("OrderId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<string>("Address")
@@ -616,7 +617,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("WardId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.OrderCoupon", b =>
@@ -639,7 +640,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderCoupons", (string)null);
+                    b.ToTable("OrderCoupons");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.OrderProduct", b =>
@@ -651,9 +652,6 @@ namespace DTech.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("CostAtPurchase")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("InitialCost")
                         .HasColumnType("numeric");
 
                     b.Property<string>("OrderId")
@@ -674,7 +672,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderProducts", (string)null);
+                    b.ToTable("OrderProducts");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.OrderStatus", b =>
@@ -690,7 +688,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("StatusId");
 
-                    b.ToTable("OrderStatuses", (string)null);
+                    b.ToTable("OrderStatuses");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Payment", b =>
@@ -729,7 +727,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("PaymentMethodId");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.PaymentMethod", b =>
@@ -757,7 +755,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("PaymentMethodId");
 
-                    b.ToTable("PaymentMethods", (string)null);
+                    b.ToTable("PaymentMethods");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Post", b =>
@@ -797,7 +795,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("CateId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.PostCategory", b =>
@@ -832,7 +830,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("PostCategories", (string)null);
+                    b.ToTable("PostCategories");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.PostComment", b =>
@@ -865,7 +863,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostComments", (string)null);
+                    b.ToTable("PostComments");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Product", b =>
@@ -950,7 +948,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.ProductComment", b =>
@@ -983,7 +981,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductComments", (string)null);
+                    b.ToTable("ProductComments");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.ProductImage", b =>
@@ -1004,7 +1002,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImages", (string)null);
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Province", b =>
@@ -1020,7 +1018,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Provinces", (string)null);
+                    b.ToTable("Provinces");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Quiz", b =>
@@ -1066,7 +1064,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("QuizId");
 
-                    b.ToTable("Quizzes", (string)null);
+                    b.ToTable("Quizzes");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.SearchHistory", b =>
@@ -1090,7 +1088,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SearchHistories", (string)null);
+                    b.ToTable("SearchHistories");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Shipping", b =>
@@ -1101,7 +1099,7 @@ namespace DTech.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ShippingId"));
 
-                    b.Property<DateOnly?>("DelivaryDate")
+                    b.Property<DateOnly?>("DeliveryDate")
                         .HasColumnType("date");
 
                     b.Property<DateOnly?>("ReceivedDate")
@@ -1109,7 +1107,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("ShippingId");
 
-                    b.ToTable("Shippings", (string)null);
+                    b.ToTable("Shippings");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Specification", b =>
@@ -1136,7 +1134,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Specifications", (string)null);
+                    b.ToTable("Specifications");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.UserQuizParticipation", b =>
@@ -1168,7 +1166,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserQuizParticipations", (string)null);
+                    b.ToTable("UserQuizParticipations");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.VisitorCount", b =>
@@ -1187,7 +1185,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VisitorCounts", (string)null);
+                    b.ToTable("VisitorCounts");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Ward", b =>
@@ -1203,7 +1201,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Wards", (string)null);
+                    b.ToTable("Wards");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.WishList", b =>
@@ -1226,7 +1224,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("WishLists", (string)null);
+                    b.ToTable("WishLists");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1645,7 +1643,7 @@ namespace DTech.Infrastructure.Migrations
             modelBuilder.Entity("DTech.Domain.Entities.WishList", b =>
                 {
                     b.HasOne("DTech.Domain.Entities.ApplicationUser", "Customer")
-                        .WithMany()
+                        .WithMany("Wishlists")
                         .HasForeignKey("CustomerId");
 
                     b.HasOne("DTech.Domain.Entities.Product", "Product")
@@ -1717,6 +1715,8 @@ namespace DTech.Infrastructure.Migrations
                     b.Navigation("CustomerCoupons");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("Wishlists");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.Brand", b =>

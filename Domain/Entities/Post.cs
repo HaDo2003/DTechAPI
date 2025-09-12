@@ -8,6 +8,7 @@ namespace DTech.Domain.Entities;
 public partial class Post
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int PostId { get; set; }
 
     [Display(Name = "Post Category")]

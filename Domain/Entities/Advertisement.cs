@@ -6,6 +6,7 @@ namespace DTech.Domain.Entities;
 public partial class Advertisement
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int AdvertisementId { get; set; }
 
     [Required(ErrorMessage = "Please enter name")]

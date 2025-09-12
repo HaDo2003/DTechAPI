@@ -35,3 +35,20 @@ export const jwtDecoder = (token: string): User | null => {
         return null;
     }
 };
+
+export const isExpired = (token: string): any => {
+    if (!token || token.split(".").length !== 3) {
+        return false;
+    }
+    try {
+        const decoded = jwtDecode<TokenPayload>(token);
+
+        if (decoded.exp && decoded.exp < Date.now() / 1000) {
+            return true;
+        }
+
+        return false;
+    } catch {
+        return true;
+    }
+}

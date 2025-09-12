@@ -43,7 +43,7 @@ const Breadcrumb: React.FC = () => {
   });
 
   return (
-    <div className="container my-1">
+    <div className="container my-2">
       <nav aria-label="breadcrumb">
         <ol className="breadcrumb pt-1 custom-breadcrumb">
           {!isHome && (

@@ -68,5 +68,16 @@ namespace DTech.Infrastructure.Repositories
             await context.SaveChangesAsync();
             return true;
         }
+    
+        public async Task<bool> ClearCartAsync(Cart cart)
+        {
+            if (cart != null)
+            {
+                context.CartProducts.RemoveRange(cart.CartProducts);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
     }
 }

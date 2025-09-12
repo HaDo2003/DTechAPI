@@ -72,6 +72,8 @@ namespace DTech.Application.Mapping
 
             CreateMap<Cart, CartDto>()
                 .ForMember(dest => dest.CartProducts, opt => opt.MapFrom(src => src.CartProducts));
+
+            CreateMap<PaymentMethod, PaymentMethodDto>();
         }
     }
 }

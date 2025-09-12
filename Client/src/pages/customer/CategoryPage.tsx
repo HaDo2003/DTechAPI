@@ -5,6 +5,7 @@ import { type Product } from "../../types/Product";
 import { type Brand } from "../../types/Brand";
 import { getCategoryProducts, getCategoryBrandProducts } from "../../services/CategoryService";
 import Loading from "../../components/shared/Loading";
+import NotFound from "./NotFound";
 
 const CategoryPage: React.FC = () => {
     const navigate = useNavigate();
@@ -40,9 +41,17 @@ const CategoryPage: React.FC = () => {
                     ? await getCategoryBrandProducts(categorySlug, brandSlug, sortOrder)
                     : await getCategoryProducts(categorySlug, sortOrder);
 
+
+                if (!data) {
+                    setProducts([]);
+                    setTitle("");
+                    return;
+                }
                 setProducts(data.products);
                 setBrands(data.brands ?? []);
                 setTitle(data.title);
+            } catch {
+                setProducts([]);
             } finally {
                 setLoading(false);
             }
@@ -52,6 +61,9 @@ const CategoryPage: React.FC = () => {
     }, [categorySlug, brandSlug, sortOrder]);
 
     if (loading) return <Loading />;
+    if (!loading && products.length === 0) {
+        return <NotFound />;
+    }
 
     const handleSortChange = (value: string) => {
         setSortOrder(value);

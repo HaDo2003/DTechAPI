@@ -20,6 +20,7 @@ import { cartService } from "../../services/CartService";
 import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import type { ProductCommentRequest, ProductCommentResponse } from "../../types/ProductComment";
 import { useAuth } from "../../context/AuthContext";
+import { checkOutService } from "../../services/CheckOutService";
 
 const ProductDetail: React.FC = () => {
     const { user, token } = useAuth();
@@ -121,9 +122,28 @@ const ProductDetail: React.FC = () => {
         }
     };
 
-    const handleBuyNow = () => {
-        // Buy now logic
-        console.log('Buy now:', { productId: product.productId, quantity });
+    const handleBuyNow = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (token === null) {
+            setAlert({ message: "Please login to add to cart", type: "error" });
+            setTimeout(() => {
+                navigate("/login");
+            }, 5000);
+            return;
+        }
+        try {
+            setLoading(true);
+            const res = await checkOutService.buyNow(token, product.productId, quantity);
+            if (res.success) {
+                setLoading(false);
+                setQuantity(1);
+                navigate("/check-out", {state: res});
+            } else {
+                setAlert({ message: res.message || "Buy now failed!", type: "error" });
+            }
+        } catch (err) {
+            setAlert({ message: "Buy now failed, please try again.", type: "error" });
+        }
     };
     
     const handleImageClick = (imageSrc: string) => setMainImage(imageSrc);
@@ -239,7 +259,7 @@ const ProductDetail: React.FC = () => {
                                 </>
                             ) : (
                                 <p className="text-dark fw-bold fs-2 mb-0 product-price1">
-                                    ${formattedOriginalPrice}
+                                    {formattedOriginalPrice}
                                 </p>
                             )}
                         </div>

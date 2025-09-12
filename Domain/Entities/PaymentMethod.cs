@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DTech.Domain.Entities;
 
@@ -8,6 +9,7 @@ public partial class PaymentMethod
 {
     [Display(Name = "ID")]
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int PaymentMethodId { get; set; }
 
     public string? Description { get; set; }

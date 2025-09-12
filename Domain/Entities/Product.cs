@@ -10,6 +10,7 @@ public partial class Product
 {
     [Key]
     [Display(Name = "ID")]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ProductId { get; set; }
 
     [Display(Name = "Brand")]
