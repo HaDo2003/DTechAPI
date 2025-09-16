@@ -243,5 +243,21 @@ namespace DTech.Infrastructure.Repositories
             }
             return false;
         }
+
+        // For Search History
+        public async Task SaveSearchHistory(string customerId, string query)
+        {
+            if (customerId != null)
+            {
+                SearchHistory model = new()
+                {
+                    UserId = customerId,
+                    SearchTerm = query,
+                    SearchDate = DateTime.UtcNow
+                };
+                context.SearchHistories.Add(model);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }

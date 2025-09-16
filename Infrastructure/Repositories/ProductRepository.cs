@@ -185,6 +185,29 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.Products.FindAsync(productId);
         }
+        public async Task<List<Product>> GetProductByQuery(string query)
+        {
+            query = query.Trim().ToLower();
+
+            var products = await context.Products
+                .AsNoTracking()
+                .Include(a => a.Brand)
+                .Include(a => a.Category)
+                .Include(p => p.Specifications)
+                .Where(p => p.Status == 1 &&
+                (
+                    EF.Functions.Like(p.Name!.ToLower(), $"%{query}%") ||
+                    EF.Functions.Like(p.Description!.ToLower(), $"%{query}%") ||
+                    p.Specifications!.Any(s =>
+                        EF.Functions.Like(s.SpecName!.ToLower(), $"%{query}%") ||
+                        EF.Functions.Like(s.Detail!.ToLower(), $"%{query}%")
+                    )
+                ))
+                .OrderByDescending(a => a.ProductId)
+                .ToListAsync();
+            
+            return products;
+        }
 
         // Repo for Product Images
         // Repo for Product Comments

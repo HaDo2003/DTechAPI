@@ -123,6 +123,10 @@ Nav Bar
     box-shadow: none;
 }
 
+.btn.btn-search:hover {
+  background: #f8f9fa;
+}
+
 .btn.btn-search:focus {
     outline: none;
     box-shadow: none;

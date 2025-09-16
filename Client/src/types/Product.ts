@@ -3,6 +3,7 @@ import { type Brand } from "./Brand";
 import { type ProductCommentResponse } from "./ProductComment";
 import { type ProductImage } from "./ProductImage";
 import { type Specification} from "./Specification";
+import type { MessageResponse } from "./MessageReponse";
 
 export interface Product {
     productId: number;
@@ -26,4 +27,9 @@ export interface Product {
     productImages: ProductImage[];
     specifications: Specification[];
     relatedProducts: Product[];
+}
+
+export interface SearchProductProps extends MessageResponse{
+    products?: Product[];
+    initialSort?: string;
 }

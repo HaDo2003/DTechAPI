@@ -1,17 +1,16 @@
 ﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
-using DTech.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using System.Security.Claims;
 
 namespace DTech.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController(
-        IProductService productService) : ControllerBase
+        IProductService productService
+    ) : ControllerBase
     {
         [HttpGet("{categorySlug}/{brandSlug}/{slug}")]
         public async Task<IActionResult> GetProductDetailAsync(string categorySlug, string brandSlug, string slug)
@@ -90,6 +89,18 @@ namespace DTech.API.Controllers
             if(!response.Success)
                 return BadRequest(new { response.Message });
             return Ok(response);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string query, [FromQuery] string sortOrder = "newest")
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(query))
+                return BadRequest(new { message = "Query cannot be empty." });
+
+            var products = await productService.SearchProductsAsync(query, sortOrder, userId);
+
+            return Ok(new { products, initialSort = sortOrder, success = true });
         }
     }
 }

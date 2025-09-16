@@ -14,5 +14,6 @@ namespace DTech.Application.Interfaces
 
         Task<List<ProductDto>> GetRecentlyViewedProductsAsync(string? ids);
         Task<ProductCommentDto> PostCommentAsync(ProductCommentRequestDto model);
+        Task<List<ProductDto>> SearchProductsAsync(string query, string sortOrder, string? customerId);
     }
 }

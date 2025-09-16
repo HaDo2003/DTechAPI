@@ -1,4 +1,5 @@
 ﻿using DTech.Domain.Entities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DTech.Domain.Interfaces
 {
@@ -29,5 +30,8 @@ namespace DTech.Domain.Interfaces
         Task<bool> CreateCartAsync(Cart cart);
         // For Feedback table
         Task<bool> SendContactAsync(Feedback model);
+
+        // For Search History
+        Task SaveSearchHistory(string customerId, string query);
     }
 }

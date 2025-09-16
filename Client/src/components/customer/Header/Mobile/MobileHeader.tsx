@@ -6,19 +6,19 @@ import AccountItem from '../AccountItem';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../../../context/AuthContext';
+import { useCart } from '../../../../context/CartContext';
 
 interface MobileHeaderProps {
-    cartItemCount?: number;
     searchQuery?: string;
     onSearch?: (query: string) => void;
 }
 
 const MobileHeader: React.FC<MobileHeaderProps> = ({
-    cartItemCount = 0,
     searchQuery = '',
     onSearch = () => { },
 }) => {
     const { token, logout } = useAuth();
+    const { cartItemCount } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchInput, setSearchInput] = useState(searchQuery);
     const [isSearchHistoryVisible] = useState(false);
@@ -49,6 +49,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
         if (searchInput.trim()) {
             onSearch(searchInput.trim());
         }
+        navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
     };
 
     const clearSearchHistory = () => {

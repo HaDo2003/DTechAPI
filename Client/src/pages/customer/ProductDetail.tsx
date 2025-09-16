@@ -21,9 +21,11 @@ import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import type { ProductCommentRequest, ProductCommentResponse } from "../../types/ProductComment";
 import { useAuth } from "../../context/AuthContext";
 import { checkOutService } from "../../services/CheckOutService";
+import { useCart } from "../../context/CartContext";
 
 const ProductDetail: React.FC = () => {
     const { user, token } = useAuth();
+    const { fetchCart } = useCart();
     const navigate = useNavigate();
     const { categorySlug, brandSlug, slug } = useParams<{ categorySlug: string; brandSlug: string; slug: string }>();
     const [product, setProduct] = useState<Product | null>(null);
@@ -42,6 +44,7 @@ const ProductDetail: React.FC = () => {
     useEffect(() => {
         document.title = "DTech - Product Detail";
         const fetchProduct = async () => {
+            setLoading(true);
             try {
                 const data = await productService.getProductData(categorySlug!, brandSlug!, slug!);
                 setProduct(data);
@@ -56,6 +59,15 @@ const ProductDetail: React.FC = () => {
 
         fetchProduct();
     }, [categorySlug, brandSlug, slug]);
+
+
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                <Loading />
+            </div>
+        );
+    }
 
     if (!product) {
         return <NotFound />;
@@ -112,6 +124,7 @@ const ProductDetail: React.FC = () => {
             if (res.success) {
                 setAlert({ message: res.message || "Added to cart!", type: "success" });
                 setQuantity(1);
+                await fetchCart();
             } else {
                 setAlert({ message: res.message || "Add to cart failed!", type: "error" });
             }
@@ -135,7 +148,7 @@ const ProductDetail: React.FC = () => {
             if (res.success) {
                 setLoading(false);
                 setQuantity(1);
-                navigate("/check-out", {state: res});
+                navigate("/check-out", { state: res });
             } else {
                 setAlert({ message: res.message || "Buy now failed!", type: "error" });
             }
@@ -143,7 +156,7 @@ const ProductDetail: React.FC = () => {
             setAlert({ message: "Buy now failed, please try again.", type: "error" });
         }
     };
-    
+
     const handleImageClick = (imageSrc: string) => setMainImage(imageSrc);
     const handleToggleDescription = () => setShowFullDescription(!showFullDescription);
     const handleRateNow = () => setShowCommentForm(!showCommentForm);
@@ -572,12 +585,6 @@ const ProductDetail: React.FC = () => {
                     type={alert.type}
                     onClose={() => setAlert(null)}
                 />
-            )}
-
-            {loading && (
-                <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
-                    <Loading />
-                </div>
             )}
         </>
     );

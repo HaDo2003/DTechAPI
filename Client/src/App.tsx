@@ -17,12 +17,14 @@ import ForgotPassword from './pages/customer/ForgotPassword';
 import ResetPassword from './pages/customer/ResetPassword';
 import CustomerAccount from './pages/customer/CustomerAccount';
 import CartPage from './pages/customer/Cart';
+import OrderSuccess from './pages/customer/OrderSuccess';
+import OrderFail from './pages/customer/OrderFail';
+import SearchPage from './pages/customer/SearchPage';
 
 //Utils
 import ScrollToTop from './utils/scrollToTop';
 import Checkout from './pages/customer/CheckOut';
-import OrderSuccess from './pages/customer/OrderSuccess';
-import OrderFail from './pages/customer/OrderFail';
+
 
 function App() {
   return (
@@ -44,6 +46,7 @@ function App() {
           <Route path="order-success" element={<NotFound />} />
           <Route path="order-fail" element={<OrderFail />} />
           <Route path="contact" element={<ContactPage />} />
+          <Route path="search" element={<SearchPage />} />
 
           <Route path="not-found" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />

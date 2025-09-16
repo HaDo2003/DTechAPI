@@ -82,6 +82,8 @@ const DesktopHeader: React.FC<HeaderProps> = ({
             if (onSearch) {
                 onSearch(searchQuery.trim());
             }
+
+            navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
         }
     };
 
@@ -156,11 +158,9 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onFocus={handleSearchInputFocus}
                                     />
-                                    <span className="input-group-btn">
-                                        <button className="btn btn-search" type="submit">
-                                            <i className="fa-solid fa-magnifying-glass fa-xl"></i>
-                                        </button>
-                                    </span>
+                                    <button className="btn btn-search" type="submit">
+                                        <i className="fa-solid fa-magnifying-glass fa-xl"></i>
+                                    </button>
                                 </div>
                             </form>
 

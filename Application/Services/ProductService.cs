@@ -191,5 +191,26 @@ namespace DTech.Application.Services
                 CommentId = commentId
             };
         }
+
+        public async Task<List<ProductDto>> SearchProductsAsync(string query, string sortOrder, string? customerId)
+        {
+            if(customerId != null)
+            {
+                var customer = await customerRepo.CheckCustomerAsync(customerId);
+                if (!customer)
+                {
+                    await customerRepo.SaveSearchHistory(customerId, query);
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(query))
+                return [];
+
+            var products = await productRepo.GetProductByQuery(query);
+            products = SortOrders(sortOrder, [.. products]);
+
+            var productDto = _mapper.Map<List<ProductDto>>(products);
+            return productDto;
+        }
     }
 }
