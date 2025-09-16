@@ -117,13 +117,18 @@ const Checkout: React.FC = () => {
         setLoading(true);
         try {
             const res = await checkOutService.placeOrder(
-                token, 
+                token,
                 formData,
                 buyNowData ? true : false
             );
             console.log(formData);
             if (res && res.success) {
-                navigate(`/order-success/${res.orderId}`, { state: res });
+                if (res.paymentUrl) {
+                    window.location.href = res.paymentUrl;
+                    return;
+                } else {
+                    navigate(`/order-success/${res.orderId}`, { state: res });
+                }
             } else {
                 navigate("/order-fail");
             }

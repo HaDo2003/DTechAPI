@@ -21,9 +21,11 @@ import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import type { ProductCommentRequest, ProductCommentResponse } from "../../types/ProductComment";
 import { useAuth } from "../../context/AuthContext";
 import { checkOutService } from "../../services/CheckOutService";
+import { useCart } from "../../context/CartContext";
 
 const ProductDetail: React.FC = () => {
     const { user, token } = useAuth();
+    const { fetchCart } = useCart();
     const navigate = useNavigate();
     const { categorySlug, brandSlug, slug } = useParams<{ categorySlug: string; brandSlug: string; slug: string }>();
     const [product, setProduct] = useState<Product | null>(null);
@@ -114,6 +116,7 @@ const ProductDetail: React.FC = () => {
             if (res.success) {
                 setAlert({ message: res.message || "Added to cart!", type: "success" });
                 setQuantity(1);
+                await fetchCart();
             } else {
                 setAlert({ message: res.message || "Add to cart failed!", type: "error" });
             }

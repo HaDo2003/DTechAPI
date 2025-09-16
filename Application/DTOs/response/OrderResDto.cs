@@ -15,5 +15,7 @@
         public decimal? FinalCost { get; set; }
         public PaymentMethodDto? PaymentMethod { get; set; }
         public List<OrderProductDto>? OrderProducts { get; set; }
+
+        public string? PaymentUrl { get; set; } // For third party payment like Vnpay or Momo
     }
 }

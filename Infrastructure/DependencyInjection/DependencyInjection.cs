@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Win32;
 using System.Text;
 
 namespace DTech.Infrastructure.DependencyInjection
@@ -80,6 +81,9 @@ namespace DTech.Infrastructure.DependencyInjection
 
             //Mapper Configuration
             services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
+
+            //Register IHttpContextAccessor
+            services.AddHttpContextAccessor();
 
             // Register application services
             services.AddScoped<IHomeService, HomeService>();

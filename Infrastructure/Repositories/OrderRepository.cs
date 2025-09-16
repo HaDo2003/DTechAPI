@@ -82,5 +82,16 @@ namespace DTech.Infrastructure.Repositories
                 return null;
             }
         }
+
+        public async Task<Order?> GetByPaymentIdAsync(int? paymentId)
+        {
+            if (paymentId == null)
+            {
+                return null;
+            }
+            return await context.Orders
+                .AsNoTracking()
+                .FirstOrDefaultAsync(o => o.PaymentId == paymentId);
+        }
     }
 }

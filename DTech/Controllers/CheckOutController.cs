@@ -1,6 +1,7 @@
 ﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
+using DTech.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -96,6 +97,34 @@ namespace DTech.API.Controllers
 
             if (!response.Success)
                 return BadRequest(new { success = false, response.Message });
+
+            return Ok(response);
+        }
+
+        [HttpGet("vnpay-callback")]
+        public async Task<IActionResult> VnPayCallback()
+        {
+            var result = await checkOutService.HandleVnPayCallbackAsync(Request.Query);
+
+            if (!result.Success)
+            {
+                return Redirect($"http://localhost:5173/order-fail?message={Uri.EscapeDataString(result.Message ?? "Payment failed")}");
+            }
+
+            return Redirect($"http://localhost:5173/order-success/{result.OrderId}");
+        }
+
+        [HttpGet("get-order-success/{orderId}")]
+        public async Task<IActionResult> GetOrderSuccess(string orderId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var response = await checkOutService.GetOrderSuccessAsync(userId, orderId);
+            if (!response.Success)
+                return BadRequest(new { response.Message });
 
             return Ok(response);
         }

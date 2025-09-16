@@ -1,17 +1,54 @@
-import React from "react";
-import { useLocation, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import type { OrderSuccessModel } from "../../types/OrderSuccess";
 import NotFound from "./NotFound";
+import { checkOutService } from "../../services/CheckOutService";
+import { useAuth } from "../../context/AuthContext";
 
 
 const OrderSuccess: React.FC = () => {
+  const { token } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
-  const order: OrderSuccessModel = location.state;
+  const [order, setOrder] = useState<OrderSuccessModel | null>(
+    location.state || null
+  ); 
   const { orderId } = useParams<{ orderId: string }>();
+  const [loading, setLoading] = useState<boolean>(true);
 
-  if(orderId === undefined){
-    return <NotFound />
-  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!order && orderId) {
+        if (token === null) {
+          navigate("/login");
+          return;
+        }
+        setLoading(true);
+        try {
+          const res = await checkOutService.getOrderSuccess(
+            token,
+            orderId
+          );
+          if (res && res.success) {
+            setOrder(res);
+          } else {
+            navigate("/order-fail");
+          }
+        } catch (err) {
+          console.error("Place order failed:", err);
+          navigate("/order-fail");
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
+    fetchData();
+  }, [orderId, order]);
+
+  if (orderId === undefined) return <NotFound />
+  if (loading) return <div>Loading...</div>;
+  if (!order) return <NotFound />;
 
   return (
     <div className="bg-light min-vh-100">

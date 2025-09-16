@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Vnpay;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace DTech.Application.Services
 {
@@ -18,7 +20,9 @@ namespace DTech.Application.Services
         IPaymentRepository paymentRepo,
         IMapper mapper,
         IBackgroundTaskQueue backgroundTaskQueue,
-        IEmailService emailService
+        IEmailService emailService,
+        IVnPayService vnPayService,
+        IHttpContextAccessor httpContextAccessor
     ) : ICheckOutService
     {
         // Main Methods
@@ -116,6 +120,35 @@ namespace DTech.Application.Services
                 if (!success || order == null)
                     return new OrderResDto { Success = false, Message = message };
 
+                // 🔹 If VNPay selected
+                if (model.PaymentMethod == 3 && order.Payment != null)
+                {
+                    if (order.FinalCost <= 0)
+                        return new OrderResDto { Success = false, Message = "Invalid order total" };
+
+                    var paymentInfo = new PaymentInformationModel
+                    {
+                        OrderType = "other",
+                        Amount = order.FinalCost,
+                        OrderDescription = $"Payment for order {order.OrderId}",
+                        Name = customer.FullName,
+                        TxnRef = order.Payment.PaymentId.ToString()
+                    };
+
+                    var clientIp = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "127.0.0.1";
+
+                    // generate VNPay URL
+                    var paymentUrl = vnPayService.CreatePaymentUrl(paymentInfo, clientIp);
+
+                    return new OrderResDto
+                    {
+                        Success = true,
+                        OrderId = order.OrderId,
+                        PaymentUrl = paymentUrl,
+                        Message = "Redirect to VNPay"
+                    };
+                }
+
                 //SendEmail(order);
 
                 OrderResDto result = new()
@@ -153,6 +186,122 @@ namespace DTech.Application.Services
             catch (Exception ex) {
                 return new OrderResDto { Success = false, Message = ex.Message };
             }
+        }
+
+        public async Task<OrderResDto> HandleVnPayCallbackAsync(IQueryCollection query)
+        {
+            var response = vnPayService.PaymentExecute(query);
+            if (!(response?.Success ?? false))
+            {
+                return new OrderResDto
+                {
+                    Success = false,
+                    Message = "Payment failed or invalid callback"
+                };
+            }
+
+            try
+            {
+                var txnRef = query["vnp_TxnRef"].ToString();
+                var responseCode = query["vnp_ResponseCode"].ToString();
+                var amount = query["vnp_Amount"].ToString();
+
+                if (string.IsNullOrEmpty(txnRef))
+                    return new OrderResDto { Success = false, Message = "Missing transaction reference" };
+
+                if (responseCode != "00")
+                    return new OrderResDto { Success = false, Message = $"Payment failed with code: {responseCode}" };
+
+                if (!int.TryParse(txnRef, out int paymentId))
+                    return new OrderResDto { Success = false, Message = "Invalid payment ID" };
+
+                var payment = await paymentRepo.GetByIdAsync(paymentId);
+                if (payment == null)
+                    return new OrderResDto { Success = false, Message = "Payment record not found" };
+
+                if (payment.Status == 1)
+                {
+                    var existingOrder = await orderRepo.GetByPaymentIdAsync(payment.PaymentId);
+                    return new OrderResDto
+                    {
+                        Success = true,
+                        Message = "Payment already processed",
+                        OrderId = existingOrder?.OrderId ?? string.Empty,
+                        PaymentMethod = existingOrder?.Payment?.PaymentMethod == null
+                        ? null
+                        : new PaymentMethodDto
+                        {
+                            Description = "VNPay"
+                        },
+                        FinalCost = payment.Amount
+                    };
+                }
+
+                // ✅ Update payment
+                payment.Status = 1;
+                await paymentRepo.UpdateAsync(payment);
+
+                var order = await orderRepo.GetByPaymentIdAsync(payment.PaymentId);
+
+                //SendEmail(order);
+
+                OrderResDto result = new()
+                {
+                    Success = true,
+                    OrderId = order?.OrderId ?? string.Empty,
+                };
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new OrderResDto
+                {
+                    Success = false,
+                    Message = $"Error processing payment: {ex.Message}"
+                };
+            }
+
+        }
+
+        public async Task<OrderResDto> GetOrderSuccessAsync(string customerId, string orderId)
+        {
+            var customer = await customerRepo.GetCustomerByIdAsync(customerId);
+            if (customer == null)
+                return new OrderResDto { Success = false, Message = "Customer not found" };
+
+            var order = await orderRepo.GetOrderByIdAsync(orderId);
+            OrderResDto result = new()
+            {
+                Success = true,
+                OrderId = order?.OrderId ?? string.Empty,
+                Phone = order?.Phone,
+                Email = order?.Email,
+                Address = order?.Address,
+                ShippingAddress = order?.ShippingAddress,
+                ShippingCost = order?.ShippingCost ?? 0,
+                CostDiscount = order?.CostDiscount ?? 0,
+                TotalCost = order?.TotalCost ?? 0,
+                FinalCost = order?.FinalCost ?? 0,
+                PaymentMethod = order?.Payment?.PaymentMethod == null
+                        ? null
+                        : new PaymentMethodDto
+                        {
+                            Description = order.Payment.PaymentMethod.Description
+                        },
+                OrderProducts = order?.OrderProducts?
+                        .Where(op => op?.Product != null)
+                        .Select(op => new OrderProductDto
+                        {
+                            Id = op.Id,
+                            Name = op.Product.Name,
+                            Photo = op.Product.Photo,
+                            Quantity = op.Quantity,
+                            CostAtPurchase = op.CostAtPurchase
+                        }).ToList()
+            };
+
+            return result;
         }
 
         // --- Helper Methods ---

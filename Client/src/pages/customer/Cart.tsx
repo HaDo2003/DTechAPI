@@ -46,6 +46,7 @@ const CartPage: React.FC = () => {
             if (res.success) {
                 setAlert({ message: "Update quantity successfully!", type: "success" });
                 setCartData(res);
+                await fetchCart();
             } else {
                 setAlert({ message: res.message || "Fail to update quantity!", type: "error" });
             }

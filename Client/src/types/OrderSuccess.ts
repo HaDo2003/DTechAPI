@@ -22,4 +22,5 @@ export interface OrderSuccessModel {
     totalCost?: number;
     finalCost?: number;
     orderProducts?: OrderProduct[];
+    paymentUrl?: string;
 };
