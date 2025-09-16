@@ -116,7 +116,7 @@ namespace DTech.Application.Services
                 if (!success || order == null)
                     return new OrderResDto { Success = false, Message = message };
 
-                //SendEmail(order);
+                SendEmail(order);
 
                 OrderResDto result = new()
                 {

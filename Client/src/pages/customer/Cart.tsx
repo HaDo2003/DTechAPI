@@ -58,7 +58,6 @@ const CartPage: React.FC = () => {
 
     const handleRemove = (id: number) => handleUpdateQuantity(id, 0);
 
-    if (loading) return <Loading />;
     if (!cartData?.cartProducts?.length) {
         return <div className="alert alert-info">Your cart is empty.</div>;
     }
@@ -131,8 +130,12 @@ const CartPage: React.FC = () => {
                     onClose={() => setAlert(null)}
                 />
             )}
+            {loading && (
+                <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                    <Loading />
+                </div>
+            )}
         </>
-
     );
 };
 

@@ -63,8 +63,6 @@ const CustomerAccount: React.FC = () => {
         fetchCustomer();
     }, [token, navigate]);
 
-    if (loading) return <Loading />;
-
     return (
         <>
             <div className="app-content">
@@ -83,6 +81,12 @@ const CustomerAccount: React.FC = () => {
                     type={alert.type}
                     onClose={() => setAlert(null)}
                 />
+            )}
+
+            {loading && (
+                <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                    <Loading />
+                </div>
             )}
         </>
 

@@ -59,9 +59,30 @@ const Address: React.FC<AddressProps> = ({
         }
     };
 
-    const onSetDefault = (addressId: number | null) => {
-        // Implement set default functionality here
-        console.log("Set default address with ID:", addressId);
+    const onSetDefault = async (addressId: number | null) => {
+        if (!addressId) return;
+
+        try {
+            setLoading(true);
+            const res = await customerService.setDefaultAddress(token ?? "", addressId);
+
+            if (res.success) {
+                setAddressList(prev =>
+                    prev.map(addr => ({
+                        ...addr,
+                        isDefault: addr.addressId === addressId
+                    }))
+                );
+
+                setAlert({ message: "Default address updated!", type: "success" });
+            } else {
+                setAlert({ message: res.message || "Failed to set default address.", type: "error" });
+            }
+        } catch (err) {
+            setAlert({ message: "Request failed, please try again.", type: "error" });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleClose = () => {
@@ -85,14 +106,19 @@ const Address: React.FC<AddressProps> = ({
                 if (isEdit) {
                     setAddressList(prev =>
                         prev.map(addr =>
-                            addr.addressId === data.addressId ? { ...addr, ...data } : addr
+                            addr.addressId === data.addressId
+                                ? { ...addr, ...data }
+                                : { ...addr, isDefault: data.isDefault ? false : addr.isDefault }
                         )
                     );
                 } else {
-                    setAddressList(prev => [
-                        ...prev,
-                        { ...data, addressId: res.addressId ?? null },
-                    ]);
+                    setAddressList(prev => {
+                        const newAddress = { ...data, addressId: res.addressId ?? null };
+                        if (newAddress.isDefault) {
+                            return prev.map(addr => ({ ...addr, isDefault: false })).concat(newAddress);
+                        }
+                        return [...prev, newAddress];
+                    });
                 }
             } else {
                 setAlert({ message: res.message || "Operation failed!", type: "error" });
@@ -104,14 +130,6 @@ const Address: React.FC<AddressProps> = ({
             setShowForm(false);
         }
     };
-
-    if (loading) {
-        return (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
-                <Loading />;
-            </div>
-        );
-    }
 
     return (
         <>
@@ -200,6 +218,12 @@ const Address: React.FC<AddressProps> = ({
                     type={alert.type}
                     onClose={() => setAlert(null)}
                 />
+            )}
+
+            {loading && (
+                <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                    <Loading />
+                </div>
             )}
         </>
     );

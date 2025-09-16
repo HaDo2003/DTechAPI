@@ -18,19 +18,25 @@ const HomePage: React.FC = () => {
     });
   }, []);
 
-  if (loading) return <Loading/>;
-
   return (
-    <div>
-      {data && <Slider advertisements={data.advertisements} />}
-      {data && <ProductGrid products={data.hotProducts} Title="Hot Sales"/>}
-      <FeaturedCategory />
-      {data && <ProductGrid products={data.laptopProducts} Title="Laptop"/>}
-      {data && <ProductGrid products={data.smartphoneProducts} Title="Smart Phone"/>}
-      {data && <ProductGrid products={data.tabletProducts} Title="Tablet"/>}
-      {data && <ProductGrid products={data.accessoriesProducts} Title="Accessory"/>}
-      {RVData.length > 0 && <ProductGrid products={RVData} Title="Recently Viewed Products"/>}
-    </div>
+    <>
+      <div>
+        {data && <Slider advertisements={data.advertisements} />}
+        {data && <ProductGrid products={data.hotProducts} Title="Hot Sales" />}
+        <FeaturedCategory />
+        {data && <ProductGrid products={data.laptopProducts} Title="Laptop" />}
+        {data && <ProductGrid products={data.smartphoneProducts} Title="Smart Phone" />}
+        {data && <ProductGrid products={data.tabletProducts} Title="Tablet" />}
+        {data && <ProductGrid products={data.accessoriesProducts} Title="Accessory" />}
+        {RVData.length > 0 && <ProductGrid products={RVData} Title="Recently Viewed Products" />}
+      </div>
+      {loading && (
+        <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+          <Loading />
+        </div>
+      )}
+    </>
+
   );
 };
 

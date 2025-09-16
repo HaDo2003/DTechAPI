@@ -93,14 +93,6 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
-                <Loading />;
-            </div>
-        );
-    }
-
     return (
         <>
             <form onSubmit={handleSubmit} encType="multipart/form-data">
@@ -195,6 +187,12 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
                     type={alert.type}
                     onClose={() => setAlert(null)}
                 />
+            )}
+
+            {loading && (
+                <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                    <Loading />
+                </div>
             )}
         </>
 

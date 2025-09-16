@@ -109,5 +109,20 @@ namespace DTech.API.Controllers
 
             return Ok(new { Message = "Delete Address successfully." });
         }
+
+        [HttpPut("switch-default-address/{addressId}")]
+        public async Task<IActionResult> SwitchDefaultAsync(int addressId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var response = await customerService.SwitchDefaultAsync(userId, addressId);
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+
+            return Ok(new { Message = "Change default address successfully." });
+        }
     }
 }

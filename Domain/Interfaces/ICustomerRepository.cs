@@ -24,6 +24,7 @@ namespace DTech.Domain.Interfaces
         Task<bool> DeleteAddressAsync(string customerId, int addressId);
         Task<List<CustomerAddress>> GetAllAddressesByCustomerIdAsync(string customerId);
         Task<CustomerAddress?> GetDefaultAddressByCustomerIdAsync(string customerId);
+        Task<bool> SetDefaultAddressAsync(string customerId, int addressId);
         //For Cart table
         Task<bool> CreateCartAsync(Cart cart);
         // For Feedback table

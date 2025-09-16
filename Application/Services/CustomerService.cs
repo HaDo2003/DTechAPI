@@ -158,5 +158,23 @@ namespace DTech.Application.Services
             return new MessageResponse { Success = true, Message = "Send Contact Successfully" };
         }
 
+        public async Task<AddressResponse> SwitchDefaultAsync(string customerId, int addressId)
+        {
+            var customer = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customer)
+                return new AddressResponse { Success = false, Message = "Customer not found" };
+
+            var isUpdated = await customerRepo.SetDefaultAddressAsync(customerId, addressId);
+            if (!isUpdated)
+                return new AddressResponse { Success = false, Message = "Failed to change default address" };
+
+            return new AddressResponse 
+            { 
+                Success = true, 
+                Message = "Edit address successfully", 
+                AddressId = addressId 
+            };
+        }
+
     }
 }

@@ -124,6 +124,17 @@ namespace DTech.Infrastructure.Repositories
         {
             if (model != null)
             {
+                if (model.IsDefault)
+                {
+                    var existingAddresses = await context.CustomerAddresses
+                        .Where(a => a.CustomerId == model.CustomerId)
+                        .ToListAsync();
+
+                    foreach (var addr in existingAddresses)
+                    {
+                        addr.IsDefault = false;
+                    }
+                }
                 context.CustomerAddresses.Add(model);
                 await context.SaveChangesAsync();
                 return model.AddressId;
@@ -134,6 +145,17 @@ namespace DTech.Infrastructure.Repositories
         {
             if (model != null)
             {
+                if (model.IsDefault)
+                {
+                    var otherAddresses = await context.CustomerAddresses
+                        .Where(a => a.CustomerId == model.CustomerId && a.AddressId != model.AddressId)
+                        .ToListAsync();
+
+                    foreach (var addr in otherAddresses)
+                    {
+                        addr.IsDefault = false;
+                    }
+                }
                 context.CustomerAddresses.Update(model);
                 await context.SaveChangesAsync();
                 return true;
@@ -179,6 +201,23 @@ namespace DTech.Infrastructure.Repositories
             return await context.CustomerAddresses
                 .Where(c => c.CustomerId == customerId && c.IsDefault == true)
                 .FirstOrDefaultAsync();
+        }
+        public async Task<bool> SetDefaultAddressAsync(string customerId, int addressId)
+        {
+            var addresses = await context.CustomerAddresses
+                .Where(c => c.CustomerId == customerId)
+                .ToListAsync();
+
+            if (addresses.Count == 0)
+                return false;
+
+            foreach (var addr in addresses)
+            {
+                addr.IsDefault = (addr.AddressId == addressId);
+            }
+
+            await context.SaveChangesAsync();
+            return true;
         }
 
         //For Cart table

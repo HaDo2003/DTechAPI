@@ -44,14 +44,6 @@ const ChangePassword: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
-                <Loading />;
-            </div>
-        );
-    }
-
     return (
         <>
             <div>
@@ -93,6 +85,12 @@ const ChangePassword: React.FC = () => {
                     type={alert.type}
                     onClose={() => setAlert(null)}
                 />
+            )}
+
+            {loading && (
+                <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                    <Loading />
+                </div>
             )}
         </>
     );

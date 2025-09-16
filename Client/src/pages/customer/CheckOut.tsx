@@ -173,8 +173,6 @@ const Checkout: React.FC = () => {
         }
     };
 
-    if (loading) return <Loading />;
-
     return (
         <>
             <div className="container-fluid">
@@ -330,6 +328,12 @@ const Checkout: React.FC = () => {
                     type={alert.type}
                     onClose={() => setAlert(null)}
                 />
+            )}
+
+            {loading && (
+                <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                    <Loading />
+                </div>
             )}
         </>
     );

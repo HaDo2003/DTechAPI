@@ -202,5 +202,35 @@ export const customerService = {
             }
             return { success: false, message: "Unexpected error occurred" };
         }
+    },
+
+    async setDefaultAddress(token: string, addressId: number): Promise<CustomerAddressResponse> {
+        try {
+            const response = await axios.put<CustomerAddressResponse>(`/api/profile/switch-default-address/${addressId}`, null, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return { 
+                success: true, 
+                message: response.data.message || "Change default successfully" ,
+                addressId: response.data.addressId
+            };
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to change default address. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
     }
 }

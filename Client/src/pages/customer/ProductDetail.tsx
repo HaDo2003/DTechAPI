@@ -57,8 +57,6 @@ const ProductDetail: React.FC = () => {
         fetchProduct();
     }, [categorySlug, brandSlug, slug]);
 
-    if (loading) return <Loading />;
-
     if (!product) {
         return <NotFound />;
     }
@@ -574,6 +572,12 @@ const ProductDetail: React.FC = () => {
                     type={alert.type}
                     onClose={() => setAlert(null)}
                 />
+            )}
+
+            {loading && (
+                <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                    <Loading />
+                </div>
             )}
         </>
     );
