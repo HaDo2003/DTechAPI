@@ -124,5 +124,23 @@ namespace DTech.API.Controllers
 
             return Ok(new { Message = "Change default address successfully." });
         }
+
+        [HttpGet("get-order-detail/{orderId}")]
+        public async Task<IActionResult> GetOrderDetailAsync(string orderId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var response = await customerService.GetOrderDetailAsync(userId, orderId);
+            if (response == null)
+                return NotFound(new { Message = "User not found." });
+
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+
+            return Ok(response);
+        }
     }
 }

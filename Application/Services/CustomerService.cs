@@ -9,6 +9,7 @@ namespace DTech.Application.Services
 {
     public class CustomerService(
         ICustomerRepository customerRepo,
+        IOrderRepository orderRepo,
         IMapper mapper,
         ICloudinaryService cloudinaryService,
         IBackgroundTaskQueue backgroundTaskQueue,
@@ -174,6 +175,50 @@ namespace DTech.Application.Services
                 Message = "Edit address successfully", 
                 AddressId = addressId 
             };
+        }
+
+        public async Task<OrderDetailResDto> GetOrderDetailAsync(string customerId, string orderId)
+        {
+            var customer = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customer)
+                return new OrderDetailResDto { Success = false, Message = "Customer not found" };
+
+            var order = await orderRepo.GetOrderDetailAsync(customerId, orderId);
+            if (order == null)
+                return new OrderDetailResDto { Success = false, Message = "Order not found" };
+
+            OrderDetailResDto model = new() 
+            { 
+                OrderId = order.OrderId,
+                OrderDate = order.OrderDate,
+                Name = order.Name,
+                NameReceive = order.NameReceive,
+                ShippingAddress = order.ShippingAddress,
+                Address = order.Address,
+                StatusName = order.Status?.Description ?? "Unknown",
+                Note = order.Note,
+                CostDiscount = order.CostDiscount,
+                ShippingCost = order.ShippingCost,
+                FinalCost = order.FinalCost,
+                Payment = order.Payment == null
+                    ? null
+                    : new PaymentDto
+                    { 
+                        Status = order.Payment.Status,
+                        PaymentMethodName = order.Payment.PaymentMethod!.Description ?? string.Empty,
+                    },
+                OrderProducts = order.OrderProducts?.Select(op => new OrderProductDto
+                {
+                    Id = op.Id,
+                    Name = op.Product.Name,
+                    Photo = op.Product.Photo,
+                    Price = op.Product.Price,
+                    Quantity = op.Quantity,
+                    CostAtPurchase = op.CostAtPurchase,
+                }).ToList()
+            };
+
+            return model;
         }
 
     }

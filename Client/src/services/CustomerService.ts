@@ -3,6 +3,7 @@ import { type Customer, type CustomerProfileForm, type ChangePasswordForm } from
 import { type MessageResponse } from "../types/MessageReponse";
 import { type CustomerAddress, type CustomerAddressResponse } from "../types/CustomerAddress";
 import type { Contact } from "../types/Contact";
+import type { OrderDetailResponse } from "../types/Order";
 
 export const customerService = {
     async getCustomerProfile(token: string): Promise<Customer> {
@@ -219,6 +220,30 @@ export const customerService = {
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 let message: string = "Failed to change default address. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
+    },
+
+    async getOrderDetail(token: string, orderId: string): Promise<OrderDetailResponse> {
+        try {
+            const response = await axios.get<Customer>(`/api/profile/get-order-detail/${orderId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return { ...response.data, success: true, message: "Fetch order detail successfully" };
+        } catch (err: any) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to fetch order detail. Please try again.";
                 if (typeof err.response?.data === "string") {
                     message = err.response.data;
                 }

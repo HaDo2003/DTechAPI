@@ -9,5 +9,6 @@ namespace DTech.Domain.Interfaces
 
         Task<bool> AddOrderCouponAsync(string reductionCode, string orderId);
         Task<Order?> GetOrderByIdAsync(string? orderId);
+        Task<Order?> GetOrderDetailAsync(string customerId, string orderId);
     }
 }

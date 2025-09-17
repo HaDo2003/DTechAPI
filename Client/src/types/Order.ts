@@ -53,3 +53,33 @@ export interface CouponResponse {
     discountAmount?: number;
     total?: number;
 }
+
+export interface OrderDetailResponse extends MessageResponse {
+    orderId?: string;
+    orderDate?: string;
+    name?: string;
+    nameReceive?: string;
+    shippingAddress?: string;
+    address?: string;
+    payment?: Payment;
+    statusName?: string;
+    note?: string;
+    orderProducts?: OrderProduct[];
+    costDiscount?: number;
+    shippingCost?: number;
+    finalCost?: number;
+}
+
+interface OrderProduct {
+    productId?: string;
+    name?: string;
+    photo?: string;
+    price?: number;
+    quantity?: number;
+    costAtPurchase?: number;
+}
+
+interface Payment {
+    status?: number;
+    paymentMethodName?: string;
+}

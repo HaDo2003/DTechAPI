@@ -4,10 +4,20 @@ import DesktopHeader from "../components/customer/header/desktop/DesktopHeader";
 import MobileHeader from "../components/customer/header/mobile/MobileHeader";
 import Footer from "../components/customer/footer/Footer";
 import Breadcrumb from "../components/customer/Breadcrumb";
-// import ChatBox from "../components/customer/ChatBox";
+import ChatBox, { type ChatMessage } from "../components/customer/ChatBox";
 // import { AuthDebugger } from "../context/AuthContext";
 
 const CustomerLayout: React.FC = () => {
+  const currentUserId = "123";
+  const messages: ChatMessage[] = [
+    {
+      id: "1",
+      senderId: "support",
+      message: "Welcome! Need any help?",
+      timestamp: new Date().toISOString(),
+    },
+  ];
+  
   return (
     <div className="customer-layout">
       {/* <AuthDebugger /> */}
@@ -29,6 +39,7 @@ const CustomerLayout: React.FC = () => {
       </div>
 
       {/* <ChatBox /> */}
+      <ChatBox currentUserId={currentUserId} messages={messages} />
     </div>
   );
 };

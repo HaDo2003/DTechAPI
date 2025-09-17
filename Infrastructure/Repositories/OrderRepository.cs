@@ -82,5 +82,23 @@ namespace DTech.Infrastructure.Repositories
                 return null;
             }
         }
+
+        public async Task<Order?> GetOrderDetailAsync(string customerId, string orderId)
+        {
+            try
+            {
+                if (orderId == null) return null;
+                return await context.Orders
+                    .Include(o => o.Status)
+                    .Include(o => o.Payment).ThenInclude(p => p.PaymentMethod)
+                    .Include(o => o.OrderProducts).ThenInclude(op => op.Product)
+                    .FirstOrDefaultAsync(o => o.OrderId == orderId && o.CustomerId == customerId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
     }
 }

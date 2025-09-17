@@ -1,5 +1,6 @@
 ﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
+using DTech.Domain.Entities;
 
 namespace DTech.Application.Interfaces
 {
@@ -13,5 +14,6 @@ namespace DTech.Application.Interfaces
         Task<MessageResponse> DeleteAddressAsync(string customerId, int addressId);
         Task<MessageResponse> SendContactAsync(ContactDto model);
         Task<AddressResponse> SwitchDefaultAsync(string customerId, int addressId);
+        Task<OrderDetailResDto> GetOrderDetailAsync(string customerId, string orderId);
     }
 }
