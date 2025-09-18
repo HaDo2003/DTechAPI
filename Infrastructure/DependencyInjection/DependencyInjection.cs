@@ -89,8 +89,10 @@ namespace DTech.Infrastructure.DependencyInjection
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<ICheckOutService, CheckOutService>();
+            services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<IVnPayService, VnPayService>();
+
             services.AddTransient<IEmailService, EmailService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddHostedService<QueuedHostedService>();
@@ -107,6 +109,7 @@ namespace DTech.Infrastructure.DependencyInjection
             services.AddScoped<ICouponRepository, CouponRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IShippingRepository, ShippingRepository>();
+            services.AddScoped<IAdminRepository, AdminRepository>();
 
             return services;
         }

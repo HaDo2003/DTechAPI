@@ -1,9 +1,9 @@
 import React from "react";
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface MenuItemProps {
     label: string;
-    path?: string;
+    path: string;
     onClick?: () => void;
 }
 
@@ -12,25 +12,18 @@ const MenuItem: React.FC<MenuItemProps> = ({
     path,
     onClick,
 }) => {
-    const navigate = useNavigate();
-
-    const handleClick = () => {
-        if (onClick) {
-            onClick();
-        } else if (path) {
-            navigate(path);
-        }
-    };
     return (
-        <li className="nav-item text-light">
-            <button
-                onClick={handleClick}
-                className={`nav-link text-light btn border-0 bg-transparent`}
+        <li className="nav-item">
+            <Link
+                to={path}
+                className="nav-link text-light"
+                onClick={onClick}
             >
                 {label}
-            </button>
+            </Link>
         </li>
     );
 };
+
 
 export default MenuItem;

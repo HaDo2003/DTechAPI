@@ -1,0 +1,16 @@
+export const informationMenu = [
+    { to: "/admin/admins", label: "Admin Account", key: "admin" },
+    { to: "/admin/advertisements", label: "Advertisement", key: "advertisement" },
+    { to: "/admin/brands", label: "Brand", key: "brand" },
+    { to: "/admin/categories", label: "Category", key: "category" },
+    { to: "/admin/coupons", label: "Coupon", key: "coupon" },
+    { to: "/admin/customers", label: "Customer", key: "customer" },
+    { to: "/admin/feedbacks", label: "Feedback", key: "feedback" },
+    { to: "/admin/orders", label: "Order", key: "order" },
+    { to: "/admin/payments", label: "Payment", key: "payment" },
+    { to: "/admin/payment-methods", label: "Payment Method", key: "paymentmethod" },
+    { to: "/admin/posts", label: "Post", key: "post" },
+    { to: "/admin/post-categories", label: "Post Category", key: "postcategory" },
+    { to: "/admin/products", label: "Product", key: "product" },
+    { to: "/admin/suppliers", label: "Supplier", key: "supplier" },
+];

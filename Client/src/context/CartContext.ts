@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { cartService } from "../services/CartService";
 import type { Cart } from "../types/Cart";
-import { isExpired } from "../utils/jwtDecoder";
+import { isExpired, jwtDecoder } from "../utils/jwtDecoder";
 
 type CartContextType = {
     cart: Cart | null;
@@ -15,15 +15,18 @@ const CartContext = createContext<CartContextType | null>(null);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [cart, setCart] = useState<Cart | null>(null);
-    const [ token ] = useState<string | null>(() => {
+    const [token] = useState<string | null>(() => {
         const savedToken = localStorage.getItem("jwt_token")
         if (savedToken === null) return null;
-        const isTokenExpired = isExpired(savedToken);
-        if (isTokenExpired) {
+
+        const decoded = jwtDecoder(savedToken);
+        if (!decoded) return null;
+        if (decoded.exp && isExpired(decoded)) {
+            localStorage.removeItem("jwt_token");
             return null;
         }
         return savedToken;
-        }
+    }
     );
 
     const fetchCart = async () => {

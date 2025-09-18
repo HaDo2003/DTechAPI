@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import DTechLogo from '../../../../assets/DTechlogo.png';
 import NavItem from './NavItem';
@@ -130,16 +130,14 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                     <div className="row align-items-center">
                         {/* Logo */}
                         <div className="col-2 col-lg-3 col-xl-2">
-                            <button
-                                onClick={() => handleNavigation('/')}
-                                className="btn p-0 border-0 bg-transparent"
-                            >
+                            <Link to="/" className="d-inline-block">
                                 <img
                                     src={DTechLogo}
                                     className="img-logo"
                                     alt="DTech logo"
+                                    style={{ cursor: "pointer" }}
                                 />
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Search Box */}
@@ -272,7 +270,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                 <MenuItem label="Home" path="/" />
                                 <MenuItem label="Introduce" path="/" />
                                 <MenuItem label="Laptop" path="/laptop" />
-                                <MenuItem label="Smart Phone" path="/smart-phone" />
+                                <MenuItem label="Mobile" path="/smart-phone" />
                                 <MenuItem label="Tablet" path="/tablet" />
 
                                 {/* Accessory Dropdown */}

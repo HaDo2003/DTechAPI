@@ -32,10 +32,8 @@ const CustomerAccount: React.FC = () => {
     ];
 
     useEffect(() => {
-        if (token === null) {
-            navigate("/login");
+        if (token === null) 
             return;
-        }
 
         setLoading(true);
 
@@ -61,7 +59,7 @@ const CustomerAccount: React.FC = () => {
         };
 
         fetchCustomer();
-    }, [token, navigate]);
+    }, [token]);
 
     return (
         <>

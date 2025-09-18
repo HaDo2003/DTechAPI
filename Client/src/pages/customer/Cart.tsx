@@ -20,7 +20,6 @@ const CartPage: React.FC = () => {
     useEffect(() => {
         if (!token) {
             setAlert({ message: "Please login to view your cart", type: "error" });
-            navigate("/login");
             return;
         }
 
@@ -39,7 +38,6 @@ const CartPage: React.FC = () => {
         try {
             if (!token) {
                 setAlert({ message: "Please login to view your cart", type: "error" });
-                navigate("/login");
                 return;
             }
             const res = await cartService.updateProductQuantity(token, id, change);

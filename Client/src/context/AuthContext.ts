@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecoder, type User } from "../utils/jwtDecoder";
+import { isExpired, jwtDecoder, type User } from "../utils/jwtDecoder";
 import { useCart } from "./CartContext";
 
 interface AuthContextType {
@@ -8,46 +8,37 @@ interface AuthContextType {
     login: (token: string) => void;
     logout: () => void;
     hasRole: (role: string) => boolean;
+    isLoading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(() => {
-        const savedToken = localStorage.getItem("jwt_token");
-        if (savedToken) {
-            try {
-                const decoded = jwtDecoder(savedToken);
-                if (decoded) {
-                    return {
-                        roles: decoded.roles ?? [],
-                        name: decoded.name ?? "",
-                        email: decoded.email ?? "",
-                    };
-                }
-            } catch {
-                return null;
-            }
-        }
-        return null;
-    });
-
-    const [token, setToken] = useState<string | null>(() => {
-        return localStorage.getItem("jwt_token");
-    });
+    const [user, setUser] = useState<User | null>(null);
+    const [token, setToken] = useState<string | null>(null);
     const { setCart, fetchCart } = useCart();
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        setIsLoading(true);
         const savedToken = localStorage.getItem("jwt_token");
         if (savedToken) {
             try {
                 const decoded = jwtDecoder(savedToken);
                 if (!decoded) throw new Error("Invalid token");
+                if (isExpired(decoded)) {
+                    localStorage.removeItem("jwt_token");
+                    setToken(null);
+                    setUser(null);
+                    return;
+                }
                 setToken(savedToken);
                 setUser(decoded);
             } catch (error) {
                 setToken(null);
                 setUser(null);
+            } finally {
+                setIsLoading(false);
             }
         }
     }, []);
@@ -75,10 +66,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const hasRole = (role: string): boolean => user?.roles.includes(role) ?? false;
-    
+
     return React.createElement(
         AuthContext.Provider,
-        { value: { user, token, login, logout, hasRole } },
+        { value: { user, token, login, logout, hasRole, isLoading } },
         children
     );
 };

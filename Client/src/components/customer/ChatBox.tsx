@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Zalo from '../../assets/zalo.png'
 
 export interface ChatMessage {
   id: string;
@@ -44,7 +45,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
       {/* Redirect to Zalo Chat */}
       <div className="chat-widget-zalo">
         <a href="https://chat.zalo.me/" target="_blank" rel="noopener noreferrer" className="chat-btn-zalo">
-          <img src="/img/zalo.png" alt="Zalo Chat" className="zalo-icon" />
+          <img src={Zalo} alt="Zalo Chat" className="zalo-icon" />
         </a>
       </div>
 

@@ -1,3 +1,5 @@
+import '../styles/site.css'
+import '../styles/responsive.css'
 import React from "react";
 import { Outlet } from "react-router-dom";
 import DesktopHeader from "../components/customer/header/desktop/DesktopHeader";

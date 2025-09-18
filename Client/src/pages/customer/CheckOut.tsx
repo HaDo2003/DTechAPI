@@ -41,11 +41,9 @@ const Checkout: React.FC = () => {
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
 
     useEffect(() => {
-        if (token === null) {
-            navigate("/login");
+        if (token === null) 
             return;
-        }
-
+        
         if (buyNowData) {
             if (!buyNowData.paymentMethod && (buyNowData.paymentMethods?.length ?? 0) > 0) {
                 const cod = buyNowData.paymentMethods!.find(pm => pm.description === "COD");
@@ -110,14 +108,10 @@ const Checkout: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (token === null) {
-            navigate("/login");
-            return;
-        }
         setLoading(true);
         try {
             const res = await checkOutService.placeOrder(
-                token, 
+                token!, 
                 formData,
                 buyNowData ? true : false
             );
@@ -136,11 +130,6 @@ const Checkout: React.FC = () => {
     };
 
     const handleApplyDiscount = async () => {
-        if (token === null) {
-            navigate("/login");
-            return;
-        }
-
         if (!reductionCode.trim()) {
             setAlert({ message: "Please enter a coupon code.", type: "error" });
             return;
@@ -149,13 +138,13 @@ const Checkout: React.FC = () => {
         let res;
 
         if (buyNowData) {
-            res = await checkOutService.applyCoupon(token, reductionCode, {
+            res = await checkOutService.applyCoupon(token!, reductionCode, {
                 isBuyNow: true,
                 productId: buyNowData.orderSummary?.items[0]?.productId ?? 0,
                 quantity: buyNowData.orderSummary?.items[0]?.quantity ?? 1
             });
         } else {
-            res = await checkOutService.applyCoupon(token, reductionCode);
+            res = await checkOutService.applyCoupon(token!, reductionCode);
         }
 
         if (res.success && res) {
