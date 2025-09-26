@@ -1,13 +1,14 @@
 ﻿using DTech.Application.Interfaces;
-using DTech.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace DTech.API.Controllers
+namespace DTech.API.Controllers.Admin
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AdminController(
+    [Authorize(Roles = "Admin,Seller")]
+    public class DashboardController(
         IAdminService adminService
     ) : ControllerBase
     {

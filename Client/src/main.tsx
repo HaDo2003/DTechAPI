@@ -16,7 +16,6 @@ import 'datatables.net';
 // AdminLTE
 import "admin-lte/dist/css/adminlte.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
-import "overlayscrollbars/styles/overlayscrollbars.css";
 
 // Apex Chart
 import "apexcharts/dist/apexcharts.css";

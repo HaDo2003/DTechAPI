@@ -30,6 +30,9 @@ import Checkout from './pages/customer/CheckOut';
 import AccessDenied from './pages/customer/AccessDenied';
 import Dashboard from './pages/admin/Dashboard';
 import PrivateRoute from './routes/privateRoute';
+import ManagementPage from "./pages/admin/ManagementPage";
+import AdminAccountFormPage from "./pages/admin/admin/AdminAccountFormPage";
+import AdminDelete from "./pages/admin/admin/AdminDelete";
 
 
 
@@ -67,9 +70,62 @@ function App() {
         </Route>
 
         {/* Admin-only routes */}
-        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute allowedRoles={["Admin", "Seller"]}>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
-          {/* <Route path="products" element={<ProductManagement />} /> */}
+
+          {/* Only for ADMIN routes */}
+          <Route
+            path="admin"
+            element={
+              <AdminRoute allowedRoles={["Admin"]}>
+                <ManagementPage />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="admin/create"
+            element={
+              <AdminRoute allowedRoles={["Admin"]}>
+                <AdminAccountFormPage />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="admin/edit/:id"
+            element={
+              <AdminRoute allowedRoles={["Admin"]}>
+                <AdminAccountFormPage />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="admin/delete/:id"
+            element={
+              <AdminRoute allowedRoles={["Admin"]}>
+                <AdminDelete />
+              </AdminRoute>
+            }
+          />
+
+          {/* Admin and seller routes */}
+          <Route
+            path="advertisement"
+            element={
+              <AdminRoute allowedRoles={["Admin", "Seller"]}>
+                <ManagementPage />
+              </AdminRoute>
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>

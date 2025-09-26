@@ -1,14 +1,16 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+type Role = "Admin" | "Seller";
+
 interface AdminRouteProps {
     children: React.ReactNode;
+    allowedRoles: Role[];
 }
 
-const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
+const AdminRoute: React.FC<AdminRouteProps> = ({ children, allowedRoles }) => {
     const { user, token, isLoading } = useAuth();
     const location = useLocation();
-    const allowedRoles = ["Admin", "Seller"];
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -18,7 +20,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         return <Navigate to="/login" replace state={{ from: location }} />;
     }
 
-    const isAuthorized = allowedRoles.includes(user.roles);
+    const isAuthorized = allowedRoles.includes(user.roles as Role);
     return isAuthorized ? <>{children}</> : <Navigate to="/access-denied" replace />;;
 };
 

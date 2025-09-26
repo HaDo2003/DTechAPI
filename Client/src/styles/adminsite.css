@@ -1,39 +1,58 @@
 body {
     font-size: 18px;
 }
+
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
+
 /*=========================================================
 Header
 ===========================================================*/
 .navbar-nav .dropdown-menu-end {
-  left: auto !important; 
-  right: 0 !important;     
-  transform-origin: right top !important; 
-  z-index: 3000;           
+    left: auto !important;
+    right: 0 !important;
+    transform-origin: right top !important;
+    z-index: 3000;
 }
 
 /*=========================================================
 Index
 ===========================================================*/
-.header-row{
-    margin-bottom:-15px;
+.header-row {
+    margin-bottom: -15px;
 }
 
 .btn-custom {
     position: relative;
+    overflow: visible;
 }
 
 .btn-custom .hover-text {
     display: none;
     position: absolute;
-    top: 100%;
+    bottom: 120%;
     left: 50%;
-    transform: translate(-50%, -200%);
-    background-color: rgba(0, 0, 0, 0.7);
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.75);
     color: white;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 4px 8px;
+    border-radius: 4px;
     font-size: 12px;
     white-space: nowrap;
+    z-index: 10;
+}
+
+
+.btn-custom .hover-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
 }
 
 .btn-custom:hover .hover-text {
@@ -41,18 +60,19 @@ Index
 }
 
 .custom-alert {
-    display: flex; 
-    justify-content: center; 
+    display: flex;
+    justify-content: center;
     align-items: center;
-    max-width: 300em; 
-    max-height: 1.75em; 
-    margin: 0 auto; 
-    padding: 10px; 
-    font-size: 1em; 
-    border: 1px solid #ddd; 
-    border-radius: 5px; 
+    max-width: 300em;
+    max-height: 1.75em;
+    margin: 0 auto;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 /*=========================================================
 Dashboard
 ===========================================================*/
@@ -69,12 +89,13 @@ img#imgpreview {
     border-radius: 50%;
 }
 
-img#imgsquare{
+img#imgsquare {
     width: 25em;
     height: 20em;
     max-width: 100%;
     max-height: 80%;
 }
+
 /*=========================================================
 Detail
 ===========================================================*/
@@ -107,7 +128,7 @@ input.custom-photo-input {
     gap: 1em;
 }
 
-.custom-radio-group > div {
+.custom-radio-group>div {
     display: flex;
     align-items: center;
 }
@@ -146,15 +167,13 @@ label.custom-label-radio:before {
     box-sizing: border-box;
 }
 
-input[type="radio"].custom-radio:checked +
-label.custom-label-radio:before {
+input[type="radio"].custom-radio:checked+label.custom-label-radio:before {
     background-color: #4189e0;
     border-width: 0.4em;
     border-color: #ffffff;
 }
 
-input[type="radio"].custom-radio:checked +
-label.custom-label-radio {
+input[type="radio"].custom-radio:checked+label.custom-label-radio {
     background-color: #4189e0;
     color: #ffffff;
 }

@@ -1,6 +1,7 @@
 import '../styles/adminsite.css'
 import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import "overlayscrollbars/styles/overlayscrollbars.css";
 
 // Component
 import Header from "../components/admin/Header";
@@ -55,7 +56,7 @@ const AdminLayout: React.FC = () => {
                     <Header user={user} />
 
                     {/* Sidebar */}
-                    <Sidebar user={user} />
+                    <Sidebar client={user} />
 
                     {/* Main content */}
                     <main className="app-main">

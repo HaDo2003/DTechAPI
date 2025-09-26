@@ -16,7 +16,7 @@ namespace DTech.Application.Services
         ) : IProductService
     {
         //Get details of a product by its slug, category slug, and brand slug
-        public async Task<ProductDto> ProductDetailAsync(string categorySlug, string brandSlug, string slug)
+        public async Task<ProductDto?> ProductDetailAsync(string categorySlug, string brandSlug, string slug)
         {
             try
             {
@@ -41,12 +41,12 @@ namespace DTech.Application.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                throw new Exception("An error occurred while fetching product details.", ex);
+                return null;
             }
         }
 
         //Get products by category slug and sort order
-        public async Task<List<ProductDto>> GetProductsByCategoryAsync(string? categorySlug, string? sortOrder)
+        public async Task<List<ProductDto>?> GetProductsByCategoryAsync(string? categorySlug, string? sortOrder)
         {
             try
             {
@@ -79,12 +79,12 @@ namespace DTech.Application.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                throw new Exception("An error occurred while fetching products by category.", ex);
+                return null;
             }
         }
 
         //Get products by category slug, brand slug and sort order
-        public async Task<List<ProductDto>> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, string? sortOrder)
+        public async Task<List<ProductDto>?> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, string? sortOrder)
         {
             try
             {
@@ -126,7 +126,7 @@ namespace DTech.Application.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                throw new Exception("An error occurred while fetching products by category and brand.", ex);
+                return null;
             }
         }
 
