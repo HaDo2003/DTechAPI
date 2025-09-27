@@ -8,6 +8,22 @@ export interface Order {
     statusName: string;
 }
 
+export interface OrderForm{
+    id: number | string;
+    email?: string;
+    billingName?: string;
+    billingPhone?: string;
+    billingAddress?: string;
+    shippingName?: string,
+    shippingPhone?: string,
+    shippingAddress?: string,
+    note?: string;
+    reductionCode?: string;
+    paymentId?: number;
+    orderProducts?: { productId: number; quantity: number }[];
+    shippingId?: number;
+}
+
 export interface CheckOut extends MessageResponse {
     email?: string;
     billingName?: string;

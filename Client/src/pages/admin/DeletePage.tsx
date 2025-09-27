@@ -1,6 +1,6 @@
 interface DeletePageProps<T extends { id: string | number }> {
   entityName: string;
-  data: T;           
+  data: T;
   fields: { key: keyof T; label: string }[];
   imageKey?: keyof T;
   onDelete: (id: string | number) => void;

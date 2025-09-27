@@ -1,6 +1,6 @@
 import '../styles/adminsite.css'
 import React, { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import "overlayscrollbars/styles/overlayscrollbars.css";
 
 // Component

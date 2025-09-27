@@ -4,7 +4,7 @@ import Slider from "../../components/customer/homepage/Slider";
 import ProductGrid from "../../components/customer/ProductGrid";
 import FeaturedCategory from "../../components/customer/homepage/FeaturedCategory";
 import Loading from "../../components/shared/Loading";
-import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
+import { useRecentlyViewed } from "../../utils/useRecentlyViewed";
 
 const HomePage: React.FC = () => {
   const [data, setData] = useState<HomePageData | null>(null);

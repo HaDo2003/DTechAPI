@@ -5,6 +5,16 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CustomerLayout from './layouts/CustomerLayout';
 import AdminLayout from './layouts/AdminLayout';
 
+// Admin Pages
+import AdminRoute from './routes/adminRoute';
+
+//Utils
+import ScrollToTop from './utils/scrollToTop';
+import Checkout from './pages/customer/CheckOut';
+import AccessDenied from './pages/customer/AccessDenied';
+import Dashboard from './pages/admin/Dashboard';
+import PrivateRoute from './routes/privateRoute';
+
 // Customer Pages
 import Home from './pages/customer/Home';
 import NotFound from './pages/customer/NotFound';
@@ -20,20 +30,11 @@ import CartPage from './pages/customer/Cart';
 import OrderSuccess from './pages/customer/OrderSuccess';
 import OrderFail from './pages/customer/OrderFail';
 import SearchPage from './pages/customer/SearchPage';
-
-// Admin Pages
-import AdminRoute from './routes/adminRoute';
-
-//Utils
-import ScrollToTop from './utils/scrollToTop';
-import Checkout from './pages/customer/CheckOut';
-import AccessDenied from './pages/customer/AccessDenied';
-import Dashboard from './pages/admin/Dashboard';
-import PrivateRoute from './routes/privateRoute';
 import ManagementPage from "./pages/admin/ManagementPage";
 import AdminAccountFormPage from "./pages/admin/admin/AdminAccountFormPage";
 import AdminDelete from "./pages/admin/admin/AdminDelete";
-
+import AdvertisementFormPage from "./pages/admin/advertisement/AdvertisementFormPage";
+import AdvertisementDelete from "./pages/admin/advertisement/AdvertisementDelete";
 
 
 function App() {
@@ -123,6 +124,33 @@ function App() {
             element={
               <AdminRoute allowedRoles={["Admin", "Seller"]}>
                 <ManagementPage />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="advertisement/create"
+            element={
+              <AdminRoute allowedRoles={["Admin", "Seller"]}>
+                <AdvertisementFormPage />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="advertisement/edit/:id"
+            element={
+              <AdminRoute allowedRoles={["Admin"]}>
+                <AdvertisementFormPage />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="advertisement/delete/:id"
+            element={
+              <AdminRoute allowedRoles={["Admin"]}>
+                <AdvertisementDelete />
               </AdminRoute>
             }
           />

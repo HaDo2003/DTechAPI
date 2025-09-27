@@ -95,9 +95,9 @@ export const checkOutService = {
                 else {
                     message = JSON.stringify(err.response?.data);
                 }
-                return { success: false };
+                return { success: false, message };
             }
-            return { success: false };
+            return { success: false, message: "Unexpected error occurred" };
         }
     }
 }

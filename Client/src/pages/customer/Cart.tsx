@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { cartService } from "../../services/CartService";
 import { useAuth } from "../../context/AuthContext";
 import CartItem from "../../components/customer/cart/CartItem";
@@ -12,7 +12,6 @@ import { useCart } from "../../context/CartContext";
 const CartPage: React.FC = () => {
     const { token } = useAuth();
     const { cart, fetchCart } = useCart();
-    const navigate = useNavigate();
     const [cartData, setCartData] = useState<Cart | null>(cart);
     const [loading, setLoading] = useState(true);
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);

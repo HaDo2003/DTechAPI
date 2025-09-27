@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { adminService } from "../../../services/AdminService";
 import { useAuth } from "../../../context/AuthContext";
+import { adminService } from "../../../services/AdminService";
 import CardWrapped from "../CardWrapped";
 import InputField from "../InputField";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
-import { type AdminForm } from "../../../types/Admin";
+import type { BrandForm } from "../../../types/Brand";
 
-const AdminAccountFormPage: React.FC = () => {
+const BrandFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,46 +16,31 @@ const AdminAccountFormPage: React.FC = () => {
 
   const mode: "create" | "edit" = location.pathname.includes("edit") ? "edit" : "create";
 
-  const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
-  const [form, setForm] = useState<AdminForm>({
-    id: "",
-    fullName: "",
-    userName: "",
-    email: "",
-    phoneNumber: "",
-    gender: "Male",
-    dateOfBirth: "",
-    roleId: "",
-    image: "",
-    createdBy: "",
-    createDate: "",
-    updatedBy: "",
-    updateDate: "",
+  const [form, setForm] = useState<BrandForm>({
+    id: 0,
+    name: "",
+    slug: "",
+    status: 1,
+    statusName: "",
+    logo: "",
   });
 
   const [preview, setPreview] = useState<string>("");
-  const options = ["Male", "Female", "Other"];
   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch roles
-  useEffect(() => {
-    (async () => {
-      const res = await adminService.getRolesData<{ id: string; name: string }>("/api/admin/get-roles", token ?? "");
-      if (res.success && res.data) {
-        setRoles(res.data.map(r => ({ value: r.id, label: r.name })));
-      }
-    })();
-  }, [token]);
-
-  // Fetch admin data if edit
+  // Fetch brand when editing
   useEffect(() => {
     if (mode === "edit" && id) {
       (async () => {
-        const res = await adminService.getSingleData<AdminForm>(`/api/admin/get/${id}`, token ?? "");
+        const res = await adminService.getSingleData<BrandForm>(`/api/brand/get/${id}`, token ?? "");
         if (res.success && res.data) {
-          setForm(res.data as unknown as AdminForm);
-          setPreview((res.data as any).image ?? "");
+          const brand = res.data as BrandForm;
+          setForm({
+            ...brand,
+            statusName: brand.status === 1 ? "Active" : "Inactive",
+          });
+          setPreview(brand.logo ?? "");
         }
       })();
     }
@@ -64,14 +49,17 @@ const AdminAccountFormPage: React.FC = () => {
   // handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm({
+      ...form,
+      [name]: name === "status" ? Number(value) : value,
+    });
   };
 
   // handle file input
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      setForm({ ...form, imageUpload: file });
+      setForm({ ...form, logoUpload: file });
       setPreview(URL.createObjectURL(file));
     }
   };
@@ -80,41 +68,40 @@ const AdminAccountFormPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append('fullName', form.fullName ?? "");
-    formData.append('userName', form.userName ?? "");
-    formData.append('email', form.email ?? "");
-    formData.append('phoneNumber', form.phoneNumber ?? "");
-    formData.append('gender', form.gender ?? "");
-    formData.append('dateOfBirth', form.dateOfBirth ?? "");
-    formData.append('roleId', form.roleId ?? "");
-    formData.append('image', form.image ?? "");
+    formData.append("Name", form.name ?? "");
+    formData.append("Status", form.status?.toString() ?? "");
+    formData.append("Logo", form.logo ?? "");
 
-    // Only append image if it exists
-    if (form.imageUpload) {
-      formData.append('imageUpload', form.imageUpload);
+    if (form.logoUpload) {
+      formData.append("logoUpload", form.logoUpload);
     }
 
     setLoading(true);
-    const res = mode === "create"
-      ? await adminService.createData("/api/admin/create", formData, token ?? "")
-      : await adminService.updateData("/api/admin/update", id ?? "", formData, token ?? "");
+    const res =
+      mode === "create"
+        ? await adminService.createData("/api/brand/create", formData, token ?? "")
+        : await adminService.updateData("/api/brand/update", id ?? "", formData, token ?? "");
 
     if (res.success && mode === "create") {
       setLoading(false);
-      navigate("/admin/admin", {
+      navigate("/admin/brand", {
         state: {
           alert: {
-            message: mode === "create" ? "Admin created successfully!" : "Admin updated successfully!",
+            message: "Brand created successfully!",
             type: "success",
           },
         },
       });
     } else if (res.success && mode === "edit") {
-      const updatedRes = await adminService.getSingleData<AdminForm>(`/api/admin/get/${id}`, token ?? "");
+      const updatedRes = await adminService.getSingleData<BrandForm>(`/api/brand/get/${id}`, token ?? "");
       if (updatedRes.success && updatedRes.data) {
-        setForm(updatedRes.data as unknown as AdminForm);
-        setPreview((updatedRes.data as any).image ?? "");
-        setAlert({ message: "Admin updated successfully!", type: "success" });
+        const updated = updatedRes.data as BrandForm;
+        setForm({
+          ...updated,
+          statusName: updated.status === 1 ? "Active" : "Inactive",
+        });
+        setPreview(updated.logo ?? "");
+        setAlert({ message: "Brand updated successfully!", type: "success" });
       }
       setLoading(false);
     } else {
@@ -138,15 +125,16 @@ const AdminAccountFormPage: React.FC = () => {
           <Loading />
         </div>
       )}
-      <CardWrapped title="Admin Account Form">
+
+      <CardWrapped title="Brand Form">
         <>
           <form onSubmit={handleSubmit}>
             <div className="card">
               <div className="card-header text-center">
-                <h3>{mode === "create" ? "Create Admin" : "Edit Admin"}</h3>
+                <h3>{mode === "create" ? "Create Brand" : "Edit Brand"}</h3>
               </div>
               <div className="card-body">
-                {/* Avatar upload */}
+                {/* Logo upload */}
                 <div className="form-group">
                   <div className="row align-items-center">
                     <div className="col-lg-2 col-sm-4 text-center">
@@ -154,116 +142,59 @@ const AdminAccountFormPage: React.FC = () => {
                     </div>
                     <div className="col-lg-10 col-sm-8 p-0">
                       <label htmlFor="input-file" className="btn btn-sm btn-danger ms-2">
-                        Update Photo
+                        Update Logo
                       </label>
                     </div>
                   </div>
                   <input
                     type="file"
-                    name="imageUpload"
+                    name="logoUpload"
                     id="input-file"
                     className="form-control d-none"
                     onChange={handleFileChange}
                   />
                 </div>
 
-                {/* User Name + Role */}
                 <div className="row">
                   <div className="col">
                     <InputField
-                      label="User Name"
-                      name="userName"
-                      value={form.userName ?? ""}
+                      label="Name"
+                      name="name"
+                      value={form.name ?? ""}
                       onChange={handleChange}
-                      readOnly={mode === "edit"}
                     />
                   </div>
+
+                  {mode === "edit" && (
+                    <div className="col">
+                      <InputField
+                        label="Slug"
+                        name="slug"
+                        value={form.slug ?? ""}
+                        onChange={handleChange}
+                        readOnly
+                      />
+                    </div>
+                  )}
+
                   <div className="col">
                     <div className="form-group">
-                      <label htmlFor="role-select">Role</label>
+                      <label htmlFor="status-select">Status</label>
                       <select
-                        id="role-select"
-                        name="roleId"
-                        value={form.roleId}
+                        id="status-select"
+                        name="status"
+                        value={form.status ?? ""}
                         onChange={handleChange}
                         className="form-control"
                       >
-                        <option value="">Select Role</option>
-                        {roles.map((role) => (
-                          <option key={role.value} value={role.value}>
-                            {role.label}
-                          </option>
-                        ))}
+                        <option value="">Select Status</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
                       </select>
                     </div>
                   </div>
                 </div>
 
-                {/* Fullname + Date of Birth */}
-                <div className="row">
-                  <div className="col">
-                    <InputField
-                      label="Full Name"
-                      name="fullName"
-                      value={form.fullName ?? ""}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="col">
-                    <InputField
-                      label="Date of Birth"
-                      type="date"
-                      name="dateOfBirth"
-                      value={form.dateOfBirth ?? ""}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                {/* Gender */}
-                <div className="form-group py-2 custom-radio-container">
-                  <label className="control-label">Gender</label>
-                  <div className="custom-radio-group">
-                    {options.map((option) => (
-                      <div key={option}>
-                        <input
-                          type="radio"
-                          name="gender"
-                          value={option}
-                          id={option}
-                          className="custom-radio"
-                          checked={form.gender === option}
-                          onChange={handleChange}
-                        />
-                        <label className="custom-label-radio" htmlFor={option}>
-                          {option}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Phone + Email */}
-                <div className="row">
-                  <div className="col">
-                    <InputField
-                      label="Phone Number"
-                      name="phoneNumber"
-                      value={form.phoneNumber ?? ""}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="col">
-                    <InputField
-                      label="Email"
-                      name="email"
-                      value={form.email ?? ""}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                {/* Audit fields in edit mode */}
                 {mode === "edit" && (
                   <>
                     <div className="row">
@@ -312,7 +243,7 @@ const AdminAccountFormPage: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate("/admin/admin")}
+                  onClick={() => navigate("/admin/brand")}
                   className="btn btn-secondary"
                 >
                   <i className="fa-solid fa-right-from-bracket fa-rotate-180"></i> Back to List
@@ -326,4 +257,4 @@ const AdminAccountFormPage: React.FC = () => {
   );
 };
 
-export default AdminAccountFormPage;
+export default BrandFormPage;

@@ -17,7 +17,7 @@ import AlertForm from "../../components/customer/AlertForm";
 // Service
 import { cartService } from "../../services/CartService";
 
-import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
+import { useRecentlyViewed } from "../../utils/useRecentlyViewed";
 import type { ProductCommentRequest, ProductCommentResponse } from "../../types/ProductComment";
 import { useAuth } from "../../context/AuthContext";
 import { checkOutService } from "../../services/CheckOutService";

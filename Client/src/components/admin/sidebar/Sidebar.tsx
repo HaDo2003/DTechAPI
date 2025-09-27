@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import InformationItem from "./InformationItem";
 import { informationMenu } from "../../../utils/menuConfig";
 import type { Admin } from "../../../types/Admin";
@@ -18,7 +18,6 @@ const Sidebar: React.FC<AdminSidebarProps> = ({
   page = "",
 }) => {
   const { user } = useAuth();
-  const location = useLocation();
   const [infoOpen, setInfoOpen] = useState(mainPage === "information");
 
   const activeClass = (

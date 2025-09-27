@@ -34,3 +34,17 @@ export interface ChangePasswordForm {
   oldPassword: string;
   newPassword: string;
 }
+
+export interface CustomerForm {
+  id: string | number;
+  userName?: string;
+  fullName?: string;
+  email?: string;
+  phoneNumber?: string
+  gender?: string;
+  dateOfBirth?: string;
+  createDate?: string;
+  createdBy?: string;
+  updateDate?: string;
+  updatedBy?: string;
+}

@@ -1,17 +1,17 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { type AdminForm } from "../../../types/Admin";
-import DeletePage from "../DeletePage";
 import { useAuth } from "../../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { adminService } from "../../../services/AdminService";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
+import DeletePage from "../DeletePage";
+import { type AdminForm } from "../../../types/Admin";
 
 const AdminDelete: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { token } = useAuth();
-  const [admin, setAdmin] = useState<AdminForm | null>(null);
+  const [data, setData] = useState<AdminForm | null>(null);
   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,7 +20,7 @@ const AdminDelete: React.FC = () => {
       (async () => {
         const res = await adminService.getSingleData<AdminForm>(`/api/admin/get/${id}`, token ?? "");
         if (res.success && res.data) {
-          setAdmin(res.data as unknown as AdminForm);
+          setData(res.data as unknown as AdminForm);
         }
       })();
     }
@@ -49,7 +49,7 @@ const AdminDelete: React.FC = () => {
     navigate("/admin/admin");
   };
 
-  if (!admin) {
+  if (!data) {
     return <Loading />;
   }
   return (
@@ -69,7 +69,7 @@ const AdminDelete: React.FC = () => {
       )}
       <DeletePage<AdminForm>
         entityName="Admin Account"
-        data={admin}
+        data={data}
         fields={[
           { key: "email", label: "Email" },
           { key: "userName", label: "User Name" },

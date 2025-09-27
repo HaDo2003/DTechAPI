@@ -4,3 +4,12 @@ export interface Contact {
     phoneNumber?: string;
     detail?: string;
 }
+
+export interface FeedbackForm {
+    id: string | number;
+    name?: string;
+    email?: string;
+    phoneNumber?: string;
+    detail?: string;
+    fbdate?: string;
+}

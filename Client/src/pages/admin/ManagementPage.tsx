@@ -77,13 +77,15 @@ const ManagementPage: React.FC = () => {
                                 <i className="fa-solid fa-pen-to-square fa-sm"></i>
                                 <span className="hover-text">Edit</span>
                             </button>
-                            <button
-                                className="btn btn-sm btn-danger btn-custom"
-                                onClick={() => handleDelete(item.id)}
-                            >
-                                <i className="fa-solid fa-trash fa-sm"></i>
-                                <span className="hover-text">Delete</span>
-                            </button>
+                            {config.allowDelete && (
+                                <button
+                                    className="btn btn-sm btn-danger btn-custom"
+                                    onClick={() => handleDelete(item.id)}
+                                >
+                                    <i className="fa-solid fa-trash fa-sm"></i>
+                                    <span className="hover-text">Delete</span>
+                                </button>
+                            )}
                         </>
                     ),
                 }

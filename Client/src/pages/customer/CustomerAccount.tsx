@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { type Customer } from "../../types/Customer";
 import { customerService } from "../../services/CustomerService";
 
@@ -18,7 +17,6 @@ import Loading from "../../components/shared/Loading";
 
 const CustomerAccount: React.FC = () => {
     const { token, logout } = useAuth();
-    const navigate = useNavigate();
     const [customer, setCustomer] = useState<Customer | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
