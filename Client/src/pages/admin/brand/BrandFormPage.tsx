@@ -20,8 +20,7 @@ const BrandFormPage: React.FC = () => {
     id: 0,
     name: "",
     slug: "",
-    status: 1,
-    statusName: "",
+    status: "Available",
     logo: "",
   });
 
@@ -36,10 +35,7 @@ const BrandFormPage: React.FC = () => {
         const res = await adminService.getSingleData<BrandForm>(`/api/brand/get/${id}`, token ?? "");
         if (res.success && res.data) {
           const brand = res.data as BrandForm;
-          setForm({
-            ...brand,
-            statusName: brand.status === 1 ? "Active" : "Inactive",
-          });
+          setForm(brand);
           setPreview(brand.logo ?? "");
         }
       })();
@@ -96,10 +92,7 @@ const BrandFormPage: React.FC = () => {
       const updatedRes = await adminService.getSingleData<BrandForm>(`/api/brand/get/${id}`, token ?? "");
       if (updatedRes.success && updatedRes.data) {
         const updated = updatedRes.data as BrandForm;
-        setForm({
-          ...updated,
-          statusName: updated.status === 1 ? "Active" : "Inactive",
-        });
+        setForm(updated);
         setPreview(updated.logo ?? "");
         setAlert({ message: "Brand updated successfully!", type: "success" });
       }

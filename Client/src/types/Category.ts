@@ -10,8 +10,7 @@ export interface CategoryForm {
     slug?: string;
     parentId?: number | null;
     parentName?: string;
-    status?: number;
-    statusName?: string;
+    status?: string;
     createDate?: string;
     createdBy?: string;
     updateDate?: string;

@@ -25,8 +25,7 @@ const CouponFormPage: React.FC = () => {
     condition: 0,
     details: "",
     endDate: "",
-    status: 1,
-    statusName: "",
+    status: "Available",
   });
 
   const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);

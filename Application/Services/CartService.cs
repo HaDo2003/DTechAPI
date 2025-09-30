@@ -56,11 +56,11 @@ namespace DTech.Application.Services
                     Id = cp.Id,
                     ProductId = cp.ProductId,
                     Quantity = cp.Quantity,
-                    Name = cp.Product.Name,
-                    Price = cp.Product.Price,
-                    Discount = cp.Product.Discount,
-                    PriceAfterDiscount = cp.Product.PriceAfterDiscount,
-                    Photo = cp.Product.Photo
+                    Name = cp.Product?.Name,
+                    Price = cp.Product?.Price,
+                    Discount = cp.Product?.Discount,
+                    PriceAfterDiscount = cp.Product?.PriceAfterDiscount,
+                    Photo = cp.Product?.Photo
                 })],
                 Success = true,
                 Message = "Cart retrieved successfully"

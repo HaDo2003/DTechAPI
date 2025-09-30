@@ -7,7 +7,6 @@ namespace DTech.Application.DTOs.response
         public int ProductId { get; set; }
         public string? Name { get; set; }
         public string? Slug { get; set; }
-        
         public string? Warranty { get; set; }
         public bool? StatusProduct { get; set; }
         public decimal? Price { get; set; }
@@ -24,11 +23,11 @@ namespace DTech.Application.DTOs.response
         public CategoryDto? Category { get; set; }
         public BrandDto? Brand { get; set; }
 
-        public virtual ICollection<ProductCommentDto> ProductComments { get; set; } = new List<ProductCommentDto>();
+        public virtual ICollection<ProductCommentDto> ProductComments { get; set; } = [];
 
-        public virtual ICollection<ProductImageDto> ProductImages { get; set; } = new List<ProductImageDto>();
+        public virtual ICollection<ProductImageDto> ProductImages { get; set; } = [];
 
-        public virtual ICollection<SpecificationDto> Specifications { get; set; } = new List<SpecificationDto>();
-        public virtual ICollection<RelatedProductDto> RelatedProducts { get; set; } = new List<RelatedProductDto>();
+        public virtual ICollection<SpecificationDto> Specifications { get; set; } = [];
+        public virtual ICollection<RelatedProductDto> RelatedProducts { get; set; } = [];
     }
 }

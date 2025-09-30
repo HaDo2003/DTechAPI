@@ -1,4 +1,5 @@
 ﻿using DTech.Domain.Entities;
+using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
-                .Where(a => a.Category!.Name != "Laptop" && a.Category!.Name != "Smart Phone" && a.Category!.Name != "Tablet" && a.Status == 1)
+                .Where(a => a.Category!.Name != "Laptop" && a.Category!.Name != "Smart Phone" && a.Category!.Name != "Tablet" && a.Status == StatusEnums.Available)
                 .ToListAsync();
 
             // Shuffle the list randomly
@@ -32,7 +33,7 @@ namespace DTech.Infrastructure.Repositories
                     && a.Category!.Name != "Smart Phone"
                     && a.Category!.Name != "Tablet"
                     && a.BrandId == brandId
-                    && a.Status == 1)
+                    && a.Status == StatusEnums.Available)
                 .ToListAsync();
 
             // Shuffle the list randomly
@@ -46,7 +47,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
-                .Where(a => a.Discount != null && a.Discount > 0 && a.Status == 1)
+                .Where(a => a.Discount != null && a.Discount > 0 && a.Status == StatusEnums.Available)
                 .OrderByDescending(a => a.Discount)
                 .ToListAsync();
             return products;
@@ -58,7 +59,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
-                .Where(a => a.Discount != null && a.Discount > 0 && a.BrandId == brandId && a.Status == 1)
+                .Where(a => a.Discount != null && a.Discount > 0 && a.BrandId == brandId && a.Status == StatusEnums.Available)
                 .OrderByDescending(a => a.Discount)
                 .ToListAsync();
             return products;
@@ -74,7 +75,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
-                .Where(p => p.CategoryId != null && id.Contains(p.CategoryId.Value) && p.Status == 1)
+                .Where(p => p.CategoryId != null && id.Contains(p.CategoryId.Value) && p.Status == StatusEnums.Available)
                 .OrderByDescending(a => a.ProductId)
                 .ToListAsync();
             return products;
@@ -90,7 +91,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
-                .FirstOrDefaultAsync(a => a.Slug == slug && a.Status == 1);
+                .FirstOrDefaultAsync(a => a.Slug == slug && a.Status == StatusEnums.Available);
 
             if (product != null)
             {
@@ -140,7 +141,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
-                .Where(a => a.BrandId == brandId && a.ProductId != productId && a.Status == 1)
+                .Where(a => a.BrandId == brandId && a.ProductId != productId && a.Status == StatusEnums.Available)
                 .OrderByDescending(a => a.ProductId)
                 .Take(5)
                 .ToListAsync();
@@ -157,7 +158,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
-                .Where(a => a.CategoryId == categoryId && a.BrandId == brandId && a.Status == 1)
+                .Where(a => a.CategoryId == categoryId && a.BrandId == brandId && a.Status == StatusEnums.Available)
                 .OrderByDescending(a => a.ProductId)
                 .ToListAsync();
             return products;
@@ -173,7 +174,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
-                .Where(p => ids.Contains(p.ProductId) && p.Status == 1)
+                .Where(p => ids.Contains(p.ProductId) && p.Status == StatusEnums.Available)
                 .ToListAsync();
             return products;
         }
@@ -194,7 +195,7 @@ namespace DTech.Infrastructure.Repositories
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
                 .Include(p => p.Specifications)
-                .Where(p => p.Status == 1 &&
+                .Where(p => p.Status == StatusEnums.Available &&
                 (
                     EF.Functions.Like(p.Name!.ToLower(), $"%{query}%") ||
                     EF.Functions.Like(p.Description!.ToLower(), $"%{query}%") ||
@@ -205,7 +206,7 @@ namespace DTech.Infrastructure.Repositories
                 ))
                 .OrderByDescending(a => a.ProductId)
                 .ToListAsync();
-            
+
             return products;
         }
 
@@ -213,7 +214,7 @@ namespace DTech.Infrastructure.Repositories
         // Repo for Product Comments
         public async Task<int?> AddProductCommentAsync(ProductComment model)
         {
-            if(model != null)
+            if (model != null)
             {
                 context.ProductComments.Add(model);
                 await context.SaveChangesAsync();
@@ -222,5 +223,94 @@ namespace DTech.Infrastructure.Repositories
             return null;
         }
         // Repo for Product Specifications
+
+        // For admin
+
+        public async Task<List<Product>?> GetAllProductsAsync()
+        {
+            return await context.Products
+                .AsNoTracking()
+                .Where(p => p.Status == StatusEnums.Available)
+                .OrderBy(p => p.ProductId)
+                .ToListAsync();
+        }
+
+        public async Task<bool> CheckIfProductExistsAsync(Product product)
+        {
+            if (product == null)
+                return false;
+
+            if (product.ProductId > 0)
+            {
+                return await context.Products.AnyAsync(p =>
+                    p.Slug == product.Slug &&
+                    p.ProductId != product.ProductId);
+            }
+            else
+            {
+                return await context.Products.AnyAsync(p =>
+                    p.Slug == product.Slug);
+            }
+        }
+
+        public async Task<(bool Success, string Message)> CreateProductAsync(Product product)
+        {
+            if (product == null)
+                return (false, "Product is null");
+
+            await context.Products.AddAsync(product);
+            var result = await context.SaveChangesAsync();
+            if (result > 0)
+                return (true, "Product created successfully");
+            else
+                return (false, "Failed to create product");
+        }
+
+        public async Task<(bool Success, string Message)> UpdateProductAsync(Product product)
+        {
+            var existingProduct = await context.Products.FindAsync(product.ProductId);
+            if (existingProduct == null)
+                return (false, "Product not found");
+
+            existingProduct.Name = product.Name;
+            existingProduct.Slug = product.Slug;
+            existingProduct.Warranty = product.Warranty;
+            existingProduct.StatusProduct = product.StatusProduct;
+            existingProduct.InitialCost = product.InitialCost;
+            existingProduct.Price = product.Price;
+            existingProduct.Discount = product.Discount;
+            existingProduct.PriceAfterDiscount = product.PriceAfterDiscount;
+            existingProduct.EndDateDiscount = product.EndDateDiscount;
+            existingProduct.Views = product.Views;
+            existingProduct.DateOfManufacture = product.DateOfManufacture;
+            existingProduct.MadeIn = product.MadeIn;
+            existingProduct.PromotionalGift = product.PromotionalGift;
+            existingProduct.Photo = product.Photo;
+            existingProduct.Description = product.Description;
+            existingProduct.UpdateDate = DateTime.UtcNow;
+            existingProduct.UpdatedBy = product.UpdatedBy;
+            existingProduct.Status = product.Status;
+
+            context.Products.Update(existingProduct);
+            var result = await context.SaveChangesAsync();
+            if (result > 0)
+                return (true, "Product updated successfully");
+            else
+                return (false, "Failed to update product");
+        }
+
+        public async Task<(bool Success, string Message)> DeleteProductAsync(int productId)
+        {
+            var product = await context.Products.FindAsync(productId);
+            if (product == null)
+                return (false, "Product not found");
+
+            context.Products.Remove(product);
+            var result = await context.SaveChangesAsync();
+            if (result > 0)
+                return (true, "Product deleted successfully");
+            else
+                return (false, "Failed to delete product");
+        }
     }
 }

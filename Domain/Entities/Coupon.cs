@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DTech.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -35,7 +36,7 @@ public partial class Coupon
 
     public DateOnly? EndDate { get; set; }
 
-    public int? Status { get; set; }
+    public StatusEnums Status { get; set; } = StatusEnums.Available;
 
     [Display(Name = "Created By")]
     public string? CreatedBy { get; set; }

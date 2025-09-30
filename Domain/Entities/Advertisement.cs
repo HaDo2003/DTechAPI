@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using DTech.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DTech.Domain.Entities;
 
@@ -32,5 +33,5 @@ public partial class Advertisement
     [Display(Name = "Update Date")]
     public DateTime? UpdateDate { get; set; }
 
-    public int? Status { get; set; }
+    public StatusEnums Status { get; set; } = StatusEnums.Available;
 }

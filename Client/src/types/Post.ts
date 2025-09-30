@@ -2,7 +2,7 @@ export interface PostForm {
     id: string | number;
     name?: string;
     description?: string;
-    postCategoryId?: string | number;
+    status?: string;
     postCategory?: string;
     image?: string;
     imageUpload?: File;

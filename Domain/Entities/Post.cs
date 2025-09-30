@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DTech.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -29,9 +30,7 @@ public partial class Post
 
     [Display(Name = "Posted By")]
     public string? PostBy { get; set; }
-
-    public int? Status { get; set; }
-
+    public StatusEnums Status { get; set; } = StatusEnums.Available;
     [Display(Name = "Post Category")]
     public virtual PostCategory? Cate { get; set; }
 

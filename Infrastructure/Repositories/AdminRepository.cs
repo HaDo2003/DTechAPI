@@ -144,12 +144,13 @@ namespace DTech.Infrastructure.Repositories
             );
         }
 
-        public async Task<bool> UpdateAdminAsync(ApplicationUser user, string? roleId)
+        public async Task<(bool Success, string Message)> UpdateAdminAsync(ApplicationUser user, string? roleId)
         {
             var existingUser = await userManager.FindByIdAsync(user.Id);
             if (existingUser == null)
-                return false;
+                return (false, "User not found");
 
+            // Update user fields
             existingUser.FullName = user.FullName;
             existingUser.UserName = user.UserName;
             existingUser.Email = user.Email;
@@ -161,31 +162,43 @@ namespace DTech.Infrastructure.Repositories
             existingUser.UpdatedBy = user.UpdatedBy;
             existingUser.RoleId = user.RoleId;
 
-            var result = await userManager.UpdateAsync(existingUser);
-            if (!result.Succeeded)
-                return false;
+            // Update user
+            var updateResult = await userManager.UpdateAsync(existingUser);
+            if (!updateResult.Succeeded)
+            {
+                var errors = string.Join("; ", updateResult.Errors.Select(e => e.Description));
+                return (false, $"Failed to update user: {errors}");
+            }
 
+            // Handle role change
             if (!string.IsNullOrEmpty(roleId) && roleId != existingUser.RoleId)
             {
                 var role = await FindRoleByIdAsync(roleId);
                 if (role == null)
-                    return false;
+                    return (false, "Role not found");
 
                 var currentRoles = await userManager.GetRolesAsync(existingUser);
                 if (currentRoles.Any())
                 {
                     var removeResult = await userManager.RemoveFromRolesAsync(existingUser, currentRoles);
                     if (!removeResult.Succeeded)
-                        return false;
+                    {
+                        var errors = string.Join("; ", removeResult.Errors.Select(e => e.Description));
+                        return (false, $"Failed to remove user from current roles: {errors}");
+                    }
                 }
 
-                var addToRoleResult = await userManager.AddToRoleAsync(existingUser, role.Name);
+                var addToRoleResult = await userManager.AddToRoleAsync(existingUser, role.Name!);
                 if (!addToRoleResult.Succeeded)
-                    return false;
+                {
+                    var errors = string.Join("; ", addToRoleResult.Errors.Select(e => e.Description));
+                    return (false, $"Failed to add user to new role: {errors}");
+                }
 
                 existingUser.RoleId = role.Id;
             }
-            return true;
+
+            return (true, "Admin updated successfully");
         }
 
         public async Task<(bool Success, string Message)> DeleteAdminAsync(string userId)
@@ -209,6 +222,14 @@ namespace DTech.Infrastructure.Repositories
         {
             var roles = await roleManager.Roles.ToListAsync();
             return roles;
+        }
+
+        public async Task<string> GetAdminFullNameAsync(string? currentUserId)
+        {
+            if (currentUserId == null)
+                return "Unknown User";
+            var user = await userManager.FindByIdAsync(currentUserId);
+            return user?.FullName ?? "Unknown User";
         }
     }
 }

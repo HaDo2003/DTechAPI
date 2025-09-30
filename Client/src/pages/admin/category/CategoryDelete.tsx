@@ -21,10 +21,7 @@ const CategoryDelete: React.FC = () => {
                 const res = await adminService.getSingleData<CategoryForm>(`/api/category/get/${id}`, token ?? "");
                 if (res.success && res.data) {
                     const category = res.data as CategoryForm;
-                    setData({
-                        ...category,
-                        statusName: category.status === 1 ? "Active" : "Inactive",
-                    });
+                    setData(category);
                 }
             })();
         }
@@ -80,7 +77,7 @@ const CategoryDelete: React.FC = () => {
                     { key: "name", label: "Name" },
                     { key: "slug", label: "Slug" },
                     { key: "parentName", label: "Parent Category" },
-                    { key: "statusName", label: "Status" },
+                    { key: "status", label: "Status" },
                 ]}
                 onDelete={handleDelete}
                 onCancel={handleCancel}

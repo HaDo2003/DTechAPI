@@ -13,6 +13,7 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     getHomeData().then((res) => {
+      console.log("Home API response:", res);
       setData(res);
       setLoading(false);
     });

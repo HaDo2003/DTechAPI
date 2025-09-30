@@ -1,5 +1,7 @@
 ﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.response.admin;
+using DTech.Application.DTOs.Response.Admin.Customer;
 using DTech.Domain.Entities;
 
 namespace DTech.Application.Interfaces
@@ -15,5 +17,9 @@ namespace DTech.Application.Interfaces
         Task<MessageResponse> SendContactAsync(ContactDto model);
         Task<AddressResponse> SwitchDefaultAsync(string customerId, int addressId);
         Task<OrderDetailResDto> GetOrderDetailAsync(string customerId, string orderId);
+
+        // For Admin
+        Task<IndexResDto<List<CustomerIndexDto>>> GetCustomersAsync();
+        Task<IndexResDto<CustomerDetailDto>> GetCustomerDetailAsync(string customerId);
     }
 }

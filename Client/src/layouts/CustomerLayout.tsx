@@ -19,7 +19,7 @@ const CustomerLayout: React.FC = () => {
       timestamp: new Date().toISOString(),
     },
   ];
-  
+
   return (
     <div className="customer-layout">
       {/* <AuthDebugger /> */}

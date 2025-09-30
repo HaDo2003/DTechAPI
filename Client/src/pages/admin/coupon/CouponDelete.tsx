@@ -21,10 +21,7 @@ const CouponDelete: React.FC = () => {
                 const res = await adminService.getSingleData<CouponForm>(`/api/coupon/get/${id}`, token ?? "");
                 if (res.success && res.data) {
                     const coupon = res.data as CouponForm;
-                    setData({
-                        ...coupon,
-                        statusName: coupon.status === 1 ? "Available" : "Unavailable",
-                    });
+                    setData(coupon);
                 }
             })();
         }
@@ -79,7 +76,7 @@ const CouponDelete: React.FC = () => {
                     { key: "code", label: "Code" },
                     { key: "discountType", label: "Discount Type" },
                     { key: "discount", label: "Discount" },
-                    { key: "statusName", label: "Status" },
+                    { key: "status", label: "Status" },
                 ]}
                 onDelete={handleDelete}
                 onCancel={handleCancel}

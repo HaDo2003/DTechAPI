@@ -7,6 +7,7 @@ using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using DTech.Infrastructure.Repositories;
 using DTech.Infrastructure.Services;
+using DTech.Infrastructure.Services.Background;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace DTech.Infrastructure.DependencyInjection
 {
@@ -78,38 +80,49 @@ namespace DTech.Infrastructure.DependencyInjection
                 config.GetSection("Jwt"));
             services.AddHttpClient();
 
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
             //Mapper Configuration
             services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
             // Register application services
-            services.AddScoped<IHomeService, HomeService>();
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<ICustomerService, CustomerService>();
-            services.AddScoped<ICartService, CartService>();
-            services.AddScoped<ICheckOutService, CheckOutService>();
-            services.AddScoped<IAdminService, AdminService>();
-            services.AddScoped<ICloudinaryService, CloudinaryService>();
-            services.AddScoped<IVnPayService, VnPayService>();
+            var serviceAssembly = typeof(AdminService).Assembly;
+            foreach (var type in serviceAssembly.GetTypes())
+            {
+                if (type.IsClass && !type.IsAbstract && type.Name.EndsWith("Service"))
+                {
+                    var interfaceType = type.GetInterface($"I{type.Name}");
+                    if (interfaceType != null)
+                    {
+                        services.AddScoped(interfaceType, type);
+                    }
+                }
+            }
 
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
+            services.AddScoped<ITokenService, TokenService>();
             services.AddTransient<IEmailService, EmailService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddHostedService<QueuedHostedService>();
+            services.AddHostedService<CodeStatusCheckerService>();
 
             // Register repositories
-            services.AddScoped<IAdvertisementRepository, AdvertisementRepository>();
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<IBrandRepository, BrandRepository>();
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<ICartRepository, CartRepository>();
-            services.AddScoped<IOrderRepository, OrderRepository>();
-            services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
-            services.AddScoped<ICouponRepository, CouponRepository>();
-            services.AddScoped<IPaymentRepository, PaymentRepository>();
-            services.AddScoped<IShippingRepository, ShippingRepository>();
-            services.AddScoped<IAdminRepository, AdminRepository>();
+            var repoAssembly = typeof(AdminRepository).Assembly;
+            foreach (var type in repoAssembly.GetTypes())
+            {
+                if (type.IsClass && !type.IsAbstract && type.Name.EndsWith("Repository"))
+                {
+                    var interfaceType = type.GetInterface($"I{type.Name}");
+                    if (interfaceType != null)
+                    {
+                        services.AddScoped(interfaceType, type);
+                    }
+                }
+            }
 
             return services;
         }

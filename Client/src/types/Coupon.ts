@@ -1,5 +1,7 @@
 export interface CouponForm {
     id: string | number;
+    name?: string;
+    slug?: string;
     code: string;
     discountType: "Percentage" | "Direct";
     discount: number;
@@ -7,8 +9,7 @@ export interface CouponForm {
     condition?: number;
     details?: string;
     endDate: string;
-    status?: number;
-    statusName?: string;
+    status?: string;
     createDate?: string;
     createdBy?: string;
     updateDate?: string;

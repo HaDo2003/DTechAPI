@@ -22,8 +22,7 @@ const CategoryFormPage: React.FC = () => {
         slug: "",
         parentId: null,
         parentName: "",
-        status: 1,
-        statusName: "",
+        status: "Available",
     });
 
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);

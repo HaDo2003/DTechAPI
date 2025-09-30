@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.response.admin;
+using DTech.Application.DTOs.Response.Admin.Product;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
+using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
 
 namespace DTech.Application.Services
@@ -12,9 +15,12 @@ namespace DTech.Application.Services
         ICategoryRepository categoryRepo,
         IProductRepository productRepo,
         ICustomerRepository customerRepo,
+        IAdminRepository adminRepo,
+        ICloudinaryService cloudinaryService,
         IMapper _mapper
         ) : IProductService
     {
+        readonly string folderName = "Pre-thesis/Product";
         //Get details of a product by its slug, category slug, and brand slug
         public async Task<ProductDto?> ProductDetailAsync(string categorySlug, string brandSlug, string slug)
         {
@@ -60,7 +66,10 @@ namespace DTech.Application.Services
                         products = await productRepo.GetAccessoriesAsync();
                         break;
                     default:
-                        var category = await categoryRepo.GetCategoryBySlugAsync(categorySlug!);
+                        if (string.IsNullOrWhiteSpace(categorySlug))
+                            return [];
+
+                        var category = await categoryRepo.GetCategoryBySlugAsync(categorySlug);
                         if (category == null) return [];
 
                         var categoryIds = new List<int> { category.CategoryId };
@@ -167,12 +176,12 @@ namespace DTech.Application.Services
         {
             return sortOrder switch
             {
-                "newest" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.ProductId)],
-                "discount" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Discount)],
-                "name_asc" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.Name)],
-                "name_desc" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Name)],
-                "price_asc" => [.. products.Where(a => a.Status == 1).OrderBy(p => p.Price)],
-                "price_desc" => [.. products.Where(a => a.Status == 1).OrderByDescending(p => p.Price)],
+                "newest" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderBy(p => p.ProductId)],
+                "discount" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderByDescending(p => p.Discount)],
+                "name_asc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderBy(p => p.Name)],
+                "name_desc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderByDescending(p => p.Name)],
+                "price_asc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderBy(p => p.Price)],
+                "price_desc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderByDescending(p => p.Price)],
                 _ => products
             };
         }
@@ -211,6 +220,309 @@ namespace DTech.Application.Services
 
             var productDto = _mapper.Map<List<ProductDto>>(products);
             return productDto;
+        }
+
+        // For admin
+        public async Task<IndexResDto<List<ProductIndexDto>>> GetProductsAsync()
+        {
+            var products = await productRepo.GetAllProductsAsync();
+            if (products == null || products.Count == 0)
+            {
+                return new IndexResDto<List<ProductIndexDto>>
+                {
+                    Success = false,
+                    Message = "No product found"
+                };
+            }
+
+            var productDtos = products.Select(p => new ProductIndexDto
+            {
+                Id = p.ProductId,
+                Name = p.Name,
+                Price = p.Price,
+                StatusProduct = p.StatusProduct == true ? "In stock"
+                       : p.StatusProduct == false ? "Out of stock"
+                       : "Unknown",
+            }).ToList();
+
+            return new IndexResDto<List<ProductIndexDto>>
+            {
+                Success = true,
+                Data = productDtos
+            };
+        }
+
+        public async Task<IndexResDto<ProductDetailDto>> GetProductDetailAsync(int productId)
+        {
+            var product = await productRepo.GetProductByIdAsync(productId);
+            if (product == null)
+            {
+                return new IndexResDto<ProductDetailDto>
+                {
+                    Success = false,
+                    Message = "Product not found"
+                };
+            }
+
+            var dto = new ProductDetailDto
+            {
+                Id = product.ProductId,
+                Name = product.Name,
+                Slug = product.Slug,
+                Warranty = product.Warranty,
+                StatusProduct = product.StatusProduct switch
+                {
+                    true => "In stock",
+                    false => "Out of stock",
+                    null => "Unknown"
+                },
+                InitialCost = product.InitialCost,
+                Price = product.Price,
+                Discount = product.Discount,
+                PriceAfterDiscount = product.PriceAfterDiscount,
+                EndDateDiscount = product.EndDateDiscount,
+                DateOfManufacture = product.DateOfManufacture,
+                MadeIn = product.MadeIn,
+                Views = product.Views,
+                PromotionalGift = product.PromotionalGift,
+                Photo = product.Photo,
+                Description = product.Description,
+                BrandId = product.BrandId,
+                CategoryId = product.CategoryId,
+                CreateDate = product.CreateDate,
+                CreatedBy = product.CreatedBy,
+                UpdateDate = product.UpdateDate,
+                UpdatedBy = product.UpdatedBy
+            };
+
+            return new IndexResDto<ProductDetailDto>
+            {
+                Success = true,
+                Data = dto
+            };
+        }
+
+        public async Task<IndexResDto<object?>> CreateProductAsync(ProductDetailDto model, string? currentUserId)
+        {
+            try
+            {
+                Product product = new()
+                {
+                    Name = model.Name,
+                    Slug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-"),
+                    Warranty = model.Warranty,
+                    StatusProduct = model.StatusProduct?.ToLower() switch
+                    {
+                        "in stock" => true,
+                        "out of stock" => false,
+                        _ => null
+                    },
+                    InitialCost = model.InitialCost,
+                    Price = model.Price,
+                    Discount = model.Discount,
+                    PriceAfterDiscount = model.PriceAfterDiscount,
+                    EndDateDiscount = model.EndDateDiscount,
+                    DateOfManufacture = model.DateOfManufacture,
+                    MadeIn = model.MadeIn,
+                    Views = model.Views,
+                    PromotionalGift = model.PromotionalGift,
+                    Description = model.Description,
+                    BrandId = model.BrandId,
+                    CategoryId = model.CategoryId,
+                    CreateDate = DateTime.UtcNow,
+                    CreatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
+                };
+
+                product.Slug = product.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
+
+                var existingProduct = await productRepo.CheckIfProductExistsAsync(product);
+                if (existingProduct)
+                {
+                    return new IndexResDto<object?>
+                    {
+                        Success = false,
+                        Message = "Product with same name exists",
+                        Data = null
+                    };
+                }
+
+                if (model.PhotoUpload != null && model.PhotoUpload.Length > 0)
+                {
+                    string imageName = await cloudinaryService.UploadImageAsync(
+                        model.PhotoUpload,
+                        folderName
+                    );
+
+                    if (string.IsNullOrEmpty(imageName))
+                    {
+                        return new IndexResDto<object?>
+                        {
+                            Success = false,
+                            Message = "Image upload failed",
+                            Data = null
+                        };
+                    }
+
+                    product.Photo = imageName;
+                }
+
+                var (Success, Message) = await productRepo.CreateProductAsync(product);
+
+                if (!Success)
+                {
+                    return new IndexResDto<object?>
+                    {
+                        Success = false,
+                        Message = Message,
+                        Data = null
+                    };
+                }
+
+                return new IndexResDto<object?>
+                {
+                    Success = true,
+                    Message = "Product created successfully",
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new IndexResDto<object?>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<IndexResDto<object?>> UpdateProductAsync(int productId, ProductDetailDto model, string? currentUserId)
+        {
+            try
+            {
+                Product product = new()
+                {
+                    Name = model.Name,
+                    Slug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-"),
+                    Warranty = model.Warranty,
+                    StatusProduct = model.StatusProduct?.ToLower() switch
+                    {
+                        "in stock" => true,
+                        "out of stock" => false,
+                        _ => null
+                    },
+                    InitialCost = model.InitialCost,
+                    Price = model.Price,
+                    Discount = model.Discount,
+                    PriceAfterDiscount = model.PriceAfterDiscount,
+                    EndDateDiscount = model.EndDateDiscount,
+                    DateOfManufacture = model.DateOfManufacture,
+                    MadeIn = model.MadeIn,
+                    Views = model.Views,
+                    PromotionalGift = model.PromotionalGift,
+                    Description = model.Description,
+                    BrandId = model.BrandId,
+                    CategoryId = model.CategoryId,
+                    CreateDate = DateTime.UtcNow,
+                    CreatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
+                    UpdateDate = DateTime.UtcNow,
+                    UpdatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
+                };
+
+                string newSlug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-") ?? string.Empty;
+                product.Slug = newSlug;
+
+                var existingProduct = await productRepo.CheckIfProductExistsAsync(product);
+                if (existingProduct)
+                {
+                    return new IndexResDto<object?>
+                    {
+                        Success = false,
+                        Message = "Product with the same name already exists",
+                        Data = null
+                    };
+                }
+
+                // Handle image change
+                if (model.PhotoUpload != null && model.PhotoUpload.Length > 0)
+                {
+                    string imageName = await cloudinaryService.ChangeImageAsync(
+                        oldfile: model.Photo ?? string.Empty,
+                        newfile: model.PhotoUpload,
+                        filepath: folderName
+                    );
+
+                    if (string.IsNullOrEmpty(imageName))
+                    {
+                        return new IndexResDto<object?>
+                        {
+                            Success = false,
+                            Message = "Image upload failed",
+                            Data = null
+                        };
+                    }
+
+                    product.Photo = imageName;
+                }
+
+                var (Success, Message) = await productRepo.UpdateProductAsync(product);
+                if (!Success)
+                {
+                    return new IndexResDto<object?>
+                    {
+                        Success = false,
+                        Message = Message,
+                        Data = null
+                    };
+                }
+                return new IndexResDto<object?>
+                {
+                    Success = true,
+                    Message = "Product updated successfully",
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new IndexResDto<object?>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<IndexResDto<object?>> DeleteProductAsync(int productId)
+        {
+            try
+            {
+                var (Success, Message) = await productRepo.DeleteProductAsync(productId);
+                if (!Success)
+                {
+                    return new IndexResDto<object?>
+                    {
+                        Success = false,
+                        Message = Message,
+                        Data = null
+                    };
+                }
+                return new IndexResDto<object?>
+                {
+                    Success = true,
+                    Message = "Product deleted successfully",
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new IndexResDto<object?>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Data = null
+                };
+            }
         }
     }
 }

@@ -18,13 +18,12 @@ const AdvertisementDelete: React.FC = () => {
     useEffect(() => {
         if (id) {
             (async () => {
+                setLoading(true);
                 const res = await adminService.getSingleData<AdvertisementForm>(`/api/advertisement/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    const ad = res.data as AdvertisementForm;
-                    setData({
-                        ...ad,
-                        statusName: ad.status === 1 ? "Available" : "Unavailable",
-                    });
+                if (res) {
+                    const ad = res as unknown as AdvertisementForm;
+                    setData(ad);
+                    setLoading(false);
                 }
             })();
         }
@@ -32,7 +31,7 @@ const AdvertisementDelete: React.FC = () => {
 
     const handleDelete = async () => {
         setLoading(true);
-        const res = await adminService.deleteData(`/api/advertisement/delete`, id ?? "", token ?? "");
+        const res = await adminService.deleteData("/api/advertisement/delete", id ?? "", token ?? "");
         if (res.success) {
             setLoading(false);
             navigate("/admin/advertisement", {
@@ -78,7 +77,7 @@ const AdvertisementDelete: React.FC = () => {
                     { key: "name", label: "Name" },
                     { key: "slug", label: "Slug" },
                     { key: "order", label: "Order" },
-                    { key: "statusName", label: "Status" },
+                    { key: "status", label: "Status" },
                 ]}
                 imageKey="image"
                 onDelete={handleDelete}

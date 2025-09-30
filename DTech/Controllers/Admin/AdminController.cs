@@ -1,8 +1,8 @@
-﻿using DTech.Application.DTOs.response.admin.admin;
+﻿using DTech.API.Helper;
+using DTech.Application.DTOs.response.admin.admin;
 using DTech.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace DTech.API.Controllers.Admin
@@ -17,99 +17,59 @@ namespace DTech.API.Controllers.Admin
         [HttpGet("get-admins")]
         public async Task<IActionResult> GetAdmins()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+            var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
 
             var response = await adminService.GetAdmins();
-            if (response == null)
-                return NotFound(new { Message = "User not found." });
-
-            if (!response.Success)
-                return BadRequest(new { response.Message });
-
-            return Ok(response.Data);
+            return ControllerHelper.HandleResponse(response, this);
         }
 
         [HttpGet("get/{id}")]
         public async Task<IActionResult> GetAdmin(string id)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+            var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
 
             var response = await adminService.GetAdminDetailAsync(id);
-            if (response == null)
-                return NotFound(new { Message = "User not found." });
-
-            if (!response.Success)
-                return BadRequest(new { response.Message });
-
-            return Ok(response);
+            return ControllerHelper.HandleResponse(response, this);
         }
 
         [HttpPost("create")]
         public async Task<IActionResult> CreateAdmin([FromForm] AdminDetailDto model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
-
-            var response = await adminService.CreateAdminAsync(model);
-            if (response == null)
-                return NotFound(new { Message = "User not found." });
-
-            if (!response.Success)
-                return BadRequest(new { response.Message });
-
-            return Ok(response);
+            var response = await adminService.CreateAdminAsync(model, userId);
+            return ControllerHelper.HandleResponse(response, this);
         }
 
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateAdmin(string id, [FromForm] AdminDetailDto model)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
-
-            var response = await adminService.UpdateAdminAsync(id, model);
-            if (response == null)
-                return NotFound(new { Message = "User not found." });
-
-            if (!response.Success)
-                return BadRequest(new { response.Message });
-
-            return Ok(response);
+            var response = await adminService.UpdateAdminAsync(id, model, userId);
+            return ControllerHelper.HandleResponse(response, this);
         }
 
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteAdmin(string id)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+            var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
 
             var response = await adminService.DeleteAdminAsync(id);
-            if (response == null)
-                return NotFound(new { Message = "User not found." });
-
-            if (!response.Success)
-                return BadRequest(new { response.Message });
-
-            return Ok(response);
+            return ControllerHelper.HandleResponse(response, this);
         }
 
         [HttpGet("get-roles")]
         public async Task<IActionResult> GetRoles()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+            var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
+
             var roles = await adminService.GetRolesAsync();
             return Ok(roles);
         }

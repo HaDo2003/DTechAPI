@@ -100,5 +100,12 @@ namespace DTech.Infrastructure.Repositories
                 return null;
             }
         }
+
+        public async Task<List<Order>?> GetAllOrdersAsync()
+        {
+            return await context.Orders
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

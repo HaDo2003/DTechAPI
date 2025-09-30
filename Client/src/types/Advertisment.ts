@@ -10,8 +10,7 @@ export interface AdvertisementForm {
   name?: string;
   slug?: string;
   order: number;
-  status?: number;
-  statusName?: string;
+  status?: string;
   image?: string;
   imageUpload?: File;
   createDate?: string;

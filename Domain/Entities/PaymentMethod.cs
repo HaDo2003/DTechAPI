@@ -26,5 +26,5 @@ public partial class PaymentMethod
     [Display(Name = "Created Date")]
     public DateTime? UpdateDate { get; set; }
 
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    public virtual ICollection<Payment> Payments { get; set; } = [];
 }

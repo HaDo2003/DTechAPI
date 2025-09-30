@@ -13,6 +13,13 @@ namespace DTech.Infrastructure.Repositories
     ) : ICustomerRepository
     {
         //For User table
+        public async Task<List<ApplicationUser>> GetAllCustomersAsync()
+        {
+            return await context.Users
+                .AsNoTracking()
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+        }
         public async Task<bool> CheckAccountAsync(string? account)
         {
             return await context.Users.AnyAsync(e => e.UserName == account);
@@ -37,10 +44,7 @@ namespace DTech.Infrastructure.Repositories
 
         public async Task<ApplicationUser> GetCustomerByIdAsync(string? customerId)
         {
-            if (customerId == null)
-            {
-                throw new ArgumentNullException(nameof(customerId));
-            }
+            ArgumentNullException.ThrowIfNull(customerId);
 
             var customer = await userManager.FindByIdAsync(customerId);
             if (customer != null)
@@ -71,6 +75,13 @@ namespace DTech.Infrastructure.Repositories
             {
                 throw new InvalidOperationException($"Customer with ID '{customerId}' not found.");
             }
+        }
+
+        public async Task<ApplicationUser?> GetOnlyCustomerByIdAsync(string? userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return null;
+            return await userManager.FindByIdAsync(userId);
         }
         public async Task<bool> UpdateCustomerAsync(ApplicationUser customer)
         {

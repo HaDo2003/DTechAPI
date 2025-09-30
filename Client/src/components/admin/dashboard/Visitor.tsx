@@ -1,5 +1,6 @@
-import React from "react";
-import Chart from "react-apexcharts";
+import React, { lazy } from "react";
+
+const Chart = lazy(() => import("react-apexcharts"));
 
 const OnlineStoreVisitors: React.FC = () => {
     const options: ApexCharts.ApexOptions = {

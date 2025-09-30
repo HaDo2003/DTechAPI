@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DTech.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -29,7 +30,7 @@ public partial class Category
     [Display(Name = "Update Date")]
     public DateTime? UpdateDate { get; set; }
 
-    public int? Status { get; set; }
+    public StatusEnums Status { get; set; } = StatusEnums.Available;
 
     public virtual ICollection<Category> InverseParent { get; set; } = new List<Category>();
 

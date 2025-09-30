@@ -11,8 +11,9 @@ namespace DTech.Domain.Interfaces
         Task<bool> CheckIfAdminExistsAsync(ApplicationUser user);
         Task<IdentityRole?> FindRoleByIdAsync(string? roleId);
         Task<(bool Success, string Message)> CreateAdminAsync(ApplicationUser user, string? roleName);
-        Task<bool> UpdateAdminAsync(ApplicationUser user, string? roleName);
+        Task<(bool Success, string Message)> UpdateAdminAsync(ApplicationUser user, string? roleName);
         Task<(bool Success, string Message)> DeleteAdminAsync(string userId);
         Task<List<IdentityRole>> GetAllRolesAsync();
+        Task<string> GetAdminFullNameAsync(string? currentUserId);
     }
 }

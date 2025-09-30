@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.response.admin;
+using DTech.Application.DTOs.response.admin.advertisement;
+using DTech.Application.DTOs.Response.Admin.Customer;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -219,6 +222,65 @@ namespace DTech.Application.Services
             };
 
             return model;
+        }
+
+        // For Admin
+        public async Task<IndexResDto<List<CustomerIndexDto>>> GetCustomersAsync()
+        {
+            var customers = await customerRepo.GetAllCustomersAsync();
+            if (customers == null || customers.Count == 0)
+            {
+                return new IndexResDto<List<CustomerIndexDto>>
+                {
+                    Success = false,
+                    Message = "No advertisement found"
+                };
+            }
+
+            var customerDtos = customers.Select(adv => new CustomerIndexDto
+            {
+                UserName = adv.UserName,
+                FullName = adv.FullName,
+                Email = adv.Email,
+                PhoneNumber = adv.PhoneNumber,
+            }).ToList();
+
+            return new IndexResDto<List<CustomerIndexDto>>
+            {
+                Success = true,
+                Data = customerDtos
+            };
+        }
+        public async Task<IndexResDto<CustomerDetailDto>> GetCustomerDetailAsync(string customerId)
+        {
+            var customer = await customerRepo.GetOnlyCustomerByIdAsync(customerId);
+            if (customer == null)
+            {
+                return new IndexResDto<CustomerDetailDto>
+                {
+                    Success = false,
+                    Message = "Advertisement not found"
+                };
+            }
+            var customerDetail = new CustomerDetailDto
+            {
+                UserName = customer.UserName,
+                FullName = customer.FullName,
+                Email = customer.Email,
+                PhoneNumber = customer.PhoneNumber,
+                Gender = customer.Gender,
+                DateOfBirth = customer.DateOfBirth,
+                CreateDate = customer.CreateDate,
+                CreatedBy = customer.CreatedBy,
+                UpdateDate = customer.UpdateDate,
+                UpdatedBy = customer.UpdatedBy,
+            };
+
+            return new IndexResDto<CustomerDetailDto>
+            {
+                Success = true,
+                Data = customerDetail
+            };
         }
 
     }

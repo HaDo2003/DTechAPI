@@ -16,6 +16,7 @@ import Dashboard from './pages/admin/Dashboard';
 import PrivateRoute from './routes/privateRoute';
 
 // Customer Pages
+import RouteLink from "./routes/routeLink";
 import Home from './pages/customer/Home';
 import NotFound from './pages/customer/NotFound';
 import ProductDetail from './pages/customer/ProductDetail';
@@ -35,7 +36,6 @@ import AdminAccountFormPage from "./pages/admin/admin/AdminAccountFormPage";
 import AdminDelete from "./pages/admin/admin/AdminDelete";
 import AdvertisementFormPage from "./pages/admin/advertisement/AdvertisementFormPage";
 import AdvertisementDelete from "./pages/admin/advertisement/AdvertisementDelete";
-
 
 function App() {
   return (
@@ -82,6 +82,7 @@ function App() {
           <Route index element={<Dashboard />} />
 
           {/* Only for ADMIN routes */}
+          {/* Admin Page */}
           <Route
             path="admin"
             element={
@@ -119,41 +120,65 @@ function App() {
           />
 
           {/* Admin and seller routes */}
-          <Route
-            path="advertisement"
-            element={
-              <AdminRoute allowedRoles={["Admin", "Seller"]}>
-                <ManagementPage />
-              </AdminRoute>
-            }
-          />
+          {/* Advertisement Page */}
+      {RouteLink({ path: "advertisement", element: <ManagementPage /> })}
+      {RouteLink({ path: "advertisement/create", element: <AdvertisementFormPage /> })}
+      {RouteLink({ path: "advertisement/edit/:id", element: <AdvertisementFormPage /> })}
+      {RouteLink({ path: "advertisement/delete/:id", element: <AdvertisementDelete /> })}
 
-          <Route
-            path="advertisement/create"
-            element={
-              <AdminRoute allowedRoles={["Admin", "Seller"]}>
-                <AdvertisementFormPage />
-              </AdminRoute>
-            }
-          />
+      {/* Brand Page */}
+      {RouteLink({ path: "brand", element: <ManagementPage /> })}
+      {RouteLink({ path: "brand/create", element: <ManagementPage /> })}
+      {RouteLink({ path: "brand/edit/:id", element: <ManagementPage /> })}
+      {RouteLink({ path: "brand/delete/:id", element: <ManagementPage /> })}
 
-          <Route
-            path="advertisement/edit/:id"
-            element={
-              <AdminRoute allowedRoles={["Admin"]}>
-                <AdvertisementFormPage />
-              </AdminRoute>
-            }
-          />
+      {/* Category Page */}
+      {RouteLink({ path: "category", element: <ManagementPage /> })}
+      {RouteLink({ path: "category/create", element: <ManagementPage /> })}
+      {RouteLink({ path: "category/edit/:id", element: <ManagementPage /> })}
+      {RouteLink({ path: "category/delete/:id", element: <ManagementPage /> })}
 
-          <Route
-            path="advertisement/delete/:id"
-            element={
-              <AdminRoute allowedRoles={["Admin"]}>
-                <AdvertisementDelete />
-              </AdminRoute>
-            }
-          />
+      {/* Coupon Page */}
+      {RouteLink({ path: "coupon", element: <ManagementPage /> })}
+      {RouteLink({ path: "coupon/create", element: <ManagementPage /> })}
+      {RouteLink({ path: "coupon/edit/:id", element: <ManagementPage /> })}
+      {RouteLink({ path: "coupon/delete/:id", element: <ManagementPage /> })}
+
+      {/* Customer Page */}
+      {RouteLink({ path: "customer", element: <ManagementPage /> })}
+      {RouteLink({ path: "customer/edit/:id", element: <ManagementPage /> })}
+
+      {/* Feedback Page */}
+      {RouteLink({ path: "feedback", element: <ManagementPage /> })}
+      {RouteLink({ path: "feedback/edit/:id", element: <ManagementPage /> })}
+
+      {/* Order Page */}
+      {RouteLink({ path: "order", element: <ManagementPage /> })}
+      {RouteLink({ path: "order/edit/:id", element: <ManagementPage /> })}
+
+      {/* Payment Method Page */}
+      {RouteLink({ path: "payment-method", element: <ManagementPage /> })}
+      {RouteLink({ path: "payment-method/create", element: <ManagementPage /> })}
+      {RouteLink({ path: "payment-method/edit/:id", element: <ManagementPage /> })}
+      {RouteLink({ path: "payment-method/delete/:id", element: <ManagementPage /> })}
+
+      {/* Post Page */}
+      {RouteLink({ path: "post", element: <ManagementPage /> })}
+      {RouteLink({ path: "post/create", element: <ManagementPage /> })}
+      {RouteLink({ path: "post/edit/:id", element: <ManagementPage /> })}
+      {RouteLink({ path: "post/delete/:id", element: <ManagementPage /> })}
+
+      {/* Post Category Page */}
+      {RouteLink({ path: "post-category", element: <ManagementPage /> })}
+      {RouteLink({ path: "post-category/create", element: <ManagementPage /> })}
+      {RouteLink({ path: "post-category/edit/:id", element: <ManagementPage /> })}
+      {RouteLink({ path: "post-category/delete/:id", element: <ManagementPage /> })}
+
+      {/* Product Page */}
+      {RouteLink({ path: "product", element: <ManagementPage /> })}
+      {RouteLink({ path: "product/create", element: <ManagementPage /> })}
+      {RouteLink({ path: "product/edit/:id", element: <ManagementPage /> })}
+      {RouteLink({ path: "product/delete/:id", element: <ManagementPage /> })}
         </Route>
       </Routes>
     </BrowserRouter>

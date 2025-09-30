@@ -40,18 +40,24 @@ export interface ProductForm {
     slug?: string;
     warranty?: string;
     statusProduct?: boolean;
+    initialCost?: number;
     price?: number;
     discount?: number;
     priceAfterDiscount: number;
     endDateDiscount?: string | null;
     dateOfManufacture?: string | null;
     madeIn?: string | null;
+    views?: number;
     promotionalGift?: string | null;
     photo?: string;
     photoUpload?: File;
     description?: string;
     categoryId?: number | string;
     brandId?: number | string;
+    createDate?: string;
+    createdBy?: string;
+    updateDate?: string;
+    updatedBy?: string;
     specifications?: Specification[];
     productImages?: File[];
 }

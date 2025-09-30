@@ -7,7 +7,6 @@ export const informationMenu = [
     { to: "/admin/customer", label: "Customer", key: "customer", roles: ["Admin", "Seller"] },
     { to: "/admin/feedback", label: "Feedback", key: "feedback", roles: ["Admin", "Seller"] },
     { to: "/admin/order", label: "Order", key: "order", roles: ["Admin", "Seller"] },
-    { to: "/admin/payment", label: "Payment", key: "payment", roles: ["Admin", "Seller"] },
     { to: "/admin/payment-method", label: "Payment Method", key: "paymentmethod", roles: ["Admin", "Seller"] },
     { to: "/admin/post", label: "Post", key: "post", roles: ["Admin", "Seller"] },
     { to: "/admin/post-category", label: "Post Category", key: "postcategory", roles: ["Admin", "Seller"] },

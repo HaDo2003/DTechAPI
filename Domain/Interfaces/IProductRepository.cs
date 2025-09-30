@@ -23,5 +23,12 @@ namespace DTech.Domain.Interfaces
         // Repo for Product Comments
         Task<int?> AddProductCommentAsync(ProductComment model);
         // Repo for Product Specifications
+
+        //For admin
+        Task<List<Product>?> GetAllProductsAsync();
+        Task<bool> CheckIfProductExistsAsync(Product product);
+        Task<(bool Success, string Message)> CreateProductAsync(Product product);
+        Task<(bool Success, string Message)> UpdateProductAsync(Product product);
+        Task<(bool Success, string Message)> DeleteProductAsync(int productId);
     }
 }

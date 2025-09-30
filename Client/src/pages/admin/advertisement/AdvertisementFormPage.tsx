@@ -22,8 +22,7 @@ const AdvertisementFormPage: React.FC = () => {
         slug: "",
         image: "",
         order: 1,
-        status: 1,
-        statusName: "",
+        status: "Available",
     });
 
     const [preview, setPreview] = useState<string>("");
@@ -34,9 +33,9 @@ const AdvertisementFormPage: React.FC = () => {
         if (mode === "edit" && id) {
             (async () => {
                 const res = await adminService.getSingleData<AdvertisementForm>(`/api/advertisement/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setForm(res.data as unknown as AdvertisementForm);
-                    setPreview((res.data as any).image ?? "");
+                if (res) {
+                    setForm(res as unknown as AdvertisementForm);
+                    setPreview((res as any).image ?? "");
                 }
             })();
         }
@@ -128,10 +127,26 @@ const AdvertisementFormPage: React.FC = () => {
                                 {/* Avatar upload */}
                                 <div className="form-group">
                                     <div className="row align-items-center">
-                                        <div className="col-lg-2 col-sm-4 text-center">
-                                            {preview && <img src={preview} alt="Preview" className="py-2" width={100} />}
+                                        <div className="col-lg-4 col-sm-4 text-center">
+                                            {preview && (
+                                                <div className="d-flex justify-content-start align-items-center py-2">
+                                                    <img
+                                                        src={preview}
+                                                        alt="Preview"
+                                                        className="img-thumbnail rounded shadow-sm"
+                                                        style={{
+                                                            maxWidth: "450px",
+                                                            maxHeight: "450px",
+                                                            objectFit: "cover",
+                                                            transition: "transform 0.2s ease-in-out",
+                                                        }}
+                                                        onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                                                        onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="col-lg-10 col-sm-8 p-0">
+                                        <div className="col-lg-8 col-sm-8 p-0">
                                             <label htmlFor="input-file" className="btn btn-sm btn-danger ms-2">
                                                 Update Photo
                                             </label>

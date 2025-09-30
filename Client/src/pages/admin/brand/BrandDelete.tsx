@@ -21,10 +21,7 @@ const BrandDelete: React.FC = () => {
                 const res = await adminService.getSingleData<BrandForm>(`/api/brand/get/${id}`, token ?? "");
                 if (res.success && res.data) {
                     const brand = res.data as BrandForm;
-                    setData({
-                        ...brand,
-                        statusName: brand.status === 1 ? "Available" : "Unavailable",
-                    });
+                    setData(brand);
                 }
             })();
         }
@@ -79,7 +76,7 @@ const BrandDelete: React.FC = () => {
                 fields={[
                     { key: "name", label: "Name" },
                     { key: "slug", label: "Slug" },
-                    { key: "statusName", label: "Status" },
+                    { key: "status", label: "Status" },
                 ]}
                 imageKey="logo"
                 onDelete={handleDelete}

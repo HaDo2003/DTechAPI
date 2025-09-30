@@ -29,12 +29,12 @@ public partial class ApplicationUser : IdentityUser
     [Display(Name = "Update Date")]
     public DateTime? UpdateDate { get; set; }
 
-    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+    public virtual ICollection<Cart> Carts { get; set; } = [];
 
-    public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; } = new List<CustomerAddress>();
+    public virtual ICollection<CustomerAddress> CustomerAddresses { get; set; } = [];
 
-    public virtual ICollection<CustomerCoupon> CustomerCoupons { get; set; } = new List<CustomerCoupon>();
+    public virtual ICollection<CustomerCoupon> CustomerCoupons { get; set; } = [];
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-    public virtual ICollection<WishList> Wishlists { get; set; } = new List<WishList>();
+    public virtual ICollection<Order> Orders { get; set; } = [];
+    public virtual ICollection<WishList> Wishlists { get; set; } = [];
 }

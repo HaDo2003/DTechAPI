@@ -1,4 +1,5 @@
 ﻿using DTech.Domain.Entities;
+using DTech.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -73,18 +74,18 @@ public partial class Product
     [Display(Name = "Updated By")]
     public string? UpdatedBy { get; set; }
 
-    public int? Status { get; set; }
+    public StatusEnums Status { get; set; } = StatusEnums.Available;
 
     public virtual Brand? Brand { get; set; }
 
     public virtual Category? Category { get; set; }
 
-    public virtual ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
+    public virtual ICollection<OrderProduct> OrderProducts { get; set; } = [];
 
     [Display(Name = "Comment")]
-    public virtual ICollection<ProductComment> ProductComments { get; set; } = new List<ProductComment>();
+    public virtual ICollection<ProductComment> ProductComments { get; set; } = [];
 
-    public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
+    public virtual ICollection<ProductImage> ProductImages { get; set; } = [];
 
-    public virtual ICollection<Specification> Specifications { get; set; } = new List<Specification>();
+    public virtual ICollection<Specification> Specifications { get; set; } = [];
 }

@@ -9,8 +9,7 @@ export interface BrandForm {
     id: number | string;
     name?: string;
     slug?: string;
-    status?: number;
-    statusName?: string;
+    status?: string;
     logo?: string;
     logoUpload?: File;
     createDate?: string;

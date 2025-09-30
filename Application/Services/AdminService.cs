@@ -94,33 +94,19 @@ namespace DTech.Application.Services
             };
         }
 
-        public async Task<MessageResponse> CreateAdminAsync(AdminDetailDto model)
+        public async Task<IndexResDto<object?>> CreateAdminAsync(AdminDetailDto model, string? currentUserId)
         {
             try
             {
                 var role = await adminRepo.FindRoleByIdAsync(model.RoleId);
                 if (role == null)
                 {
-                    return new MessageResponse
+                    return new IndexResDto<object?>
                     {
                         Success = false,
-                        Message = "Role not exist"
-                    }; ;
-                }
-
-                if (model.ImageUpload != null && model.ImageUpload.Length > 0)
-                {
-                    string imageName = await cloudinaryService.UploadImageAsync(
-                        model.ImageUpload,
-                        folderName
-                    );
-
-                    if (string.IsNullOrEmpty(imageName))
-                    {
-                        return new MessageResponse { Success = false, Message = "Image upload failed" };
-                    }
-
-                    model.Image = imageName;
+                        Message = "Role not exist",
+                        Data = null
+                    };
                 }
 
                 ApplicationUser admin = new()
@@ -133,58 +119,82 @@ namespace DTech.Application.Services
                     DateOfBirth = model.DateOfBirth,
                     RoleId = role.Id,
                     CreateDate = DateTime.UtcNow,
-                    CreatedBy = model.FullName,
-                    Image = model.Image
+                    CreatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                 };
 
                 var existingUser = await adminRepo.CheckIfAdminExistsAsync(admin);
                 if (existingUser)
                 {
-                    return new MessageResponse
+                    return new IndexResDto<object?>
                     {
                         Success = false,
-                        Message = "Admin with the same username, email, or phone number already exists"
+                        Message = "Admin with the same username, email, or phone number already exists",
+                        Data = null
                     };
+                }
+
+                if (model.ImageUpload != null && model.ImageUpload.Length > 0)
+                {
+                    string imageName = await cloudinaryService.UploadImageAsync(
+                        model.ImageUpload,
+                        folderName
+                    );
+
+                    if (string.IsNullOrEmpty(imageName))
+                    {
+                        return new IndexResDto<object?>
+                        {
+                            Success = false,
+                            Message = "Image upload failed",
+                            Data = null
+                        };
+                    }
+
+                    admin.Image = imageName;
                 }
 
                 var (Success, Message) = await adminRepo.CreateAdminAsync(admin, model.RoleId);
 
                 if (!Success)
                 {
-                    return new MessageResponse
+                    return new IndexResDto<object?>
                     {
                         Success = false,
-                        Message = Message
+                        Message = Message,
+                        Data = null
                     };
                 }
 
-                return new MessageResponse
+                return new IndexResDto<object?>
                 {
                     Success = true,
-                    Message = "Admin created successfully"
+                    Message = "Admin created successfully",
+                    Data = null
                 };
             } 
             catch (Exception ex)
             {
-                return new MessageResponse
+                return new IndexResDto<object?>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}"
+                    Message = $"An error occurred: {ex.Message}",
+                    Data = null
                 };
             }
         }
-        public async Task<MessageResponse> UpdateAdminAsync(string userId, AdminDetailDto model)
+        public async Task<IndexResDto<object?>> UpdateAdminAsync(string userId, AdminDetailDto model,string? currentUserId)
         {
             try
             {
                 var role = await adminRepo.FindRoleByIdAsync(model.RoleId);
                 if (role == null)
                 {
-                    return new MessageResponse
+                    return new IndexResDto<object?>
                     {
                         Success = true,
-                        Message = "Role not exist"
-                    }; ;
+                        Message = "Role not exist",
+                        Data = null
+                    };
                 }
 
                 ApplicationUser admin = new()
@@ -197,10 +207,8 @@ namespace DTech.Application.Services
                     Gender = model.Gender,
                     DateOfBirth = model.DateOfBirth,
                     RoleId = role.Id,
-                    CreateDate = DateTime.UtcNow,
-                    CreatedBy = model.FullName,
                     UpdateDate = DateTime.UtcNow,
-                    UpdatedBy = model.FullName,
+                    UpdatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                     Image = model.Image,
                 };
 
@@ -215,7 +223,12 @@ namespace DTech.Application.Services
 
                     if (string.IsNullOrEmpty(imageName))
                     {
-                        return new MessageResponse { Success = false, Message = "Image upload failed" };
+                        return new IndexResDto<object?> 
+                        { 
+                            Success = false, 
+                            Message = "Image upload failed",
+                            Data = null
+                        };
                     }
 
                     admin.Image = imageName;
@@ -224,54 +237,69 @@ namespace DTech.Application.Services
                 var existingUser = await adminRepo.CheckIfAdminExistsAsync(admin);
                 if (existingUser)
                 {
-                    return new MessageResponse
+                    return new IndexResDto<object?>
                     {
                         Success = false,
-                        Message = "Admin with the same username, email, or phone number already exists"
+                        Message = "Admin with the same username, email, or phone number already exists",
+                        Data = null
                     };
                 }
 
-                var result = await adminRepo.UpdateAdminAsync(admin, model.RoleId);
-                return new MessageResponse
+                var (Success, Message) = await adminRepo.UpdateAdminAsync(admin, model.RoleId);
+                if (!Success)
+                {
+                    return new IndexResDto<object?>
+                    {
+                        Success = false,
+                        Message = Message,
+                        Data = null
+                    };
+                }
+                return new IndexResDto<object?>
                 {
                     Success = true,
-                    Message = "Admin updated successfully"
+                    Message = "Admin updated successfully",
+                    Data = null
                 };
             }
             catch (Exception ex)
             {
-                return new MessageResponse
+                return new IndexResDto<object?>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}"
+                    Message = $"An error occurred: {ex.Message}",
+                    Data = null
                 };
             }
         }
-        public async Task<MessageResponse> DeleteAdminAsync(string userId)
+        public async Task<IndexResDto<object?>> DeleteAdminAsync(string userId)
         {
             try
             {
-                var result = await adminRepo.DeleteAdminAsync(userId);
-                if (!result.Success)
+                var (Success, Message) = await adminRepo.DeleteAdminAsync(userId);
+                if (!Success)
                 {
-                    return new MessageResponse
+                    return new IndexResDto<object?>
                     {
                         Success = false,
-                        Message = result.Message
+                        Message = Message,
+                        Data = null
                     };
                 }
-                return new MessageResponse
+                return new IndexResDto<object?>
                 {
                     Success = true,
-                    Message = "Admin deleted successfully"
+                    Message = "Admin deleted successfully",
+                    Data = null
                 };
             }
             catch (Exception ex)
             {
-                return new MessageResponse
+                return new IndexResDto<object?>
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}"
+                    Message = $"An error occurred: {ex.Message}",
+                    Data = null
                 };
             }
         }
