@@ -53,9 +53,9 @@ const AdminAccountFormPage: React.FC = () => {
     if (mode === "edit" && id) {
       (async () => {
         const res = await adminService.getSingleData<AdminForm>(`/api/admin/get/${id}`, token ?? "");
-        if (res.success && res.data) {
-          setForm(res.data as unknown as AdminForm);
-          setPreview((res.data as any).image ?? "");
+        if (res) {
+          setForm(res as unknown as AdminForm);
+          setPreview((res as any).image ?? "");
         }
       })();
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { adminService } from "../../../services/AdminService";
 import { useAuth } from "../../../context/AuthContext";
 import CardWrapped from "../CardWrapped";
@@ -7,18 +7,17 @@ import InputField from "../InputField";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
 import { type OrderForm } from "../../../types/Order";
+import { priceFormatter } from "../../../utils/priceFormatter";
 
 const OrderFormPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const location = useLocation();
     const { token } = useAuth();
-
-    const mode: "create" | "edit" = location.pathname.includes("edit") ? "edit" : "create";
 
     const [form, setForm] = useState<OrderForm>({
         id: 0,
         email: "",
+        finalCost: 0,
         billingName: "",
         billingPhone: "",
         billingAddress: "",
@@ -26,72 +25,25 @@ const OrderFormPage: React.FC = () => {
         shippingPhone: "",
         shippingAddress: "",
         note: "",
-        reductionCode: "",
-        paymentId: undefined,
+        payment: undefined,
         orderProducts: [],
-        shippingId: undefined,
     });
 
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (mode === "edit" && id) {
+        if (id) {
             (async () => {
+                setLoading(true);
                 const res = await adminService.getSingleData<OrderForm>(`/api/order/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setForm(res.data as OrderForm);
+                if (res) {
+                    setForm(res as unknown as OrderForm);
                 }
+                setLoading(false);
             })();
         }
-    }, [id, mode, token]);
-
-    // handle input change
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setForm({
-            ...form,
-            [name]: value,
-        });
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const formData = new FormData();
-        Object.entries(form).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-                formData.append(key, typeof value === "object" ? JSON.stringify(value) : String(value));
-            }
-        });
-
-        setLoading(true);
-        const res = mode === "create"
-            ? await adminService.createData("/api/order/create", formData, token ?? "")
-            : await adminService.updateData("/api/order/update", id ?? "", formData, token ?? "");
-
-        if (res.success && mode === "create") {
-            setLoading(false);
-            navigate("/admin/order", {
-                state: {
-                    alert: {
-                        message: "Order created successfully!",
-                        type: "success",
-                    },
-                },
-            });
-        } else if (res.success && mode === "edit") {
-            const updatedRes = await adminService.getSingleData<OrderForm>(`/api/order/get/${id}`, token ?? "");
-            if (updatedRes.success && updatedRes.data) {
-                setForm(updatedRes.data as OrderForm);
-                setAlert({ message: "Order updated successfully!", type: "success" });
-            }
-            setLoading(false);
-        } else {
-            setLoading(false);
-            setAlert({ message: res.message || "Submit form failed!", type: "error" });
-        }
-    };
+    }, [id, token]);
 
     return (
         <>
@@ -110,121 +62,174 @@ const OrderFormPage: React.FC = () => {
             )}
             <CardWrapped title="Order Form">
                 <>
-                    <form onSubmit={handleSubmit}>
-                        <div className="card">
-                            <div className="card-header text-center">
-                                <h3>{mode === "create" ? "Create Order" : "Edit Order"}</h3>
+                    <div className="card">
+                        <div className="card-header text-center">
+                            <h3>Order Detail</h3>
+                        </div>
+                        <div className="card-body">
+                            <div className="row">
+                                <div className="col">
+                                    <InputField
+                                        label="Email"
+                                        name="email"
+                                        value={form.email ?? ""}
+                                        readOnly
+                                    />
+                                </div>
+                                <div className="col">
+                                    <InputField
+                                        label="Final Cost"
+                                        name="finalCost"
+                                        value={form.finalCost ?? 0}
+                                        readOnly
+                                    />
+                                </div>
                             </div>
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col">
-                                        <InputField
-                                            label="Email"
-                                            name="email"
-                                            value={form.email ?? ""}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col">
-                                        <InputField
-                                            label="Billing Name"
-                                            name="billingName"
-                                            value={form.billingName ?? ""}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
 
-                                <div className="row">
-                                    <div className="col">
-                                        <InputField
-                                            label="Billing Phone"
-                                            name="billingPhone"
-                                            value={form.billingPhone ?? ""}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col">
-                                        <InputField
-                                            label="Billing Address"
-                                            name="billingAddress"
-                                            value={form.billingAddress ?? ""}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
+                            <div className="row">
+                                <div className="col">
+                                    <InputField
+                                        label="Billing Name"
+                                        name="billingName"
+                                        value={form.billingName ?? ""}
+                                        readOnly
+                                    />
                                 </div>
-
-                                <div className="row">
-                                    <div className="col">
-                                        <InputField
-                                            label="Shipping Name"
-                                            name="shippingName"
-                                            value={form.shippingName ?? ""}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col">
-                                        <InputField
-                                            label="Shipping Phone"
-                                            name="shippingPhone"
-                                            value={form.shippingPhone ?? ""}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
+                                <div className="col">
+                                    <InputField
+                                        label="Billing Phone"
+                                        name="billingPhone"
+                                        value={form.billingPhone ?? ""}
+                                        readOnly
+                                    />
                                 </div>
+                                <div className="col">
+                                    <InputField
+                                        label="Billing Address"
+                                        name="billingAddress"
+                                        value={form.billingAddress ?? ""}
+                                        readOnly
+                                    />
+                                </div>
+                            </div>
 
+                            <div className="row">
+                                <div className="col">
+                                    <InputField
+                                        label="Shipping Name"
+                                        name="shippingName"
+                                        value={form.shippingName ?? ""}
+                                        readOnly
+                                    />
+                                </div>
+                                <div className="col">
+                                    <InputField
+                                        label="Shipping Phone"
+                                        name="shippingPhone"
+                                        value={form.shippingPhone ?? ""}
+                                        readOnly
+                                    />
+                                </div>
+                                <div className="col">
+                                    <InputField
+                                        label="Shipping Address"
+                                        name="shippingAddress"
+                                        value={form.shippingAddress ?? ""}
+                                        readOnly
+                                    />
+                                </div>
+                            </div>
+
+                            {form.note && (
                                 <div className="row">
-                                    <div className="col">
-                                        <InputField
-                                            label="Shipping Address"
-                                            name="shippingAddress"
-                                            value={form.shippingAddress ?? ""}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
                                     <div className="col">
                                         <InputField
                                             label="Note"
                                             name="note"
                                             value={form.note ?? ""}
-                                            onChange={handleChange}
+                                            readOnly
                                         />
                                     </div>
                                 </div>
+                            )}
+                        </div>
 
-                                <div className="row">
-                                    <div className="col">
-                                        <InputField
-                                            label="Reduction Code"
-                                            name="reductionCode"
-                                            value={form.reductionCode ?? ""}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col">
-                                        <InputField
-                                            label="Payment Id"
-                                            name="paymentId"
-                                            value={form.paymentId ? String(form.paymentId) : ""}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-footer">
-                                <button type="submit" className="btn btn-primary me-2">
-                                    <i className="fa-solid fa-floppy-disk"></i> Save
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => navigate("/admin/order")}
-                                    className="btn btn-secondary"
-                                >
-                                    <i className="fa-solid fa-right-from-bracket fa-rotate-180"></i> Back to List
-                                </button>
+                        <div className="row m-2">
+                            <div className="col">
+                                <h4>Order Products</h4>
+                                <table className="table table-bordered table-striped">
+                                    <thead className="table-dark">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th className="text-center">Quantity</th>
+                                            <th className="text-end">Price</th>
+                                            <th className="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {form.orderProducts && form.orderProducts.length > 0 ? (
+                                            form.orderProducts.map((p, idx) => (
+                                                <tr key={idx}>
+                                                    <td>{p.productName}</td>
+                                                    <td className="text-center">{p.quantity}</td>
+                                                    <td className="text-end">
+                                                        {priceFormatter(p.price)}
+                                                    </td>
+                                                    <td className="text-end">
+                                                        {priceFormatter(p.total)}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={4} className="text-center text-muted">
+                                                    No products in this order
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    </form>
+
+                        <div className="row m-2">
+                            <div className="col">
+                                <h4>Payment Information</h4>
+                                <div className="card">
+                                    <div className="card-body">
+                                        <div className="row mb-2">
+                                            <div className="col-md-6">
+                                                <strong>Payment Method:</strong> {form.payment?.method ?? "-"}
+                                            </div>
+                                            <div className="col-md-6">
+                                                <strong>Status:</strong>{" "}
+                                                <span
+                                                    className={`badge ${form.payment?.status === "Paid"
+                                                        ? "bg-success"
+                                                        : form.payment?.status === "Pending"
+                                                            ? "bg-warning text-dark"
+                                                            : "bg-danger"
+                                                        }`}
+                                                >
+                                                    {form.payment?.status ?? "Unknown"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="card-footer">
+                            <button
+                                type="button"
+                                onClick={() => navigate("/admin/order")}
+                                className="btn btn-secondary"
+                            >
+                                <i className="fa-solid fa-right-from-bracket fa-rotate-180"></i> Back to List
+                            </button>
+                        </div>
+                    </div>
                 </>
             </CardWrapped>
         </>

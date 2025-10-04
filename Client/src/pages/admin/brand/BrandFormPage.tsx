@@ -21,7 +21,7 @@ const BrandFormPage: React.FC = () => {
     name: "",
     slug: "",
     status: "Available",
-    logo: "",
+    image: "",
   });
 
   const [preview, setPreview] = useState<string>("");
@@ -30,16 +30,25 @@ const BrandFormPage: React.FC = () => {
 
   // Fetch brand when editing
   useEffect(() => {
-    if (mode === "edit" && id) {
-      (async () => {
-        const res = await adminService.getSingleData<BrandForm>(`/api/brand/get/${id}`, token ?? "");
-        if (res.success && res.data) {
-          const brand = res.data as BrandForm;
-          setForm(brand);
-          setPreview(brand.logo ?? "");
+    const fetchBrandData = async () => {
+      if (mode === "edit" && id) {
+        try {
+          const res = await adminService.getSingleData<BrandForm>(`/api/brand/get/${id}`, token ?? "");
+          if (res) {
+            const brand = res as unknown as BrandForm;
+            setForm(brand);
+            setPreview(brand.image ?? "");
+          }
+        } catch (error) {
+          setAlert({
+            message: "Failed to fetch brand data",
+            type: "error"
+          });
         }
-      })();
-    }
+      }
+    };
+
+    fetchBrandData();
   }, [id, mode, token]);
 
   // handle input change
@@ -47,7 +56,7 @@ const BrandFormPage: React.FC = () => {
     const { name, value } = e.target;
     setForm({
       ...form,
-      [name]: name === "status" ? Number(value) : value,
+      [name]: value,
     });
   };
 
@@ -55,7 +64,7 @@ const BrandFormPage: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      setForm({ ...form, logoUpload: file });
+      setForm({ ...form, imageUpload: file });
       setPreview(URL.createObjectURL(file));
     }
   };
@@ -65,13 +74,15 @@ const BrandFormPage: React.FC = () => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("Name", form.name ?? "");
-    formData.append("Status", form.status?.toString() ?? "");
-    formData.append("Logo", form.logo ?? "");
+    formData.append("Status", form.status ?? "");
+    formData.append("image", form.image ?? "");
 
-    if (form.logoUpload) {
-      formData.append("logoUpload", form.logoUpload);
+    if (form.imageUpload) {
+      formData.append("imageUpload", form.imageUpload);
     }
-
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
     setLoading(true);
     const res =
       mode === "create"
@@ -90,10 +101,10 @@ const BrandFormPage: React.FC = () => {
       });
     } else if (res.success && mode === "edit") {
       const updatedRes = await adminService.getSingleData<BrandForm>(`/api/brand/get/${id}`, token ?? "");
-      if (updatedRes.success && updatedRes.data) {
-        const updated = updatedRes.data as BrandForm;
+      if (updatedRes) {
+        const updated = updatedRes as unknown as BrandForm;
         setForm(updated);
-        setPreview(updated.logo ?? "");
+        setPreview(updated.image ?? "");
         setAlert({ message: "Brand updated successfully!", type: "success" });
       }
       setLoading(false);
@@ -159,15 +170,17 @@ const BrandFormPage: React.FC = () => {
                   </div>
 
                   {mode === "edit" && (
-                    <div className="col">
-                      <InputField
-                        label="Slug"
-                        name="slug"
-                        value={form.slug ?? ""}
-                        onChange={handleChange}
-                        readOnly
-                      />
-                    </div>
+                    <>
+                      <div className="col">
+                        <InputField
+                          label="Slug"
+                          name="slug"
+                          value={form.slug ?? ""}
+                          readOnly
+                        />
+                      </div>
+                    </>
+
                   )}
 
                   <div className="col">
@@ -181,8 +194,8 @@ const BrandFormPage: React.FC = () => {
                         className="form-control"
                       >
                         <option value="">Select Status</option>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
+                        <option value="Available">Available</option>
+                        <option value="Unvailable">Unvailable</option>
                       </select>
                     </div>
                   </div>

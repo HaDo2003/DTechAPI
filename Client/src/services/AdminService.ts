@@ -95,6 +95,28 @@ export const adminService = {
             return handleAxiosError(err, "Failed to fetch roles. Please try again.");
         }
     },
+
+    async getParentsData<T>(endpoint: string, token?: string): Promise<ServiceResponse<T[]>> {
+        try {
+            const response = await axios.get<T[]>(endpoint, {
+                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            });
+            return { success: true, data: response.data };
+        } catch (err: any) {
+            return handleAxiosError(err, "Failed to fetch parent. Please try again.");
+        }
+    },
+
+    async getCategoriesData<T>(endpoint: string, token?: string): Promise<ServiceResponse<T[]>> {
+        try {
+            const response = await axios.get<T[]>(endpoint, {
+                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            });
+            return { success: true, data: response.data };
+        } catch (err: any) {
+            return handleAxiosError(err, "Failed to fetch category. Please try again.");
+        }
+    },
 }
 
 function handleAxiosError(err: any, defaultMessage: string): ServiceResponse<any> {

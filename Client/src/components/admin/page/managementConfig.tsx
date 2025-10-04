@@ -54,7 +54,7 @@ export const managementConfig: Record<
     columns: [
       { key: "name", label: "Title" },
       { key: "slug", label: "Slug" },
-      { key: "parent", label: "Parent" },
+      { key: "parentName", label: "Parent" },
       { key: "actions", label: "Function" },
     ],
   },
@@ -110,14 +110,13 @@ export const managementConfig: Record<
       { key: "orderDate", label: "Order Date" },
       { key: "finalCost", label: "Final Cost" },
       { key: "status", label: "Status" },
-      { key: "note", label: "Note" },
       { key: "actions", label: "Function" },
     ],
   },
-  paymentMethod: {
+  "payment-method": {
     label: "Payment Method",
     endpoint: "/api/paymentMethod/get-payment-methods",
-    basePath: "/admin/paymentMethod",
+    basePath: "/admin/payment-method",
     allowDelete: true,
     columns: [
       { key: "id", label: "Payment Method ID" },
@@ -138,10 +137,10 @@ export const managementConfig: Record<
       { key: "actions", label: "Function" },
     ],
   },
-  postCategory: {
+  "post-category": {
     label: "Post Category",
     endpoint: "/api/postCategory/get-post-categories",
-    basePath: "/admin/postCategory",
+    basePath: "/admin/post-category",
     allowDelete: true,
     columns: [
       { key: "name", label: "Name" },

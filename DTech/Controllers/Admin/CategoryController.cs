@@ -1,6 +1,7 @@
 ﻿using DTech.API.Helper;
 using DTech.Application.DTOs.Response.Admin.Category;
 using DTech.Application.Interfaces;
+using DTech.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,7 +35,7 @@ namespace DTech.API.Controllers.Admin
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateCategory([FromForm] CategoryDetailDto model)
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryDetailDto model)
         {
             var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
             if (unauthorized != null) return unauthorized;
@@ -44,7 +45,7 @@ namespace DTech.API.Controllers.Admin
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromForm] CategoryDetailDto model)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDetailDto model)
         {
             var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
             if (unauthorized != null) return unauthorized;
@@ -61,6 +62,16 @@ namespace DTech.API.Controllers.Admin
 
             var response = await categoryService.DeleteCategoryAsync(id);
             return ControllerHelper.HandleResponse(response, this);
+        }
+
+        [HttpGet("get-parents")]
+        public async Task<IActionResult> GetRoles()
+        {
+            var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
+
+            var roles = await categoryService.GetParentsAsync();
+            return Ok(roles);
         }
     }
 }

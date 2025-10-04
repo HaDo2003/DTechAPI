@@ -13,12 +13,13 @@ namespace DTech.Infrastructure.Repositories
     ) : ICustomerRepository
     {
         //For User table
-        public async Task<List<ApplicationUser>> GetAllCustomersAsync()
+        public async Task<List<ApplicationUser>?> GetAllCustomersAsync()
         {
-            return await context.Users
-                .AsNoTracking()
-                .OrderBy(u => u.FullName)
-                .ToListAsync();
+            var customer = await userManager.GetUsersInRoleAsync("Customer");
+            if (customer == null || customer.Count == 0)
+                return [];
+
+            return [.. customer];
         }
         public async Task<bool> CheckAccountAsync(string? account)
         {

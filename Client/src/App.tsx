@@ -36,6 +36,23 @@ import AdminAccountFormPage from "./pages/admin/admin/AdminAccountFormPage";
 import AdminDelete from "./pages/admin/admin/AdminDelete";
 import AdvertisementFormPage from "./pages/admin/advertisement/AdvertisementFormPage";
 import AdvertisementDelete from "./pages/admin/advertisement/AdvertisementDelete";
+import BrandFormPage from "./pages/admin/brand/BrandFormPage";
+import BrandDelete from "./pages/admin/brand/BrandDelete";
+import CategoryFormPage from "./pages/admin/category/CategoryFormPage";
+import CategoryDelete from "./pages/admin/category/CategoryDelete";
+import CouponFormPage from "./pages/admin/coupon/CouponFormPage";
+import CouponDelete from "./pages/admin/coupon/CouponDelete";
+import CustomerFormPage from "./pages/admin/customer/CustomerFormPage";
+import FeedbackFormPage from "./pages/admin/feedback/FeedbackFormPage";
+import OrderFormPage from "./pages/admin/order/OrderFormPage";
+import PaymentMethodFormPage from "./pages/admin/payment-method/PaymentMethodFormPage";
+import PaymentMethodDelete from "./pages/admin/payment-method/PaymentMethodDelete";
+import PostFormPage from "./pages/admin/post/PostFormPage";
+import PostDelete from "./pages/admin/post/PostDelete";
+import PostCategoryFormPage from "./pages/admin/post-category/PostCategoryFormPage";
+import PostCategoryDelete from "./pages/admin/post-category/PostCategoryDelete";
+import ProductFormPage from "./pages/admin/product/ProductFormPage";
+import ProductDelete from "./pages/admin/product/ProductDelete";
 
 function App() {
   return (
@@ -121,64 +138,64 @@ function App() {
 
           {/* Admin and seller routes */}
           {/* Advertisement Page */}
-      {RouteLink({ path: "advertisement", element: <ManagementPage /> })}
-      {RouteLink({ path: "advertisement/create", element: <AdvertisementFormPage /> })}
-      {RouteLink({ path: "advertisement/edit/:id", element: <AdvertisementFormPage /> })}
-      {RouteLink({ path: "advertisement/delete/:id", element: <AdvertisementDelete /> })}
+          {RouteLink({ path: "advertisement", element: <ManagementPage /> })}
+          {RouteLink({ path: "advertisement/create", element: <AdvertisementFormPage /> })}
+          {RouteLink({ path: "advertisement/edit/:id", element: <AdvertisementFormPage /> })}
+          {RouteLink({ path: "advertisement/delete/:id", element: <AdvertisementDelete /> })}
 
-      {/* Brand Page */}
-      {RouteLink({ path: "brand", element: <ManagementPage /> })}
-      {RouteLink({ path: "brand/create", element: <ManagementPage /> })}
-      {RouteLink({ path: "brand/edit/:id", element: <ManagementPage /> })}
-      {RouteLink({ path: "brand/delete/:id", element: <ManagementPage /> })}
+          {/* Brand Page */}
+          {RouteLink({ path: "brand", element: <ManagementPage /> })}
+          {RouteLink({ path: "brand/create", element: <BrandFormPage /> })}
+          {RouteLink({ path: "brand/edit/:id", element: <BrandFormPage /> })}
+          {RouteLink({ path: "brand/delete/:id", element: <BrandDelete /> })}
 
-      {/* Category Page */}
-      {RouteLink({ path: "category", element: <ManagementPage /> })}
-      {RouteLink({ path: "category/create", element: <ManagementPage /> })}
-      {RouteLink({ path: "category/edit/:id", element: <ManagementPage /> })}
-      {RouteLink({ path: "category/delete/:id", element: <ManagementPage /> })}
+          {/* Category Page */}
+          {RouteLink({ path: "category", element: <ManagementPage /> })}
+          {RouteLink({ path: "category/create", element: <CategoryFormPage /> })}
+          {RouteLink({ path: "category/edit/:id", element: <CategoryFormPage /> })}
+          {RouteLink({ path: "category/delete/:id", element: <CategoryDelete /> })}
 
-      {/* Coupon Page */}
-      {RouteLink({ path: "coupon", element: <ManagementPage /> })}
-      {RouteLink({ path: "coupon/create", element: <ManagementPage /> })}
-      {RouteLink({ path: "coupon/edit/:id", element: <ManagementPage /> })}
-      {RouteLink({ path: "coupon/delete/:id", element: <ManagementPage /> })}
+          {/* Coupon Page */}
+          {RouteLink({ path: "coupon", element: <ManagementPage /> })}
+          {RouteLink({ path: "coupon/create", element: <CouponFormPage /> })}
+          {RouteLink({ path: "coupon/edit/:id", element: <CouponFormPage /> })}
+          {RouteLink({ path: "coupon/delete/:id", element: <CouponDelete /> })}
 
-      {/* Customer Page */}
-      {RouteLink({ path: "customer", element: <ManagementPage /> })}
-      {RouteLink({ path: "customer/edit/:id", element: <ManagementPage /> })}
+          {/* Customer Page */}
+          {RouteLink({ path: "customer", element: <ManagementPage /> })}
+          {RouteLink({ path: "customer/detail/:id", element: <CustomerFormPage /> })}
 
-      {/* Feedback Page */}
-      {RouteLink({ path: "feedback", element: <ManagementPage /> })}
-      {RouteLink({ path: "feedback/edit/:id", element: <ManagementPage /> })}
+          {/* Feedback Page */}
+          {RouteLink({ path: "feedback", element: <ManagementPage /> })}
+          {RouteLink({ path: "feedback/detail/:id", element: <FeedbackFormPage /> })}
 
-      {/* Order Page */}
-      {RouteLink({ path: "order", element: <ManagementPage /> })}
-      {RouteLink({ path: "order/edit/:id", element: <ManagementPage /> })}
+          {/* Order Page */}
+          {RouteLink({ path: "order", element: <ManagementPage /> })}
+          {RouteLink({ path: "order/detail/:id", element: <OrderFormPage /> })}
 
-      {/* Payment Method Page */}
-      {RouteLink({ path: "payment-method", element: <ManagementPage /> })}
-      {RouteLink({ path: "payment-method/create", element: <ManagementPage /> })}
-      {RouteLink({ path: "payment-method/edit/:id", element: <ManagementPage /> })}
-      {RouteLink({ path: "payment-method/delete/:id", element: <ManagementPage /> })}
+          {/* Payment Method Page */}
+          {RouteLink({ path: "payment-method", element: <ManagementPage /> })}
+          {RouteLink({ path: "payment-method/create", element: <PaymentMethodFormPage /> })}
+          {RouteLink({ path: "payment-method/edit/:id", element: <PaymentMethodFormPage /> })}
+          {RouteLink({ path: "payment-method/delete/:id", element: <PaymentMethodDelete /> })}
 
-      {/* Post Page */}
-      {RouteLink({ path: "post", element: <ManagementPage /> })}
-      {RouteLink({ path: "post/create", element: <ManagementPage /> })}
-      {RouteLink({ path: "post/edit/:id", element: <ManagementPage /> })}
-      {RouteLink({ path: "post/delete/:id", element: <ManagementPage /> })}
+          {/* Post Page */}
+          {RouteLink({ path: "post", element: <ManagementPage /> })}
+          {RouteLink({ path: "post/create", element: <PostFormPage /> })}
+          {RouteLink({ path: "post/edit/:id", element: <PostFormPage /> })}
+          {RouteLink({ path: "post/delete/:id", element: <PostDelete /> })}
 
-      {/* Post Category Page */}
-      {RouteLink({ path: "post-category", element: <ManagementPage /> })}
-      {RouteLink({ path: "post-category/create", element: <ManagementPage /> })}
-      {RouteLink({ path: "post-category/edit/:id", element: <ManagementPage /> })}
-      {RouteLink({ path: "post-category/delete/:id", element: <ManagementPage /> })}
+          {/* Post Category Page */}
+          {RouteLink({ path: "post-category", element: <ManagementPage /> })}
+          {RouteLink({ path: "post-category/create", element: <PostCategoryFormPage /> })}
+          {RouteLink({ path: "post-category/edit/:id", element: <PostCategoryFormPage /> })}
+          {RouteLink({ path: "post-category/delete/:id", element: <PostCategoryDelete /> })}
 
-      {/* Product Page */}
-      {RouteLink({ path: "product", element: <ManagementPage /> })}
-      {RouteLink({ path: "product/create", element: <ManagementPage /> })}
-      {RouteLink({ path: "product/edit/:id", element: <ManagementPage /> })}
-      {RouteLink({ path: "product/delete/:id", element: <ManagementPage /> })}
+          {/* Product Page */}
+          {RouteLink({ path: "product", element: <ManagementPage /> })}
+          {RouteLink({ path: "product/create", element: <ProductFormPage /> })}
+          {RouteLink({ path: "product/edit/:id", element: <ProductFormPage /> })}
+          {RouteLink({ path: "product/delete/:id", element: <ProductDelete /> })}
         </Route>
       </Routes>
     </BrowserRouter>

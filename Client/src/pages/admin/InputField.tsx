@@ -3,7 +3,7 @@ import React from "react";
 type InputFieldProps = {
   label: string;
   name: string;
-  value: string;
+  value: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   readOnly?: boolean;
   type?: string;

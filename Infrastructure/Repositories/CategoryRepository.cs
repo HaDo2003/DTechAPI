@@ -40,7 +40,8 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.Categories
                 .AsNoTracking()
-                .Where(c => c.Status == StatusEnums.Available)
+                .Include(c => c.InverseParent)
+                .Include(c => c.Parent)
                 .OrderBy(c => c.CategoryId)
                 .ToListAsync();
         }

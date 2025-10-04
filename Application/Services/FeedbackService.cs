@@ -22,6 +22,7 @@ namespace DTech.Application.Services
             }
             var fbDtos = feedbacks.Select(fb => new FeedbackIndexDto
             {
+                Id = fb.FeedbackId,
                 Name = fb.Name,
                 Message = fb.Detail,
                 Fbdate = fb.Fbdate

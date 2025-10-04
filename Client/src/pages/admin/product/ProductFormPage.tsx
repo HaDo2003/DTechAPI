@@ -3,10 +3,12 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { adminService } from "../../../services/AdminService";
 import { useAuth } from "../../../context/AuthContext";
 import CardWrapped from "../CardWrapped";
-import InputField from "../InputField";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
 import { type ProductForm } from "../../../types/Product";
+import ProductBasicInfoTab from "./ProductBasicInfoTab";
+import ProductSpecificationTab from "./SpecificationTab";
+import ProductImagesTab from "./ProductImagesTab";
 
 const ProductFormPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -21,7 +23,7 @@ const ProductFormPage: React.FC = () => {
         name: "",
         slug: "",
         warranty: "",
-        statusProduct: true,
+        statusProduct: "",
         price: 0,
         discount: 0,
         priceAfterDiscount: 0,
@@ -32,14 +34,15 @@ const ProductFormPage: React.FC = () => {
     const [preview, setPreview] = useState<string>("");
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
     const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState<"basic" | "specs" | "images">("basic");
 
     useEffect(() => {
         if (mode === "edit" && id) {
             (async () => {
                 const res = await adminService.getSingleData<ProductForm>(`/api/product/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setForm(res.data as unknown as ProductForm);
-                    setPreview((res.data as any).photo ?? "");
+                if (res) {
+                    setForm(res as unknown as ProductForm);
+                    setPreview((res as any).photo ?? "");
                 }
             })();
         }
@@ -102,9 +105,9 @@ const ProductFormPage: React.FC = () => {
             });
         } else if (res.success && mode === "edit") {
             const updatedRes = await adminService.getSingleData<ProductForm>(`/api/product/get/${id}`, token ?? "");
-            if (updatedRes.success && updatedRes.data) {
-                setForm(updatedRes.data as unknown as ProductForm);
-                setPreview((updatedRes.data as any).photo ?? "");
+            if (updatedRes) {
+                setForm(updatedRes as unknown as ProductForm);
+                setPreview((updatedRes as any).photo ?? "");
                 setAlert({ message: "Product updated successfully!", type: "success" });
             }
             setLoading(false);
@@ -134,175 +137,70 @@ const ProductFormPage: React.FC = () => {
                     <div className="card">
                         <div className="card-header text-center">
                             <h3>{mode === "create" ? "Create Product" : "Edit Product"}</h3>
+                            <div>
+                                <button
+                                    type="button"
+                                    className={`btn btn-sm me-2 ${activeTab === "basic" ? "btn-primary" : "btn-outline-primary"}`}
+                                    onClick={() => setActiveTab("basic")}
+                                >
+                                    Basic Info
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`btn btn-sm me-2 ${activeTab === "specs" ? "btn-primary" : "btn-outline-primary"}`}
+                                    onClick={() => setActiveTab("specs")}
+                                >
+                                    Specifications
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`btn btn-sm ${activeTab === "images" ? "btn-primary" : "btn-outline-primary"}`}
+                                    onClick={() => setActiveTab("images")}
+                                >
+                                    Images
+                                </button>
+                            </div>
                         </div>
                         <div className="card-body">
-                            {/* Product photo upload */}
-                            <div className="form-group">
-                                <div className="row align-items-center">
-                                    <div className="col-lg-2 col-sm-4 text-center">
-                                        {preview && <img src={preview} alt="Preview" className="py-2" width={100} />}
-                                    </div>
-                                    <div className="col-lg-10 col-sm-8 p-0">
-                                        <label htmlFor="input-file" className="btn btn-sm btn-danger ms-2">
-                                            Update Photo
-                                        </label>
-                                    </div>
-                                </div>
-                                <input
-                                    type="file"
-                                    name="photoUpload"
-                                    id="input-file"
-                                    className="form-control d-none"
-                                    onChange={handleFileChange}
-                                />
-                            </div>
-
-                            <div className="row">
-                                <div className="col">
-                                    <InputField
-                                        label="Name"
-                                        name="name"
-                                        value={form.name ?? ""}
-                                        onChange={handleChange}
+                            <div className="card-body">
+                                {activeTab === "basic" && (
+                                    <ProductBasicInfoTab
+                                        form={form}
+                                        setForm={setForm}
+                                        mode={mode}
+                                        preview={preview}
+                                        handleFileChange={handleFileChange}
+                                        handleChange={handleChange}
                                     />
-                                </div>
-                                {mode === "edit" && (
-                                    <div className="col">
-                                        <InputField
-                                            label="Slug"
-                                            name="slug"
-                                            value={form.slug ?? ""}
-                                            readOnly
-                                        />
-                                    </div>
                                 )}
-                                <div className="col">
-                                    <InputField
-                                        label="Warranty"
-                                        name="warranty"
-                                        value={form.warranty ?? ""}
-                                        onChange={handleChange}
+
+                                {activeTab === "specs" && (
+                                    <ProductSpecificationTab
+                                        productId={form.id}
+                                        specifications={form.specifications ?? []}
+                                        setForm={setForm}
                                     />
-                                </div>
+                                )}
+
+                                {activeTab === "images" && (
+                                    <ProductImagesTab
+                                        productId={form.id}
+                                        productImages={form.productImages ?? []}
+                                    />
+                                )}
                             </div>
-
-                            <div className="row">
-                                <div className="col">
-                                    <InputField
-                                        label="Price"
-                                        name="price"
-                                        type="number"
-                                        value={form.price?.toString() ?? "0"}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <InputField
-                                        label="Discount"
-                                        name="discount"
-                                        type="number"
-                                        value={form.discount?.toString() ?? "0"}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <InputField
-                                        label="Price After Discount"
-                                        name="priceAfterDiscount"
-                                        type="number"
-                                        value={form.priceAfterDiscount?.toString() ?? "0"}
-                                        onChange={handleChange}
-                                    />
-                                </div>
+                            <div className="card-footer">
+                                <button type="submit" className="btn btn-primary me-2">
+                                    <i className="fa-solid fa-floppy-disk"></i> Save
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/admin/product")}
+                                    className="btn btn-secondary"
+                                >
+                                    <i className="fa-solid fa-right-from-bracket fa-rotate-180"></i> Back to List
+                                </button>
                             </div>
-
-                            <div className="row">
-                                <div className="col">
-                                    <InputField
-                                        label="Made In"
-                                        name="madeIn"
-                                        value={form.madeIn ?? ""}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <InputField
-                                        label="Description"
-                                        name="description"
-                                        value={form.description ?? ""}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <div className="form-group">
-                                        <label htmlFor="statusProduct-select">Status</label>
-                                        <select
-                                            id="statusProduct-select"
-                                            name="statusProduct"
-                                            value={form.statusProduct ? "true" : "false"}
-                                            onChange={handleChange}
-                                            className="form-control"
-                                        >
-                                            <option value="true">Available</option>
-                                            <option value="false">Unavailable</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {mode === "edit" && (
-                                <>
-                                    <div className="row">
-                                        <div className="col">
-                                            <InputField
-                                                label="Created By"
-                                                name="createdBy"
-                                                value={(form as any).createdBy ?? ""}
-                                                readOnly
-                                            />
-                                        </div>
-                                        <div className="col">
-                                            <InputField
-                                                label="Create Date"
-                                                name="createDate"
-                                                value={(form as any).createDate ?? ""}
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="row">
-                                        <div className="col">
-                                            <InputField
-                                                label="Updated By"
-                                                name="updatedBy"
-                                                value={(form as any).updatedBy ?? ""}
-                                                readOnly
-                                            />
-                                        </div>
-                                        <div className="col">
-                                            <InputField
-                                                label="Update Date"
-                                                name="updateDate"
-                                                value={(form as any).updateDate ?? ""}
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                        <div className="card-footer">
-                            <button type="submit" className="btn btn-primary me-2">
-                                <i className="fa-solid fa-floppy-disk"></i> Save
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => navigate("/admin/product")}
-                                className="btn btn-secondary"
-                            >
-                                <i className="fa-solid fa-right-from-bracket fa-rotate-180"></i> Back to List
-                            </button>
                         </div>
                     </div>
                 </form>

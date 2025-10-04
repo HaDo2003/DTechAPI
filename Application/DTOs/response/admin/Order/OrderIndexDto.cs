@@ -7,7 +7,5 @@
         public DateOnly? OrderDate { get; set; }
         public decimal? FinalCost { get; set; }
         public string? Status { get; set; }
-        public string? Note { get; set; }
-        
     }
 }

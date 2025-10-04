@@ -1,3 +1,4 @@
+import DOMPurify from "../../utils/santitizeConfig";
 import CardWrapped from "./CardWrapped";
 
 interface DeletePageProps<T extends { id: string | number }> {
@@ -33,7 +34,11 @@ function DeletePage<T extends { id: string | number }>({
                   {fields.map((f) => (
                     <tr key={String(f.key)}>
                       <th>{f.label}</th>
-                      <td>{String(data[f.key] ?? "-")}</td>
+                      <td
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(String(data[f.key] ?? "-")),
+                        }}
+                      />
                     </tr>
                   ))}
                 </tbody>

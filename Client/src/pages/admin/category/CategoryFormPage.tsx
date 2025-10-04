@@ -16,6 +16,7 @@ const CategoryFormPage: React.FC = () => {
 
     const mode: "create" | "edit" = location.pathname.includes("edit") ? "edit" : "create";
 
+    const [parent, setParent] = useState<{ value: number; label: string }[]>([]);
     const [form, setForm] = useState<CategoryForm>({
         id: 0,
         name: "",
@@ -29,11 +30,20 @@ const CategoryFormPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        (async () => {
+            const res = await adminService.getParentsData<{ id: number; name: string }>("/api/category/get-parents", token ?? "");
+            if (res.success && res.data) {
+                setParent(res.data.map(r => ({ value: r.id, label: r.name })));
+            }
+        })();
+    }, [token]);
+
+    useEffect(() => {
         if (mode === "edit" && id) {
             (async () => {
                 const res = await adminService.getSingleData<CategoryForm>(`/api/category/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setForm(res.data as unknown as CategoryForm);
+                if (res) {
+                    setForm(res as unknown as CategoryForm);
                 }
             })();
         }
@@ -44,7 +54,7 @@ const CategoryFormPage: React.FC = () => {
         const { name, value } = e.target;
         setForm({
             ...form,
-            [name]: name === "status" ? Number(value) : value,
+            [name]: value,
         });
     };
 
@@ -68,8 +78,8 @@ const CategoryFormPage: React.FC = () => {
             });
         } else if (res.success && mode === "edit") {
             const updatedRes = await adminService.getSingleData<CategoryForm>(`/api/category/get/${id}`, token ?? "");
-            if (updatedRes.success && updatedRes.data) {
-                setForm(updatedRes.data as unknown as CategoryForm);
+            if (updatedRes) {
+                setForm(updatedRes as unknown as CategoryForm);
                 setAlert({ message: "Category updated successfully!", type: "success" });
             }
             setLoading(false);
@@ -123,12 +133,23 @@ const CategoryFormPage: React.FC = () => {
                                         </div>
                                     )}
                                     <div className="col">
-                                        <InputField
-                                            label="Parent Id"
-                                            name="parentId"
-                                            value={form.parentId !== null ? String(form.parentId) : ""}
-                                            onChange={handleChange}
-                                        />
+                                        <div className="form-group">
+                                            <label htmlFor="parent-select">Parent</label>
+                                            <select
+                                                id="parent-select"
+                                                name="parentId"
+                                                value={form.parentId ?? ""}
+                                                onChange={handleChange}
+                                                className="form-control"
+                                            >
+                                                <option value="">Select Parent</option>
+                                                {parent.map((par) => (
+                                                    <option key={par.value} value={par.value}>
+                                                        {par.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </div>
                                     <div className="col">
                                         <div className="form-group">
@@ -141,19 +162,10 @@ const CategoryFormPage: React.FC = () => {
                                                 className="form-control"
                                                 title="Status"
                                             >
-                                                <option value="">Select Status</option>
-                                                <option value="1">Active</option>
-                                                <option value="0">Inactive</option>
+                                                <option value="Available">Available</option>
+                                                <option value="Unavailable">Unavailable</option>
                                             </select>
                                         </div>
-                                    </div>
-                                    <div className="col">
-                                        <InputField
-                                            label="Status"
-                                            name="status"
-                                            value={form.status !== undefined ? String(form.status) : ""}
-                                            onChange={handleChange}
-                                        />
                                     </div>
                                 </div>
 

@@ -1,4 +1,5 @@
-﻿using DTech.Application.DTOs.response.admin;
+﻿using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.response.admin;
 using DTech.Application.DTOs.response.admin.advertisement;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
@@ -114,6 +115,13 @@ namespace DTech.Application.Services
                     adv.Image = imageName;
                 }
 
+                var order = await advRepo.CheckOrderAsync(adv.Order);
+
+                if (order)
+                {
+                    await advRepo.UpdateOrderWhenCreateAsync(adv.Order);
+                }
+
                 var (Success, Message) = await advRepo.CreateAdvertisementAsync(adv);
 
                 if (!Success)
@@ -193,7 +201,18 @@ namespace DTech.Application.Services
 
                     adv.Image = imageName;
                 }
-                
+
+                //Update order
+                var originalAdvertisement = await advRepo.GetAdvertisementByIdAsync(advertisementId);
+                int? oldOrder = originalAdvertisement?.Order;
+                int? newOrder = adv.Order;
+
+                // Only update orders if they're different
+                if (oldOrder != newOrder)
+                {
+                    await advRepo.UpdateOrderWhenEditAsync(oldOrder, newOrder, advertisementId);
+                }
+
                 var (Success, Message) = await advRepo.UpdateAdvertisementAsync(adv);
                 if (!Success)
                 {

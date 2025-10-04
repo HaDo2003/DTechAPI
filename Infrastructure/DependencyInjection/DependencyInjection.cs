@@ -8,6 +8,7 @@ using DTech.Infrastructure.Data;
 using DTech.Infrastructure.Repositories;
 using DTech.Infrastructure.Services;
 using DTech.Infrastructure.Services.Background;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -85,6 +86,17 @@ namespace DTech.Infrastructure.DependencyInjection
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
+
+            //Regiter Sanitizer
+            services.AddScoped(_ =>
+            {
+                var sanitizer = new HtmlSanitizer();
+                sanitizer.AllowedAttributes.Add("style");
+                sanitizer.AllowedCssProperties.Add("text-align");
+                sanitizer.AllowedCssProperties.Add("margin-left");
+                sanitizer.AllowedCssProperties.Add("color");
+                return sanitizer;
+            });
 
             //Mapper Configuration
             services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());

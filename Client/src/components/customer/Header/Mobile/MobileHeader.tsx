@@ -17,7 +17,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
     searchQuery = '',
     onSearch = () => { },
 }) => {
-    const { token, logout } = useAuth();
+    const { token, user, logout } = useAuth();
     const { cartItemCount } = useCart();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [searchInput, setSearchInput] = useState(searchQuery);
@@ -139,6 +139,9 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                                     <ul className="dropdown-menu">
                                         {token ? (
                                             <>
+                                                {(user?.roles === "Admin" || user?.roles === "Seller") && (
+                                                    <AccountItem label='Admin Panel' onClick={() => onNavigate('/admin')} />
+                                                )}
                                                 <AccountItem label='Profile' onClick={() => onNavigate('/profile')} />
                                                 <AccountItem label='Logout' onClick={logout} />
                                             </>

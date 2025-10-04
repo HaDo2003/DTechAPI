@@ -19,8 +19,8 @@ const CouponDelete: React.FC = () => {
         if (id) {
             (async () => {
                 const res = await adminService.getSingleData<CouponForm>(`/api/coupon/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    const coupon = res.data as CouponForm;
+                if (res) {
+                    const coupon = res as unknown as CouponForm;
                     setData(coupon);
                 }
             })();

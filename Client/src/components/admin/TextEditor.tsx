@@ -1,6 +1,6 @@
 import React from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import CustomEditor from "../../utils/customeEditor";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 interface RichTextEditorProps {
   value?: string;
@@ -10,14 +10,41 @@ interface RichTextEditorProps {
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value = "", onChange }) => {
   return (
     <CKEditor
-      editor={CustomEditor}
+      editor={ClassicEditor as unknown as any}
       data={value}
       onChange={(_, editor) => {
         const data = editor.getData();
         if (onChange) onChange(data);
       }}
-      onReady={(editor) => {
-        console.log("Editor ready:", editor);
+      config={{
+        licenseKey: 'GPL',
+        toolbar: [
+          "undo", "redo", "|",
+          "heading", "|",
+          "bold", "italic", "|",
+          "bulletedList", "numberedList", "outdent", "indent", "|",
+          "link", "imageUpload", "insertTable"
+        ],
+        image: {
+          toolbar: [
+            "imageTextAlternative",
+            "toggleImageCaption",
+            "|",
+            "imageStyle:inline",
+            "imageStyle:block",
+            "imageStyle:side"
+          ]
+        },
+        table: {
+          contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"]
+        },
+        link: {
+          addTargetToExternalLinks: true,
+          defaultProtocol: "https://"
+        },
+        simpleUpload: {
+          uploadUrl: "/img/ProductImg/ImgDes"
+        }
       }}
     />
   );

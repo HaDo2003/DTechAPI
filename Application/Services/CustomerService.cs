@@ -237,12 +237,13 @@ namespace DTech.Application.Services
                 };
             }
 
-            var customerDtos = customers.Select(adv => new CustomerIndexDto
+            var customerDtos = customers.Select(customer => new CustomerIndexDto
             {
-                UserName = adv.UserName,
-                FullName = adv.FullName,
-                Email = adv.Email,
-                PhoneNumber = adv.PhoneNumber,
+                Id = customer.Id,
+                UserName = customer.UserName,
+                FullName = customer.FullName,
+                Email = customer.Email,
+                PhoneNumber = customer.PhoneNumber,
             }).ToList();
 
             return new IndexResDto<List<CustomerIndexDto>>

@@ -7,7 +7,7 @@ namespace DTech.Domain.Interfaces
     {
         //For User table
         Task<bool> CheckAccountAsync(string? account);
-        Task<List<ApplicationUser>> GetAllCustomersAsync();
+        Task<List<ApplicationUser>?> GetAllCustomersAsync();
         Task<ApplicationUser?> GetOnlyCustomerByIdAsync(string? userId);
         //Check when create new account
         Task<bool> CheckEmailAsync(string? email);

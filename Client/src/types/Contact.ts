@@ -10,6 +10,6 @@ export interface FeedbackForm {
     name?: string;
     email?: string;
     phoneNumber?: string;
-    detail?: string;
+    message?: string;
     fbdate?: string;
 }

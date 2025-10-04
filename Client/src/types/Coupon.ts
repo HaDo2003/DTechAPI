@@ -7,8 +7,8 @@ export interface CouponForm {
     discount: number;
     maxDiscount?: number;
     condition?: number;
-    details?: string;
-    endDate: string;
+    detail?: string;
+    endDate?: string | null;
     status?: string;
     createDate?: string;
     createdBy?: string;

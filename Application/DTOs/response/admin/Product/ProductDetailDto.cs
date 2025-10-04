@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DTech.Application.DTOs.response;
+using Microsoft.AspNetCore.Http;
 
 namespace DTech.Application.DTOs.Response.Admin.Product
 {
@@ -27,6 +28,7 @@ namespace DTech.Application.DTOs.Response.Admin.Product
         public string? CreatedBy { get; set; }
         public DateTime? UpdateDate { get; set; }
         public string? UpdatedBy { get; set; }
-
+        public List<SpecificationDto>? Specifications { get; set; } = [];
+        public List<ProductImageDto> ProductImages { get; set; } = [];
     }
 }

@@ -1,6 +1,7 @@
 ﻿using DTech.API.Helper;
 using DTech.Application.DTOs.Response.Admin.Post;
 using DTech.Application.Interfaces;
+using DTech.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,6 +62,16 @@ namespace DTech.API.Controllers.Admin
 
             var response = await postService.DeletePostAsync(id);
             return ControllerHelper.HandleResponse(response, this);
+        }
+
+        [HttpGet("get-categories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
+
+            var categories = await postService.GetCategoriesAsync();
+            return Ok(categories);
         }
     }
 

@@ -3,6 +3,7 @@
     public class OrderDetailDto
     {
         public string? Id { get; set; }
+        public string? Email { get; set; }
         public string? BillingName { get; set; }
         public string? BillingPhone { get; set; }
         public string? BillingAddress { get; set; }
@@ -14,5 +15,7 @@
         public string? Note { get; set; }
         public string? ReductionCode { get; set; }
         public decimal? FinalCost { get; set; }
+        public List<OrderProductResDto> OrderProducts { get; set; } = [];
+        public PaymentResDto? Payment { get; set; }
     }
 }

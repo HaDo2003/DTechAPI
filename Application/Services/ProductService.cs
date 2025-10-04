@@ -292,7 +292,22 @@ namespace DTech.Application.Services
                 CreateDate = product.CreateDate,
                 CreatedBy = product.CreatedBy,
                 UpdateDate = product.UpdateDate,
-                UpdatedBy = product.UpdatedBy
+                UpdatedBy = product.UpdatedBy,
+                Specifications = product.Specifications != null && product.Specifications.Count != 0
+                    ? [.. product.Specifications.Select(spec => new SpecificationDto
+                    {
+                        SpecId = spec.SpecId,
+                        SpecName = spec.SpecName,
+                        Detail = spec.Detail
+                    })]
+                    : [],
+                ProductImages = product.ProductImages != null && product.ProductImages.Count != 0
+                    ? [.. product.ProductImages.Select(img => new ProductImageDto
+                    {
+                        ImageId = img.ImageId,
+                        Image = img.Image
+                    })]
+                    : [],
             };
 
             return new IndexResDto<ProductDetailDto>

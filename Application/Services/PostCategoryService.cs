@@ -25,6 +25,7 @@ namespace DTech.Application.Services
 
             var categoryDtos = categories.Select(cat => new PostCategoryIndexDto
             {
+                Id = cat.CategoryId,
                 Name = cat.Name,
                 Slug = cat.Slug,
             }).ToList();

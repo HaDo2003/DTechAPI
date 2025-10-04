@@ -1,4 +1,6 @@
-﻿namespace DTech.Application.DTOs.response
+﻿using DTech.Domain.Enums;
+
+namespace DTech.Application.DTOs.response
 {
     public class OrderDetailResDto : MessageResponse
     {
@@ -19,7 +21,7 @@
 
     public class PaymentDto
     {
-        public int? Status { get; set; }
+        public PaymentStatusEnums Status { get; set; }
         public string? PaymentMethodName { get; set; }
     }
 }

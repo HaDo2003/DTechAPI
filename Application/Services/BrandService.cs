@@ -28,6 +28,7 @@ namespace DTech.Application.Services
 
             var brandDtos = brands.Select(brand => new BrandIndexDto
             {
+                Id = brand.BrandId,
                 Name = brand.Name,
                 Slug = brand.Slug,
             }).ToList();

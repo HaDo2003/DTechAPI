@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import InformationItem from "./InformationItem";
 import { informationMenu } from "../../../utils/menuConfig";
 import type { Admin } from "../../../types/Admin";
@@ -19,6 +19,7 @@ const Sidebar: React.FC<AdminSidebarProps> = ({
 }) => {
   const { user } = useAuth();
   const [infoOpen, setInfoOpen] = useState(mainPage === "information");
+  const location = useLocation();
 
   const activeClass = (
     isActive: boolean,
@@ -85,15 +86,22 @@ const Sidebar: React.FC<AdminSidebarProps> = ({
               {infoOpen && (
                 <ul className="nav nav-treeview">
                   {informationMenu
-                    .filter((item) => !item.roles || item.roles.includes(user?.roles ?? ""))
-                    .map((item) => (
-                      <InformationItem
-                        key={item.key}
-                        to={item.to}
-                        label={item.label}
-                        isActive={page === item.key}
-                      />
-                    ))}
+                    .filter((item) => {
+                      if (!item.roles || item.roles.length === 0) return true;
+                      const allowed = item.roles.map((r) => r.toLowerCase());
+                      return allowed.some((r) => (user?.roles ?? "").toLowerCase() === r);
+                    })
+                    .map((item) => {
+                      const isActive = location.pathname.startsWith(item.to);
+                      return (
+                        <InformationItem
+                          key={item.key}
+                          to={item.to}
+                          label={item.label}
+                          isActive={isActive}
+                        />
+                      );
+                    })}
                 </ul>
               )}
             </li>

@@ -33,21 +33,19 @@ namespace DTech.Infrastructure.Repositories
 
         public async Task<bool> CheckIfPaymentMethodExistsAsync(PaymentMethod paymentMethod)
         {
-            if (paymentMethod == null || paymentMethod.Description == null)
+            if (paymentMethod == null || string.IsNullOrWhiteSpace(paymentMethod.Description))
                 return false;
 
             if (paymentMethod.PaymentMethodId > 0)
             {
                 return await context.PaymentMethods.AnyAsync(p =>
-                    p.Description != null &&
-                    p.Description.Equals(paymentMethod.Description, StringComparison.CurrentCultureIgnoreCase) &&
+                    EF.Functions.ILike(p.Description!, paymentMethod.Description) &&
                     p.PaymentMethodId != paymentMethod.PaymentMethodId);
             }
             else
             {
                 return await context.PaymentMethods.AnyAsync(p =>
-                    p.Description != null &&
-                    p.Description.Equals(paymentMethod.Description, StringComparison.CurrentCultureIgnoreCase));
+                    EF.Functions.ILike(p.Description!, paymentMethod.Description));
             }
         }
 

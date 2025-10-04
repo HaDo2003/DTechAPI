@@ -7,6 +7,8 @@ import InputField from "../InputField";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
 import { type PostForm } from "../../../types/Post";
+import RichTextEditor from "../../../components/admin/TextEditor";
+import DOMPurify from "../../../utils/santitizeConfig";
 
 const PostFormPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -21,30 +23,46 @@ const PostFormPage: React.FC = () => {
         name: "",
         description: "",
         image: "",
+        status: "Available",
+        postCategoryId: 0,
+        postCategory: ""
     });
 
     const [preview, setPreview] = useState<string>("");
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
     const [loading, setLoading] = useState(false);
+    const [categories, setCategory] = useState<{ value: number; label: string }[]>([]);
+
+    useEffect(() => {
+        (async () => {
+            const res = await adminService.getCategoriesData<{ id: number; name: string }>("/api/post/get-categories", token ?? "");
+            if (res.success && res.data) {
+                setCategory(res.data.map(r => ({ value: r.id, label: r.name })));
+            }
+        })();
+    }, [token]);
 
     useEffect(() => {
         if (mode === "edit" && id) {
             (async () => {
+                setLoading(true);
                 const res = await adminService.getSingleData<PostForm>(`/api/post/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setForm(res.data as PostForm);
-                    setPreview((res.data as any).image ?? "");
+                if (res) {
+                    const post = res as unknown as PostForm;
+                    setForm(post);
+                    setPreview((res as any).image ?? "");
                 }
+                setLoading(false);
             })();
         }
     }, [id, mode, token]);
 
     // handle input change
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setForm({
             ...form,
-            [name]: value,
+            [name]: name === "postCategoryId" ? (value ? Number(value) : null) : value,
         });
     };
 
@@ -64,8 +82,16 @@ const PostFormPage: React.FC = () => {
         formData.append("Description", form.description ?? "");
         formData.append("Image", form.image ?? "");
 
+        if (form.postCategoryId) {
+            formData.append("PostCategoryId", String(form.postCategoryId));
+        }
+
         if (form.imageUpload) {
             formData.append("ImageUpload", form.imageUpload);
+        }
+
+        for (const [key, value] of formData.entries()) {
+            console.log(key, value);
         }
 
         setLoading(true);
@@ -85,9 +111,9 @@ const PostFormPage: React.FC = () => {
             });
         } else if (res.success && mode === "edit") {
             const updatedRes = await adminService.getSingleData<PostForm>(`/api/post/get/${id}`, token ?? "");
-            if (updatedRes.success && updatedRes.data) {
-                setForm(updatedRes.data as PostForm);
-                setPreview((updatedRes.data as any).image ?? "");
+            if (updatedRes) {
+                setForm(updatedRes as unknown as PostForm);
+                setPreview((updatedRes as any).image ?? "");
                 setAlert({ message: "Post updated successfully!", type: "success" });
             }
             setLoading(false);
@@ -143,22 +169,66 @@ const PostFormPage: React.FC = () => {
                             <div className="row">
                                 <div className="col">
                                     <InputField
-                                        label="Name"
+                                        label="Title"
                                         name="name"
                                         value={form.name ?? ""}
                                         onChange={handleChange}
                                     />
                                 </div>
+                            </div>
+
+                            <div className="row">
+                                <div className="col">
+                                    <div className="form-group">
+                                        <label htmlFor="category-select">Post Category</label>
+                                        <select
+                                            id="category-select"
+                                            name="postCategoryId"
+                                            value={form.postCategoryId ?? 0}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                        >
+                                            <option value="">Select Post Category</option>
+                                            {categories.map((category) => (
+                                                <option key={category.value} value={category.value}>
+                                                    {category.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="col">
+                                    <div className="form-group">
+                                        <label htmlFor="status-select">Status</label>
+                                        <select
+                                            id="status-select"
+                                            name="status"
+                                            value={form.status ?? ""}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                            title="Status"
+                                        >
+                                            <option value="Available">Available</option>
+                                            <option value="Unavailable">Unavailable</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row">
                                 <div className="col">
                                     <div className="form-group">
                                         <label htmlFor="description">Description</label>
-                                        <textarea
-                                            id="description"
-                                            name="description"
+                                        <RichTextEditor
                                             value={form.description ?? ""}
-                                            onChange={handleChange}
-                                            className="form-control"
-                                            rows={4}
+                                            onChange={(data) => {
+                                                const cleanData = DOMPurify.sanitize(data);
+                                                setForm((prevForm) => ({
+                                                    ...prevForm,
+                                                    description: cleanData,
+                                                }));
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -170,8 +240,8 @@ const PostFormPage: React.FC = () => {
                                         <div className="col">
                                             <InputField
                                                 label="Posted By"
-                                                name="postedBy"
-                                                value={form.postedBy ?? ""}
+                                                name="postBy"
+                                                value={form.postBy ?? ""}
                                                 readOnly
                                             />
                                         </div>

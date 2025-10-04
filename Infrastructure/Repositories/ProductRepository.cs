@@ -184,7 +184,15 @@ namespace DTech.Infrastructure.Repositories
         }
         public async Task<Product?> GetProductByIdAsync(int productId)
         {
-            return await context.Products.FindAsync(productId);
+            var product = await context.Products
+                .AsNoTracking()
+                .Include(a => a.Brand)
+                .Include(a => a.Category)
+                .Include(p => p.Specifications)
+                .Include(p => p.ProductImages)
+                .FirstOrDefaultAsync(a => a.ProductId == productId);
+
+            return product;
         }
         public async Task<List<Product>> GetProductByQuery(string query)
         {

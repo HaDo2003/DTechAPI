@@ -23,11 +23,11 @@ namespace DTech.Application.DTOs.response
         public CategoryDto? Category { get; set; }
         public BrandDto? Brand { get; set; }
 
-        public virtual ICollection<ProductCommentDto> ProductComments { get; set; } = [];
+        public virtual List<ProductCommentDto> ProductComments { get; set; } = [];
 
-        public virtual ICollection<ProductImageDto> ProductImages { get; set; } = [];
+        public virtual List<ProductImageDto> ProductImages { get; set; } = [];
 
-        public virtual ICollection<SpecificationDto> Specifications { get; set; } = [];
-        public virtual ICollection<RelatedProductDto> RelatedProducts { get; set; } = [];
+        public virtual List<SpecificationDto> Specifications { get; set; } = [];
+        public virtual List<RelatedProductDto> RelatedProducts { get; set; } = [];
     }
 }

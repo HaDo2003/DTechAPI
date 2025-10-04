@@ -18,10 +18,12 @@ const AdminDelete: React.FC = () => {
   useEffect(() => {
     if (id) {
       (async () => {
+        setLoading(true);
         const res = await adminService.getSingleData<AdminForm>(`/api/admin/get/${id}`, token ?? "");
-        if (res.success && res.data) {
-          setData(res.data as unknown as AdminForm);
+        if (res) {
+          setData(res as unknown as AdminForm);
         }
+        setLoading(false);
       })();
     }
   }, [id, token]);

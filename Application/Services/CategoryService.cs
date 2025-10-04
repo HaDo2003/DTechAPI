@@ -3,6 +3,7 @@ using DTech.Application.DTOs.Response.Admin.Category;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
+using System.Data;
 
 namespace DTech.Application.Services
 {
@@ -25,9 +26,10 @@ namespace DTech.Application.Services
 
             var categoryDtos = categories.Select(cat => new CategoryIndexDto
             {
+                Id = cat.CategoryId,
                 Name = cat.Name,
                 Slug = cat.Slug,
-                Parent = cat.Parent != null ? cat.Parent.Name : "N/A",
+                ParentName = cat.Parent?.Name,
             }).ToList();
 
             return new IndexResDto<List<CategoryIndexDto>>
@@ -53,7 +55,8 @@ namespace DTech.Application.Services
             {
                 Name = cat.Name,
                 Slug = cat.Slug,
-                Parent = cat.Parent != null ? cat.Parent.Name : "N/A",
+                ParentId = cat.Parent != null ? cat.Parent.CategoryId : 0,
+                ParentName = cat.Parent != null ? cat.Parent.Name : "N/A",
                 Status = cat.Status,
                 CreateDate = cat.CreateDate,
                 CreatedBy = cat.CreatedBy,
@@ -138,6 +141,7 @@ namespace DTech.Application.Services
                     UpdateDate = DateTime.UtcNow,
                     UpdatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                 };
+                cat.Slug = cat.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
 
                 var existingCat = await categoryRepo.CheckIfCategoryExistsAsync(cat);
                 if (existingCat)
@@ -210,6 +214,23 @@ namespace DTech.Application.Services
                     Data = null
                 };
             }
+        }
+
+        public async Task<List<ParentResDto>> GetParentsAsync()
+        {
+            var parent = await categoryRepo.GetAllCategoriesAsync();
+            if (parent == null || parent.Count == 0)
+            {
+                return [];
+            }
+
+            var parentDtos = parent.Select(par => new ParentResDto
+            {
+                Id = par.CategoryId,
+                Name = par.Name,
+            }).ToList();
+
+            return parentDtos;
         }
     }
 

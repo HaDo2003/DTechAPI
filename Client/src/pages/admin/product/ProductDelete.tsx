@@ -19,13 +19,9 @@ const ProductDelete: React.FC = () => {
         if (id) {
             (async () => {
                 const res = await adminService.getSingleData<ProductForm>(`/api/product/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    const product = res.data as ProductForm;
-                    setData({
-                        ...product,
-                        // Convert boolean statusProduct into a readable string
-                        statusProduct: product.statusProduct ?? false,
-                    });
+                if (res) {
+                    const product = res as unknown as ProductForm;
+                    setData(product);
                 }
             })();
         }

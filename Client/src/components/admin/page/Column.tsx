@@ -14,7 +14,7 @@ interface GenericTableProps<T> {
 export function GenericTable<T extends { id: number }>({ data, columns }: GenericTableProps<T>) {
   return (
     <div className="table-responsive">
-      <table className="table table-bordered table-striped" id="dataTable">
+      <table className="table table-bordered table-striped text-start" id="dataTable">
         <thead>
           <tr>
             {columns.map((col) => (
@@ -23,15 +23,23 @@ export function GenericTable<T extends { id: number }>({ data, columns }: Generi
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (
-            <tr key={item.id}>
-              {columns.map((col) => (
-                <td key={`${item.id}-${col.key.toString()}`}>
-                  {col.render ? col.render(item) : (item as any)[col.key]}
-                </td>
-              ))}
+          {data && data.length > 0 ? (
+            data.map((item) => (
+              <tr key={item.id}>
+                {columns.map((col) => (
+                  <td key={`${item.id}-${col.key.toString()}`}>
+                    {col.render ? col.render(item) : (item as any)[col.key]}
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={columns.length} className="text-center">
+                No data found
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

@@ -12,7 +12,7 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.Posts
                 .AsNoTracking()
-                .Where(p => p.Status == StatusEnums.Available)
+                .Include(p => p.Cate)
                 .OrderBy(p => p.PostId)
                 .ToListAsync();
         }
@@ -22,7 +22,10 @@ namespace DTech.Infrastructure.Repositories
             if (postId <= 0)
                 return null;
 
-            return await context.Posts.FindAsync(postId);
+            return await context.Posts
+                .AsNoTracking()
+                .Include(p => p.Cate)
+                .FirstOrDefaultAsync(p => p.PostId == postId);
         }
 
         public async Task<bool> CheckIfPostExistsAsync(Post post)
@@ -69,7 +72,7 @@ namespace DTech.Infrastructure.Repositories
             existingPost.Image = post.Image;
             existingPost.PostDate = DateTime.UtcNow;
             existingPost.PostBy = post.PostBy;
-            existingPost.Cate = post.Cate;
+            existingPost.CateId = post.CateId;
 
             context.Posts.Update(existingPost);
             var result = await context.SaveChangesAsync();

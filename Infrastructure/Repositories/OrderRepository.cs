@@ -70,10 +70,12 @@ namespace DTech.Infrastructure.Repositories
         {
             try
             {
-                if(orderId == null) return null;
+                if (orderId == null) return null;
                 return await context.Orders
-                    .Include(o => o.Payment).ThenInclude(p => p.PaymentMethod)
-                    .Include(o => o.OrderProducts).ThenInclude(op => op.Product)
+                    .Include(o => o.Payment)
+                    .ThenInclude(p => p!.PaymentMethod)
+                    .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op!.Product)
                     .FirstOrDefaultAsync(o => o.OrderId == orderId);
             }
             catch (Exception ex)
@@ -90,8 +92,10 @@ namespace DTech.Infrastructure.Repositories
                 if (orderId == null) return null;
                 return await context.Orders
                     .Include(o => o.Status)
-                    .Include(o => o.Payment).ThenInclude(p => p.PaymentMethod)
-                    .Include(o => o.OrderProducts).ThenInclude(op => op.Product)
+                    .Include(o => o.Payment)
+                    .ThenInclude(p => p!.PaymentMethod)
+                    .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product!)
                     .FirstOrDefaultAsync(o => o.OrderId == orderId && o.CustomerId == customerId);
             }
             catch (Exception ex)
@@ -105,6 +109,7 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.Orders
                 .AsNoTracking()
+                .Include(o => o.Status)
                 .ToListAsync();
         }
     }

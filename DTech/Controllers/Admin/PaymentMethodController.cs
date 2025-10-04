@@ -34,7 +34,7 @@ namespace DTech.API.Controllers.Admin
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreatePaymentMethod([FromForm] PaymentMethodDetailDto model)
+        public async Task<IActionResult> CreatePaymentMethod([FromBody] PaymentMethodDetailDto model)
         {
             var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
             if (unauthorized != null) return unauthorized;
@@ -44,7 +44,7 @@ namespace DTech.API.Controllers.Admin
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdatePaymentMethod(int id, [FromForm] PaymentMethodDetailDto model)
+        public async Task<IActionResult> UpdatePaymentMethod(int id, [FromBody] PaymentMethodDetailDto model)
         {
             var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
             if (unauthorized != null) return unauthorized;

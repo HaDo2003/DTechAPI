@@ -10,7 +10,7 @@ namespace DTech.API.Controllers.Admin
     [Authorize(Roles = "Admin, Seller")]
     public class CustomerController(ICustomerService customerService) : Controller
     {
-        [HttpGet("get-customer")]
+        [HttpGet("get-customers")]
         public async Task<IActionResult> GetCustomers()
         {
             var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);

@@ -49,7 +49,12 @@ const ManagementPage: React.FC = () => {
 
     const handleEdit = (id: number | string) => {
         if (!config) return;
-        navigate(`${config.basePath}/edit/${id}`);
+        (config.basePath === "/admin/feedback"
+            || config.basePath === "/admin/customer"
+            || config.basePath === "/admin/order"
+        )
+            ? navigate(`${config.basePath}/detail/${id}`)
+            : navigate(`${config.basePath}/edit/${id}`);
     };
 
     // handle delete
@@ -59,7 +64,11 @@ const ManagementPage: React.FC = () => {
     };
 
     if (!config) {
-        return <div>Invalid management page</div>;
+        return (
+            <CardWrapped title="Invalid Management Page">
+                <div>Invalid management page</div>
+            </CardWrapped>
+        );
     }
 
     const columns = useMemo(() => {

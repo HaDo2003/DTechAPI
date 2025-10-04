@@ -19,8 +19,8 @@ const PaymentMethodDelete: React.FC = () => {
         if (id) {
             (async () => {
                 const res = await adminService.getSingleData<PaymentMethodForm>(`/api/paymentmethod/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setData(res.data as PaymentMethodForm);
+                if (res) {
+                    setData(res as unknown as PaymentMethodForm);
                 }
             })();
         }
@@ -28,10 +28,10 @@ const PaymentMethodDelete: React.FC = () => {
 
     const handleDelete = async () => {
         setLoading(true);
-        const res = await adminService.deleteData(`/api/paymentmethod/delete`, id ?? "", token ?? "");
+        const res = await adminService.deleteData(`/api/paymentMethod/delete`, id ?? "", token ?? "");
         if (res.success) {
             setLoading(false);
-            navigate("/admin/paymentmethod", {
+            navigate("/admin/payment-method", {
                 state: {
                     alert: {
                         message: "Payment Method deleted successfully!",
@@ -46,7 +46,7 @@ const PaymentMethodDelete: React.FC = () => {
     };
 
     const handleCancel = () => {
-        navigate("/admin/paymentmethod");
+        navigate("/admin/payment-method");
     };
 
     if (!data) {

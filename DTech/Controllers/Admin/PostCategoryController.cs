@@ -34,7 +34,7 @@ namespace DTech.API.Controllers.Admin
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreatePostCategory([FromForm] PostCategoryDetailDto model)
+        public async Task<IActionResult> CreatePostCategory([FromBody] PostCategoryDetailDto model)
         {
             var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
             if (unauthorized != null) return unauthorized;
@@ -44,7 +44,7 @@ namespace DTech.API.Controllers.Admin
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdatePostCategory(int id, [FromForm] PostCategoryDetailDto model)
+        public async Task<IActionResult> UpdatePostCategory(int id, [FromBody] PostCategoryDetailDto model)
         {
             var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
             if (unauthorized != null) return unauthorized;

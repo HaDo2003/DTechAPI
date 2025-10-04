@@ -11,7 +11,6 @@ namespace DTech.Application.DTOs.response.admin.advertisement
         public StatusEnums Status { get; set; } = StatusEnums.Available;
         public string? Image { get; set; }
         public IFormFile? ImageUpload { get; set; }
-        public DateOnly? DateOfBirth { get; set; }
         public DateTime? CreateDate { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? UpdateDate { get; set; }

@@ -10,8 +10,8 @@ export interface BrandForm {
     name?: string;
     slug?: string;
     status?: string;
-    logo?: string;
-    logoUpload?: File;
+    image?: string;
+    imageUpload?: File;
     createDate?: string;
     createdBy?: string;
     updateDate?: string;

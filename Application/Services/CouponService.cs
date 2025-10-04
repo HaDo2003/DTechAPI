@@ -25,6 +25,7 @@ namespace DTech.Application.Services
 
             var couponDtos = coupons.Select(c => new CouponIndexDto
             {
+                Id = c.CouponId,
                 Name = c.Name,
                 Code = c.Code,
                 DiscountType = c.DiscountType,

@@ -18,10 +18,20 @@ export interface OrderForm{
     shippingPhone?: string,
     shippingAddress?: string,
     note?: string;
-    reductionCode?: string;
-    paymentId?: number;
-    orderProducts?: { productId: number; quantity: number }[];
-    shippingId?: number;
+    finalCost?: number;
+    payment?:
+    {
+        method: string;
+        status: string;
+    };
+    orderProducts?:
+    {
+        productId: number;
+        productName: string;
+        quantity: number;
+        price: number;
+        total: number;
+    }[];
 }
 
 export interface CheckOut extends MessageResponse {

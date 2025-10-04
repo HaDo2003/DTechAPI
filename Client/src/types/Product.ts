@@ -39,7 +39,7 @@ export interface ProductForm {
     name?: string;
     slug?: string;
     warranty?: string;
-    statusProduct?: boolean;
+    statusProduct?: string;
     initialCost?: number;
     price?: number;
     discount?: number;
@@ -59,5 +59,5 @@ export interface ProductForm {
     updateDate?: string;
     updatedBy?: string;
     specifications?: Specification[];
-    productImages?: File[];
+    productImages?: ProductImage[];
 }

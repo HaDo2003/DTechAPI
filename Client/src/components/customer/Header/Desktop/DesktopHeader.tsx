@@ -22,7 +22,7 @@ interface SearchHistoryItem {
 const DesktopHeader: React.FC<HeaderProps> = ({
     onSearch,
 }) => {
-    const { token, logout } = useAuth();
+    const { token, user, logout } = useAuth();
     const { cartItemCount } = useCart();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
@@ -242,6 +242,9 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                             <ul className="list-unstyled">
                                                 {token ? (
                                                     <>
+                                                        {(user?.roles === "Admin" || user?.roles === "Seller") && (
+                                                            <AccountItem label='Admin Panel' onClick={() => handleNavigation('/admin')} />
+                                                        )}
                                                         <AccountItem label='Profile' onClick={() => handleNavigation('/profile')} />
                                                         <AccountItem label='Logout' onClick={logout} />
                                                     </>

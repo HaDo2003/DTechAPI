@@ -49,7 +49,6 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.Coupons
                 .AsNoTracking()
-                .Where(c => c.Status == StatusEnums.Available)
                 .OrderBy(c => c.CouponId)
                 .ToListAsync();
         }

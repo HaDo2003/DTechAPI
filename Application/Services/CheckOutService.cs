@@ -3,6 +3,7 @@ using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
+using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
 
 namespace DTech.Application.Services
@@ -325,7 +326,7 @@ namespace DTech.Application.Services
                 Date = DateOnly.FromDateTime(DateTime.UtcNow),
                 Amount = model.OrderSummary.Total,
                 PaymentMethodId = model.PaymentMethod,
-                Status = 0,
+                Status = PaymentStatusEnums.Unpaid,
                 CreateDate = DateTime.UtcNow,
                 CreatedBy = model.BillingName
             };

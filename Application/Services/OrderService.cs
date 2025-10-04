@@ -30,7 +30,6 @@ namespace DTech.Application.Services
                 OrderDate = order.OrderDate,
                 FinalCost = order.FinalCost,
                 Status = order.Status?.Description,
-                Note = order.Note,
             }).ToList();
 
             return new IndexResDto<List<OrderIndexDto>>
@@ -53,16 +52,31 @@ namespace DTech.Application.Services
             var orderDetail = new OrderDetailDto
             {
                 Id = order.OrderId,
+                Email = order.Email,
                 BillingName = order.Name,
                 BillingPhone = order.Phone,
                 BillingAddress = order.Address,
-                ShippingName = order.NameReceive,
-                ShippingPhone = order.PhoneReceive,
-                ShippingAddress = order.ShippingAddress,
+                ShippingName = order.NameReceive ?? order.Name,
+                ShippingPhone = order.PhoneReceive ?? order.Phone,
+                ShippingAddress = order.ShippingAddress ?? order.Address,
                 OrderDate = order.OrderDate,
                 Status = order.Status?.Description,
                 Note = order.Note,
                 FinalCost = order.FinalCost,
+                OrderProducts = order.OrderProducts?.Select(op => new OrderProductResDto
+                {
+                    ProductId = op.Product.ProductId,
+                    ProductName = op.Product?.Name,
+                    Quantity = op.Quantity,
+                    Price = op.Price,
+                    Total = op.CostAtPurchase
+                }).ToList() ?? [],
+
+                Payment = order.Payment == null ? null : new PaymentResDto
+                {
+                    Method = order.Payment.PaymentMethod?.Description,
+                    Status = order.Payment.Status
+                }
             };
 
             return new IndexResDto<OrderDetailDto>

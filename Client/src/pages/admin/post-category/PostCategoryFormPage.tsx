@@ -20,6 +20,7 @@ const PostCategoryFormPage: React.FC = () => {
         id: 0,
         name: "",
         slug: "",
+        status: ""
     });
 
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
@@ -28,9 +29,9 @@ const PostCategoryFormPage: React.FC = () => {
     useEffect(() => {
         if (mode === "edit" && id) {
             (async () => {
-                const res = await adminService.getSingleData<PostCategoryForm>(`/api/postcategory/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setForm(res.data as unknown as PostCategoryForm);
+                const res = await adminService.getSingleData<PostCategoryForm>(`/api/postCategory/get/${id}`, token ?? "");
+                if (res) {
+                    setForm(res as unknown as PostCategoryForm);
                 }
             })();
         }
@@ -50,12 +51,12 @@ const PostCategoryFormPage: React.FC = () => {
         setLoading(true);
 
         const res = mode === "create"
-            ? await adminService.createData("/api/postcategory/create", form, token ?? "")
-            : await adminService.updateData("/api/postcategory/update", id ?? "", form, token ?? "");
+            ? await adminService.createData("/api/postCategory/create", form, token ?? "")
+            : await adminService.updateData("/api/postCategory/update", id ?? "", form, token ?? "");
 
         if (res.success && mode === "create") {
             setLoading(false);
-            navigate("/admin/postcategory", {
+            navigate("/admin/post-category", {
                 state: {
                     alert: {
                         message: "Post Category created successfully!",
@@ -64,9 +65,9 @@ const PostCategoryFormPage: React.FC = () => {
                 },
             });
         } else if (res.success && mode === "edit") {
-            const updatedRes = await adminService.getSingleData<PostCategoryForm>(`/api/postcategory/get/${id}`, token ?? "");
-            if (updatedRes.success && updatedRes.data) {
-                setForm(updatedRes.data as unknown as PostCategoryForm);
+            const updatedRes = await adminService.getSingleData<PostCategoryForm>(`/api/postCategory/get/${id}`, token ?? "");
+            if (updatedRes) {
+                setForm(updatedRes as unknown as PostCategoryForm);
                 setAlert({ message: "Post Category updated successfully!", type: "success" });
             }
             setLoading(false);
@@ -117,6 +118,23 @@ const PostCategoryFormPage: React.FC = () => {
                                         />
                                     </div>
                                 )}
+                                <div className="col">
+                                    <div className="form-group">
+                                        <label htmlFor="status-select">Status</label>
+                                        <select
+                                            id="status-select"
+                                            name="status"
+                                            value={form.status ?? ""}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                            title="Status"
+                                        >
+                                            <option value="">Select Status</option>
+                                            <option value="Available">Available</option>
+                                            <option value="Unavailable">Unavailable</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
                             {mode === "edit" && (
@@ -167,7 +185,7 @@ const PostCategoryFormPage: React.FC = () => {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => navigate("/admin/postcategory")}
+                                onClick={() => navigate("/admin/post-category")}
                                 className="btn btn-secondary"
                             >
                                 <i className="fa-solid fa-right-from-bracket fa-rotate-180"></i> Back to List

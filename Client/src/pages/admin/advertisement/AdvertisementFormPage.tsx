@@ -46,7 +46,7 @@ const AdvertisementFormPage: React.FC = () => {
         const { name, value } = e.target;
         setForm({
             ...form,
-            [name]: name === "status" || name === "order" ? Number(value) : value,
+            [name]: name === "order" ? Number(value) : value,
         });
     };
 
@@ -64,7 +64,7 @@ const AdvertisementFormPage: React.FC = () => {
         const formData = new FormData();
         formData.append('Name', form.name ?? "");
         formData.append('Order', form.order.toString());
-        formData.append('Status', form.status?.toString() ?? "");
+        formData.append('Status', form.status ?? "");
         formData.append('image', form.image ?? "");
 
         // Only append image if it exists
@@ -89,9 +89,9 @@ const AdvertisementFormPage: React.FC = () => {
             });
         } else if (res.success && mode === "edit") {
             const updatedRes = await adminService.getSingleData<AdvertisementForm>(`/api/advertisement/get/${id}`, token ?? "");
-            if (updatedRes.success && updatedRes.data) {
-                setForm(updatedRes.data as unknown as AdvertisementForm);
-                setPreview((updatedRes.data as any).image ?? "");
+            if (updatedRes) {
+                setForm(updatedRes as unknown as AdvertisementForm);
+                setPreview((updatedRes as any).image ?? "");
                 setAlert({ message: "Advertisement updated successfully!", type: "success" });
             }
             setLoading(false);
@@ -133,10 +133,10 @@ const AdvertisementFormPage: React.FC = () => {
                                                     <img
                                                         src={preview}
                                                         alt="Preview"
-                                                        className="img-thumbnail rounded shadow-sm"
+                                                        className="img-thumbnail rounded shadow-sm img-fluid"
                                                         style={{
-                                                            maxWidth: "450px",
-                                                            maxHeight: "450px",
+                                                            maxWidth: "100%",
+                                                            height: "auto",
                                                             objectFit: "cover",
                                                             transition: "transform 0.2s ease-in-out",
                                                         }}
@@ -162,7 +162,7 @@ const AdvertisementFormPage: React.FC = () => {
                                 </div>
 
                                 <div className="row">
-                                    <div className="col">
+                                    <div className="col col-lg-3 col-md-6">
                                         <InputField
                                             label="Name"
                                             name="name"
@@ -173,18 +173,17 @@ const AdvertisementFormPage: React.FC = () => {
                                     {/* Audit fields in edit mode */}
                                     {mode === "edit" && (
                                         <>
-                                            <div className="col">
+                                            <div className="col col-lg-3 col-md-6">
                                                 <InputField
                                                     label="Slug"
                                                     name="slug"
                                                     value={form.slug ?? ""}
-                                                    onChange={handleChange}
                                                     readOnly
                                                 />
                                             </div>
                                         </>
                                     )}
-                                    <div className="col">
+                                    <div className="col col-lg-3 col-md-6">
                                         <div className="form-group">
                                             <label htmlFor="status-select">Status</label>
                                             <select
@@ -196,17 +195,18 @@ const AdvertisementFormPage: React.FC = () => {
                                                 title="Status"
                                             >
                                                 <option value="">Select Status</option>
-                                                <option value="1">Active</option>
-                                                <option value="0">Inactive</option>
+                                                <option value="Available">Available</option>
+                                                <option value="Unavailable">Unavailable</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="col">
+                                    <div className="col col-lg-3 col-md-6">
                                         <InputField
-                                            label="Status"
-                                            name="status"
-                                            value={form.status !== undefined ? String(form.status) : ""}
+                                            label="Order"
+                                            name="order"
+                                            value={form.order ?? 0}
                                             onChange={handleChange}
+                                            type="number"
                                         />
                                     </div>
                                 </div>

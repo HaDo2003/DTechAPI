@@ -19,8 +19,8 @@ const PostCategoryDelete: React.FC = () => {
         if (id) {
             (async () => {
                 const res = await adminService.getSingleData<PostCategoryForm>(`/api/postcategory/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setData(res.data as PostCategoryForm);
+                if (res) {
+                    setData(res as unknown as PostCategoryForm);
                 }
             })();
         }
@@ -28,10 +28,10 @@ const PostCategoryDelete: React.FC = () => {
 
     const handleDelete = async () => {
         setLoading(true);
-        const res = await adminService.deleteData(`/api/postcategory/delete`, id ?? "", token ?? "");
+        const res = await adminService.deleteData(`/api/postCategory/delete`, id ?? "", token ?? "");
         if (res.success) {
             setLoading(false);
-            navigate("/admin/postcategory", {
+            navigate("/admin/post-category", {
                 state: {
                     alert: {
                         message: "Post Category deleted successfully!",
@@ -46,7 +46,7 @@ const PostCategoryDelete: React.FC = () => {
     };
 
     const handleCancel = () => {
-        navigate("/admin/postcategory");
+        navigate("/admin/post-category");
     };
 
     if (!data) {

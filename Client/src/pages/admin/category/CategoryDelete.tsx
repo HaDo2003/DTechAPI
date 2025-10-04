@@ -19,8 +19,8 @@ const CategoryDelete: React.FC = () => {
         if (id) {
             (async () => {
                 const res = await adminService.getSingleData<CategoryForm>(`/api/category/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    const category = res.data as CategoryForm;
+                if (res) {
+                    const category = res as unknown as CategoryForm;
                     setData(category);
                 }
             })();

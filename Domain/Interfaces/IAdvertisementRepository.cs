@@ -11,5 +11,8 @@ namespace DTech.Domain.Interfaces
         Task<(bool Success, string Message)> CreateAdvertisementAsync(Advertisement advertisement);
         Task<(bool Success, string Message)> UpdateAdvertisementAsync(Advertisement advertisement);
         Task<(bool Success, string Message)> DeleteAdvertisementAsync(int advertisementId);
+        Task<bool> UpdateOrderWhenCreateAsync(int? order);
+        Task<bool> UpdateOrderWhenEditAsync(int? oldOrder, int? newOrder, int advId);
+        Task<bool> CheckOrderAsync(int? order);
     }
 }

@@ -19,8 +19,8 @@ const PostDelete: React.FC = () => {
         if (id) {
             (async () => {
                 const res = await adminService.getSingleData<PostForm>(`/api/post/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setData(res.data as PostForm);
+                if (res) {
+                    setData(res as unknown as PostForm);
                 }
             })();
         }
@@ -75,7 +75,7 @@ const PostDelete: React.FC = () => {
                     { key: "name", label: "Name" },
                     { key: "description", label: "Description" },
                     { key: "postDate", label: "Post Date" },
-                    { key: "postedBy", label: "Posted By" },
+                    { key: "postBy", label: "Posted By" },
                 ]}
                 imageKey="image"
                 onDelete={handleDelete}

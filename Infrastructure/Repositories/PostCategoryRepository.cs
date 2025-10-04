@@ -12,6 +12,14 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.PostCategories
                 .AsNoTracking()
+                .OrderBy(c => c.CategoryId)
+                .ToListAsync();
+        }
+
+        public async Task<List<PostCategory>?> GetAvailablePostCategoriesAsync()
+        {
+            return await context.PostCategories
+                .AsNoTracking()
                 .Where(c => c.Status == StatusEnums.Available)
                 .OrderBy(c => c.CategoryId)
                 .ToListAsync();

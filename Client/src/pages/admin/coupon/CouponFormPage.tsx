@@ -18,13 +18,14 @@ const CouponFormPage: React.FC = () => {
 
   const [form, setForm] = useState<CouponForm>({
     id: 0,
+    name: "",
     code: "",
-    discountType: "Percentage",
+    discountType: "Direct",
     discount: 0,
     maxDiscount: 0,
     condition: 0,
-    details: "",
-    endDate: "",
+    detail: "",
+    endDate: null,
     status: "Available",
   });
 
@@ -35,8 +36,8 @@ const CouponFormPage: React.FC = () => {
     if (mode === "edit" && id) {
       (async () => {
         const res = await adminService.getSingleData<CouponForm>(`/api/coupon/get/${id}`, token ?? "");
-        if (res.success && res.data) {
-          setForm(res.data as unknown as CouponForm);
+        if (res) {
+          setForm(res as unknown as CouponForm);
         }
       })();
     }
@@ -46,13 +47,12 @@ const CouponFormPage: React.FC = () => {
     const { name, value } = e.target;
     setForm({
       ...form,
-      [name]: name === "discount" || name === "maxDiscount" || name === "condition" || name === "status" ? Number(value) : value,
+      [name]: name === "discount" || name === "maxDiscount" || name === "condition" ? Number(value) : value,
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setLoading(true);
     const res =
       mode === "create"
@@ -108,6 +108,14 @@ const CouponFormPage: React.FC = () => {
                 <div className="row">
                   <div className="col">
                     <InputField
+                      label="Name"
+                      name="name"
+                      value={form.name ?? ""}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="col">
+                    <InputField
                       label="Code"
                       name="code"
                       value={form.code ?? ""}
@@ -141,17 +149,19 @@ const CouponFormPage: React.FC = () => {
                 </div>
 
                 <div className="row">
+                  {form.discountType === "Percentage" && (
+                    <div className="col">
+                      <InputField
+                        label="Max Discount"
+                        name="maxDiscount"
+                        value={form.maxDiscount?.toString() ?? ""}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  )}
                   <div className="col">
                     <InputField
-                      label="Max Discount"
-                      name="maxDiscount"
-                      value={form.maxDiscount?.toString() ?? ""}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="col">
-                    <InputField
-                      label="Condition"
+                      label="Condition (Order Minimum Price)"
                       name="condition"
                       value={form.condition?.toString() ?? ""}
                       onChange={handleChange}
@@ -163,6 +173,7 @@ const CouponFormPage: React.FC = () => {
                       name="endDate"
                       value={form.endDate ?? ""}
                       onChange={handleChange}
+                      type="date"
                     />
                   </div>
                 </div>
@@ -170,9 +181,9 @@ const CouponFormPage: React.FC = () => {
                 <div className="row">
                   <div className="col">
                     <InputField
-                      label="Details"
-                      name="details"
-                      value={form.details ?? ""}
+                      label="Detail"
+                      name="detail"
+                      value={form.detail ?? ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -188,8 +199,8 @@ const CouponFormPage: React.FC = () => {
                         title="Status"
                       >
                         <option value="">Select Status</option>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
+                        <option value="Available">Available</option>
+                        <option value="Unavailable">Unavailable</option>
                       </select>
                     </div>
                   </div>

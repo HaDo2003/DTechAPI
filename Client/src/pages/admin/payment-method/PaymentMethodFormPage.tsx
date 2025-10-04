@@ -27,9 +27,9 @@ const PaymentMethodFormPage: React.FC = () => {
     useEffect(() => {
         if (mode === "edit" && id) {
             (async () => {
-                const res = await adminService.getSingleData<PaymentMethodForm>(`/api/paymentmethod/get/${id}`, token ?? "");
-                if (res.success && res.data) {
-                    setForm(res.data as PaymentMethodForm);
+                const res = await adminService.getSingleData<PaymentMethodForm>(`/api/paymentMethod/get/${id}`, token ?? "");
+                if (res) {
+                    setForm(res as unknown as PaymentMethodForm);
                 }
             })();
         }
@@ -48,12 +48,12 @@ const PaymentMethodFormPage: React.FC = () => {
         setLoading(true);
 
         const res = mode === "create"
-            ? await adminService.createData("/api/paymentmethod/create", form, token ?? "")
-            : await adminService.updateData("/api/paymentmethod/update", id ?? "", form, token ?? "");
+            ? await adminService.createData("/api/paymentMethod/create", form, token ?? "")
+            : await adminService.updateData("/api/paymentMethod/update", id ?? "", form, token ?? "");
 
         if (res.success) {
             setLoading(false);
-            navigate("/admin/paymentmethod", {
+            navigate("/admin/payment-method", {
                 state: {
                     alert: {
                         message: mode === "create" ? "Payment method created successfully!" : "Payment method updated successfully!",
@@ -149,7 +149,7 @@ const PaymentMethodFormPage: React.FC = () => {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => navigate("/admin/paymentmethod")}
+                                onClick={() => navigate("/admin/payment-method")}
                                 className="btn btn-secondary"
                             >
                                 <i className="fa-solid fa-right-from-bracket fa-rotate-180"></i> Back to List

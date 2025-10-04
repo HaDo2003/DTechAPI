@@ -10,5 +10,6 @@ namespace DTech.Application.Interfaces
         Task<IndexResDto<object?>> CreateCategoryAsync(CategoryDetailDto model, string? currentUserId);
         Task<IndexResDto<object?>> UpdateCategoryAsync(int categoryId, CategoryDetailDto model, string? currentUserId);
         Task<IndexResDto<object?>> DeleteCategoryAsync(int categoryId);
+        Task<List<ParentResDto>> GetParentsAsync();
     }
 }

@@ -1,15 +1,19 @@
 ﻿using DTech.Application.DTOs.response.admin;
+using DTech.Application.DTOs.Response.Admin.Category;
 using DTech.Application.DTOs.Response.Admin.Post;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
+using Ganss.Xss;
 
 namespace DTech.Application.Services
 {
     public class PostService(
         IPostRepository postRepo,
+        IPostCategoryRepository postCategoryRepo,
         IAdminRepository adminRepo,
-        ICloudinaryService cloudinaryService
+        ICloudinaryService cloudinaryService,
+        HtmlSanitizer sanitizer
     ) : IPostService
     {
         readonly string folderName = "Pre-thesis/Post";
@@ -28,12 +32,16 @@ namespace DTech.Application.Services
 
             var postDtos = posts.Select(p => new PostIndexDto
             {
+                Id = p.PostId,
                 Name = p.Name,
                 PostDate = p.PostDate,
                 PostBy = p.PostBy,
                 PostCategory = p.Cate?.Name,
             }).ToList();
-
+            foreach(var o in postDtos)
+            {
+                Console.WriteLine($"{o.Id}: {o.PostCategory}");
+            }
             return new IndexResDto<List<PostIndexDto>>
             {
                 Success = true,
@@ -61,6 +69,8 @@ namespace DTech.Application.Services
                 Image = post.Image,
                 PostBy = post.PostBy,
                 PostDate = post.PostDate,
+                PostCategoryId = post.Cate != null ? post.Cate.CategoryId : 0,
+                PostCategory = post.Cate != null ? post.Cate.Name : "N/A"
             };
 
             return new IndexResDto<PostDetailDto>
@@ -74,15 +84,16 @@ namespace DTech.Application.Services
         {
             try
             {
+
                 Post post = new()
                 {
                     Name = model.Name,
-                    Description = model.Description,
                     Status = model.Status,
                     PostDate = DateTime.UtcNow,
                     PostBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
+                    Description = sanitizer.Sanitize(model.Description ?? string.Empty),
+                    CateId = model.PostCategoryId
                 };
-
                 post.Slug = post.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
 
                 var exists = await postRepo.CheckIfPostExistsAsync(post);
@@ -91,7 +102,7 @@ namespace DTech.Application.Services
                     return new IndexResDto<object?>
                     {
                         Success = false,
-                        Message = "Post with same name exists",
+                        Message = "Post with same title exists",
                         Data = null
                     };
                 }
@@ -159,6 +170,7 @@ namespace DTech.Application.Services
                     PostDate = DateTime.UtcNow,
                     PostBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                     Image = model.Image,
+                    CateId = model.PostCategoryId
                 };
 
                 string newSlug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-") ?? string.Empty;
@@ -256,6 +268,23 @@ namespace DTech.Application.Services
                     Data = null
                 };
             }
+        }
+
+        public async Task<List<CategoryResDto>> GetCategoriesAsync()
+        {
+            var categories = await postCategoryRepo.GetAvailablePostCategoriesAsync();
+            if (categories == null || categories.Count == 0)
+            {
+                return [];
+            }
+
+            var categoriesDtos = categories.Select(par => new CategoryResDto
+            {
+                Id = par.CategoryId,
+                Name = par.Name,
+            }).ToList();
+
+            return categoriesDtos;
         }
     }
 }

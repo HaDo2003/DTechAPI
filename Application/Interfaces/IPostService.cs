@@ -10,5 +10,6 @@ namespace DTech.Application.Interfaces
         Task<IndexResDto<object?>> CreatePostAsync(PostDetailDto model, string? currentUserId);
         Task<IndexResDto<object?>> UpdatePostAsync(int postId, PostDetailDto model, string? currentUserId);
         Task<IndexResDto<object?>> DeletePostAsync(int postId);
+        Task<List<CategoryResDto>> GetCategoriesAsync();
     }
 }

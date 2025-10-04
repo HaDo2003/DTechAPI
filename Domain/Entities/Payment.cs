@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DTech.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DTech.Domain.Entities;
@@ -11,7 +12,7 @@ public partial class Payment
     [Display(Name = "Payment Method")]
     public int? PaymentMethodId { get; set; }
 
-    public int? Status { get; set; }
+    public PaymentStatusEnums Status { get; set; }
 
     [Display(Name = "Payment Date")]
     public DateOnly? Date { get; set; }
