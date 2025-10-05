@@ -51,9 +51,12 @@ export const adminService = {
 
     async createData<T>(endpoint: string, data: FormData | T, token?: string): Promise<ServiceResponse<T>> {
         try {
+            const isFormData = data instanceof FormData;
+
             const headers: any = {
                 ...(token && { Authorization: `Bearer ${token}` }),
-                ...(!(data instanceof FormData) && { 'Content-Type': 'application/json' })
+                ...(!isFormData && { "Content-Type": "application/json" }),
+                ...(isFormData && { "Content-Type": "multipart/form-data" })
             };
 
             const response = await axios.post<ServiceResponse<T>>(endpoint, data, { headers });
@@ -63,12 +66,54 @@ export const adminService = {
         }
     },
 
-    async updateData<T>(endpoint: string, id: string | number, data: T, token?: string): Promise<ServiceResponse<T>> {
+    async updateData<T>(
+        endpoint: string,
+        id: string | number,
+        data: T | FormData,
+        token?: string
+    ): Promise<ServiceResponse<T>> {
         try {
-            const response = await axios.put<T>(`${endpoint}/${id}`, data, {
-                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-            });
-            return { success: true, data: response.data };
+            const isFormData = data instanceof FormData;
+
+            const headers: any = {
+                ...(token && { Authorization: `Bearer ${token}` }),
+                ...(!isFormData && { "Content-Type": "application/json" }),
+                ...(isFormData && { "Content-Type": "multipart/form-data" })
+            };
+
+            const response = await axios.put<ServiceResponse<T>>(
+                `${endpoint}/${id}`,
+                data,
+                { headers }
+            );
+
+            return response.data;
+        } catch (err: any) {
+            return handleAxiosError(err, "Failed to update data. Please try again.");
+        }
+    },
+
+    async updateImageData<T>(
+        endpoint: string,
+        id: string | number,
+        data: T | FormData,
+        token?: string
+    ): Promise<ServiceResponse<T>> {
+        try {
+            const isFormData = data instanceof FormData;
+
+            const headers: any = {
+                ...(token && { Authorization: `Bearer ${token}` }),
+                ...(!isFormData && { "Content-Type": "application/json" }),
+            };
+
+            const response = await axios.put<ServiceResponse<T>>(
+                `${endpoint}/${id}`,
+                data,
+                { headers }
+            );
+
+            return response.data;
         } catch (err: any) {
             return handleAxiosError(err, "Failed to update data. Please try again.");
         }
@@ -85,36 +130,14 @@ export const adminService = {
         }
     },
 
-    async getRolesData<T>(endpoint: string, token?: string): Promise<ServiceResponse<T[]>> {
+    async getSelectData<T>(endpoint: string, token?: string, typeOfData?: string): Promise<ServiceResponse<T[]>> {
         try {
             const response = await axios.get<T[]>(endpoint, {
                 headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             });
             return { success: true, data: response.data };
         } catch (err: any) {
-            return handleAxiosError(err, "Failed to fetch roles. Please try again.");
-        }
-    },
-
-    async getParentsData<T>(endpoint: string, token?: string): Promise<ServiceResponse<T[]>> {
-        try {
-            const response = await axios.get<T[]>(endpoint, {
-                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-            });
-            return { success: true, data: response.data };
-        } catch (err: any) {
-            return handleAxiosError(err, "Failed to fetch parent. Please try again.");
-        }
-    },
-
-    async getCategoriesData<T>(endpoint: string, token?: string): Promise<ServiceResponse<T[]>> {
-        try {
-            const response = await axios.get<T[]>(endpoint, {
-                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-            });
-            return { success: true, data: response.data };
-        } catch (err: any) {
-            return handleAxiosError(err, "Failed to fetch category. Please try again.");
+            return handleAxiosError(err, `Failed to fetch ${typeOfData}. Please try again.`);
         }
     },
 }

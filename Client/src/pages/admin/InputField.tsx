@@ -7,6 +7,7 @@ type InputFieldProps = {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   readOnly?: boolean;
   type?: string;
+  required?: boolean;
 };
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -16,6 +17,7 @@ const InputField: React.FC<InputFieldProps> = ({
   onChange,
   readOnly = false,
   type = "text",
+  required = false,
 }) => {
   return (
     <div className="form-group">
@@ -27,6 +29,7 @@ const InputField: React.FC<InputFieldProps> = ({
         className="form-control"
         readOnly={readOnly}
         type={type}
+        required={required}
       />
     </div>
   );

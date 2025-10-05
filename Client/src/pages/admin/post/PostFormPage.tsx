@@ -35,7 +35,7 @@ const PostFormPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const res = await adminService.getCategoriesData<{ id: number; name: string }>("/api/post/get-categories", token ?? "");
+            const res = await adminService.getSelectData<{ id: number; name: string }>("/api/post/get-categories", token ?? "", "post category");
             if (res.success && res.data) {
                 setCategory(res.data.map(r => ({ value: r.id, label: r.name })));
             }

@@ -1,27 +1,114 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import InputField from "../InputField";
 import { type ProductForm } from "../../../types/Product";
 import RichTextEditor from "../../../components/admin/TextEditor";
 import DOMPurify from "../../../utils/santitizeConfig";
+import { adminService } from "../../../services/AdminService";
 
 interface Props {
-    preview: string;
+    productId?: string | number;
+    categories: { value: number; label: string }[]
+    brands: { value: number; label: string }[]
+    token: string;
     form: ProductForm;
     mode: "create" | "edit";
-    handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
-    handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    setForm: React.Dispatch<React.SetStateAction<ProductForm>>;
+    image: string;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    setAlert: React.Dispatch<React.SetStateAction<{ message: string; type: "success" | "error" | "info" } | null>>;
+    onChange: (updatedForm: ProductForm) => void;
 }
 const ProductBasicInfoTab: React.FC<Props> = ({
-        preview,
-        form,
-        mode,
-        handleChange,
-        handleFileChange,
-        setForm
-    }) => {
+    productId,
+    categories,
+    brands,
+    form,
+    mode,
+    token,
+    image,
+    setAlert,
+    setLoading,
+    onChange
+}) => {
+    const [formData, setFormData] = useState<ProductForm>(form);
+    const [preview, setPreview] = useState<string>("");
+
+    useEffect(() => {
+        if (image) setPreview(image);
+    }, [image]);
+
+    useEffect(() => {
+        if (form) setFormData(form);
+    }, [form?.id]);
+
+    useEffect(() => {
+        onChange(formData);
+    }, [formData]);
+
+    // handle input change
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { name, value, type } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: type === "number" ? Number(value) : value,
+        }));
+    };
+
+    // handle file input
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            const updatedForm = {
+                ...formData,
+                photoUpload: file,
+            };
+            setFormData(updatedForm);
+            setPreview(URL.createObjectURL(file));
+            onChange(updatedForm);
+        }
+    };
+
+    const handleSubmitProductInfo = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const fd = new FormData();
+        const info = formData;
+
+        fd.append("Name", info.name ?? "");
+        fd.append("Warranty", info.warranty ?? "");
+        fd.append("StatusProduct", info.statusProduct ?? "");
+        fd.append("InitialCost", info.initialCost?.toString() ?? "0")
+        fd.append("Price", info.price?.toString() ?? "0");
+        fd.append("Discount", info.discount?.toString() ?? "0");
+        fd.append("EndDateDiscount", info.endDateDiscount ?? "");
+        fd.append("DateOfManufacture", info.dateOfManufacture ?? "");
+        fd.append("MadeIn", info.madeIn ?? "");
+        fd.append("PromotionalGift", info.promotionalGift ?? "");
+        fd.append("Description", info.description ?? "");
+        fd.append("Photo", info.photo ?? "");
+        fd.append("CategoryId", String(info.categoryId) ?? "0");
+        fd.append("BrandId", String(info.brandId) ?? "0");
+
+        if (info.photoUpload) {
+            fd.append("PhotoUpload", info.photoUpload);
+        }
+
+        try {
+            setLoading(true);
+            const res = await adminService.updateData("/api/product/update-infor", productId ?? "", fd, token ?? "");
+            setLoading(false);
+
+            if (res.success) {
+                setAlert({ message: "Product info saved successfully!", type: "success" });
+            } else {
+                setAlert({ message: res.message || "Failed to save product info!", type: "error" });
+            }
+        } catch (err) {
+            setLoading(false);
+            setAlert({ message: "Something went wrong!", type: "error" });
+        }
+    };
+
     return (
-        <>
+        <form onSubmit={handleSubmitProductInfo}>
             <div className="form-group">
                 <div className="row align-items-center">
                     <div className="col-lg-2 col-sm-4 text-center">
@@ -47,8 +134,9 @@ const ProductBasicInfoTab: React.FC<Props> = ({
                     <InputField
                         label="Name"
                         name="name"
-                        value={form.name ?? ""}
+                        value={formData.name ?? ""}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 {mode === "edit" && (
@@ -56,7 +144,7 @@ const ProductBasicInfoTab: React.FC<Props> = ({
                         <InputField
                             label="Slug"
                             name="slug"
-                            value={form.slug ?? ""}
+                            value={formData.slug ?? ""}
                             readOnly
                         />
                     </div>
@@ -65,28 +153,95 @@ const ProductBasicInfoTab: React.FC<Props> = ({
 
             <div className="row">
                 <div className="col">
+                    <div className="form-group">
+                        <label htmlFor="category-select">Category</label>
+                        <select
+                            id="category-select"
+                            name="categoryId"
+                            value={formData.categoryId ?? 0}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        >
+                            <option value="">Select Category</option>
+                            {categories.map((category) => (
+                                <option key={category.value} value={category.value}>
+                                    {category.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="col">
+                    <div className="form-group">
+                        <label htmlFor="brand-select">Brand</label>
+                        <select
+                            id="brand-select"
+                            name="brandId"
+                            value={formData.brandId ?? 0}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        >
+                            <option value="">Select Brand</option>
+                            {brands.map((brand) => (
+                                <option key={brand.value} value={brand.value}>
+                                    {brand.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="col">
                     <InputField
                         label="Made In"
                         name="madeIn"
-                        value={form.madeIn ?? ""}
+                        value={formData.madeIn ?? ""}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 <div className="col">
                     <InputField
                         label="Date of Manufacture"
                         name="dateOfManufacture"
-                        value={form.dateOfManufacture ?? ""}
+                        value={formData.dateOfManufacture ?? ""}
                         onChange={handleChange}
+                        type="date"
+                        required
                     />
                 </div>
+            </div>
+
+            <div className="row">
                 <div className="col">
                     <InputField
                         label="Warranty"
                         name="warranty"
-                        value={form.warranty ?? ""}
+                        value={formData.warranty ?? ""}
                         onChange={handleChange}
+                        required
                     />
+                </div>
+                <div className="col">
+                    <div className="form-group">
+                        <label htmlFor="statusProduct-select">Status</label>
+                        <select
+                            id="statusProduct-select"
+                            name="statusProduct"
+                            value={formData.statusProduct ?? ""}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        >
+                            <option value="Instock">In stock</option>
+                            <option value="Outofstock">Out of stock</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -97,8 +252,9 @@ const ProductBasicInfoTab: React.FC<Props> = ({
                         label="Price"
                         name="price"
                         type="number"
-                        value={form.price?.toString() ?? "0"}
+                        value={formData.price?.toString() ?? "0"}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 <div className="col">
@@ -106,7 +262,7 @@ const ProductBasicInfoTab: React.FC<Props> = ({
                         label="Discount"
                         name="discount"
                         type="number"
-                        value={form.discount?.toString() ?? "0"}
+                        value={formData.discount?.toString() ?? "0"}
                         onChange={handleChange}
                     />
                 </div>
@@ -115,42 +271,27 @@ const ProductBasicInfoTab: React.FC<Props> = ({
                         label="Price After Discount"
                         name="priceAfterDiscount"
                         type="number"
-                        value={form.priceAfterDiscount?.toString() ?? "0"}
+                        value={formData.priceAfterDiscount?.toString() ?? "0"}
                         onChange={handleChange}
+                        readOnly
                     />
                 </div>
             </div>
 
             <div className="row">
                 <div className="col">
-                    <InputField
-                        label="Made In"
-                        name="madeIn"
-                        value={form.madeIn ?? ""}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="col">
-                    <InputField
-                        label="Stock Status"
-                        name="statusProduct"
-                        value={form.statusProduct ?? ""}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="col">
                     <div className="form-group">
-                        <label htmlFor="statusProduct-select">Status</label>
-                        <select
-                            id="statusProduct-select"
-                            name="statusProduct"
-                            value={form.statusProduct ? "true" : "false"}
-                            onChange={handleChange}
-                            className="form-control"
-                        >
-                            <option value="true">Available</option>
-                            <option value="false">Unavailable</option>
-                        </select>
+                        <label htmlFor="promotionalGift">Promotional Gift</label>
+                        <RichTextEditor
+                            value={formData.promotionalGift ?? ""}
+                            onChange={(data) => {
+                                const cleanData = DOMPurify.sanitize(data);
+                                setFormData((prevForm) => ({
+                                    ...prevForm,
+                                    promotionalGift: cleanData,
+                                }));
+                            }}
+                        />
                     </div>
                 </div>
             </div>
@@ -160,10 +301,10 @@ const ProductBasicInfoTab: React.FC<Props> = ({
                     <div className="form-group">
                         <label htmlFor="description">Description</label>
                         <RichTextEditor
-                            value={form.description ?? ""}
+                            value={formData.description ?? ""}
                             onChange={(data) => {
                                 const cleanData = DOMPurify.sanitize(data);
-                                setForm((prevForm) => ({
+                                setFormData((prevForm) => ({
                                     ...prevForm,
                                     description: cleanData,
                                 }));
@@ -212,9 +353,15 @@ const ProductBasicInfoTab: React.FC<Props> = ({
                             />
                         </div>
                     </div>
+
+                    <div className="text-start mt-3">
+                        <button type="submit" className="btn btn-primary">
+                            <i className="fa-solid fa-floppy-disk fa-sm"></i>Save Change
+                        </button>
+                    </div>
                 </>
             )}
-        </>
+        </form>
     );
 };
 

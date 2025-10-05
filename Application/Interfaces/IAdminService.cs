@@ -1,6 +1,6 @@
 ﻿using DTech.Application.DTOs.response;
-using DTech.Application.DTOs.response.admin;
-using DTech.Application.DTOs.response.admin.admin;
+using DTech.Application.DTOs.Response.Admin;
+using DTech.Application.DTOs.Response.Admin.Admin;
 
 namespace DTech.Application.Interfaces
 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,6 @@ namespace DTech.Application.DTOs.response
     {
         public int ImageId { get; set; }
         public string? Image { get; set; }
+        public IFormFile? ImageUpload { get; set; }
     }
 }

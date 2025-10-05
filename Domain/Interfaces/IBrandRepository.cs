@@ -11,5 +11,6 @@ namespace DTech.Domain.Interfaces
         Task<(bool Success, string Message)> CreateBrandAsync(Brand brand);
         Task<(bool Success, string Message)> UpdateBrandAsync(Brand brand);
         Task<(bool Success, string Message)> DeleteBrandAsync(int brandId);
+        Task<List<Brand>?> GetAvailableBrandsAsync();
     }
 }

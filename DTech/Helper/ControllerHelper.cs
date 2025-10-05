@@ -1,4 +1,4 @@
-﻿using DTech.Application.DTOs.response.admin;
+﻿using DTech.Application.DTOs.Response.Admin;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 

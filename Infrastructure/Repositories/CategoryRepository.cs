@@ -125,5 +125,13 @@ namespace DTech.Infrastructure.Repositories
             else
                 return (false, "Failed to delete category");
         }
+        public async Task<List<Category>?> GetAvailableCategoriesAsync()
+        {
+            return await context.Categories
+                .AsNoTracking()
+                .Where(c => c.Status == StatusEnums.Available)
+                .OrderBy(c => c.CategoryId)
+                .ToListAsync();
+        }
     }
 }

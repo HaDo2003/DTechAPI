@@ -1,4 +1,4 @@
-﻿namespace DTech.Application.DTOs.response.admin
+﻿namespace DTech.Application.DTOs.Response.Admin
 {
     public class IndexResDto<T>
     {

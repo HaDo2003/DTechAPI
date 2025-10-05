@@ -20,9 +20,19 @@ namespace DTech.Domain.Interfaces
         Task<List<Product>> GetProductByQuery(string query);
 
         // Repo for Product Images
+        Task<List<ProductImage>> GetImageAsync(int productId);
+        Task AddImagesAsync(List<ProductImage> images);
+        Task DeleteImagesAsync(List<int> imageIds);
+        Task<bool> SaveImagesAsync();
+
         // Repo for Product Comments
         Task<int?> AddProductCommentAsync(ProductComment model);
+
         // Repo for Product Specifications
+        Task<List<Specification>> GetSpecificationAsync(int productId);
+        Task AddSpecificationAsync(Specification spec);
+        Task DeleteSpecificationsAsync(List<int> specIds);
+        Task<bool> SaveSpecificationsAsync();
 
         //For admin
         Task<List<Product>?> GetAllProductsAsync();

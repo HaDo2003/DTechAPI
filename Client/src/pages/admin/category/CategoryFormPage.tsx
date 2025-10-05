@@ -31,7 +31,7 @@ const CategoryFormPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const res = await adminService.getParentsData<{ id: number; name: string }>("/api/category/get-parents", token ?? "");
+            const res = await adminService.getSelectData<{ id: number; name: string }>("/api/category/get-parents", token ?? "", "parent category");
             if (res.success && res.data) {
                 setParent(res.data.map(r => ({ value: r.id, label: r.name })));
             }

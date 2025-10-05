@@ -3,6 +3,7 @@ using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DTech.Infrastructure.Repositories
 {
@@ -219,6 +220,38 @@ namespace DTech.Infrastructure.Repositories
         }
 
         // Repo for Product Images
+        public async Task<List<ProductImage>> GetImageAsync(int productId)
+        {
+            return await context.ProductImages
+                .AsNoTracking()
+                .Where(a => a.ProductId == productId)
+                .ToListAsync();
+        }
+        public async Task AddImagesAsync(List<ProductImage> images)
+        {
+            if (images == null || images.Count == 0)
+                return;
+
+            await context.ProductImages.AddRangeAsync(images);
+        }
+        public async Task DeleteImagesAsync(List<int> imageIds)
+        {
+            if (imageIds == null || imageIds.Count == 0)
+                return;
+
+            var images = await context.ProductImages
+                .Where(img => imageIds.Contains(img.ImageId))
+                .ToListAsync();
+
+            if (images.Count != 0)
+            {
+                context.ProductImages.RemoveRange(images);
+            }
+        }
+        public async Task<bool> SaveImagesAsync()
+        {
+            return await context.SaveChangesAsync() > 0;
+        }
         // Repo for Product Comments
         public async Task<int?> AddProductCommentAsync(ProductComment model)
         {
@@ -231,6 +264,39 @@ namespace DTech.Infrastructure.Repositories
             return null;
         }
         // Repo for Product Specifications
+        public async Task<List<Specification>> GetSpecificationAsync(int productId)
+        {
+            return await context.Specifications
+                .AsNoTracking()
+                .Where(a => a.ProductId == productId)
+                .ToListAsync();
+        }
+        public async Task AddSpecificationAsync(Specification specs)
+        {
+            if (specs == null)
+                return;
+
+            await context.Specifications.AddAsync(specs);
+        }
+
+        public async Task DeleteSpecificationsAsync(List<int> specIds)
+        {
+            if (specIds == null || specIds.Count == 0)
+                return;
+
+            var specs = await context.Specifications
+                .Where(spec => specIds.Contains(spec.SpecId))
+                .ToListAsync();
+
+            if (specs.Count != 0)
+            {
+                context.Specifications.RemoveRange(specs);
+            }
+        }
+        public async Task<bool> SaveSpecificationsAsync()
+        {
+            return await context.SaveChangesAsync() > 0;
+        }
 
         // For admin
 

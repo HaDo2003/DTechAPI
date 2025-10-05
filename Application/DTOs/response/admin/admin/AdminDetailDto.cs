@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace DTech.Application.DTOs.response.admin.admin
+namespace DTech.Application.DTOs.Response.Admin.Admin
 {
     public class AdminDetailDto
     {

@@ -1,4 +1,4 @@
-﻿using DTech.Application.DTOs.response.admin;
+﻿using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Category;
 using DTech.Application.DTOs.Response.Admin.Post;
 using DTech.Application.Interfaces;
@@ -270,7 +270,7 @@ namespace DTech.Application.Services
             }
         }
 
-        public async Task<List<CategoryResDto>> GetCategoriesAsync()
+        public async Task<List<SelectResDto>> GetCategoriesAsync()
         {
             var categories = await postCategoryRepo.GetAvailablePostCategoriesAsync();
             if (categories == null || categories.Count == 0)
@@ -278,7 +278,7 @@ namespace DTech.Application.Services
                 return [];
             }
 
-            var categoriesDtos = categories.Select(par => new CategoryResDto
+            var categoriesDtos = categories.Select(par => new SelectResDto
             {
                 Id = par.CategoryId,
                 Name = par.Name,

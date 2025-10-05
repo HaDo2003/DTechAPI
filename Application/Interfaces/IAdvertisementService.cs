@@ -1,5 +1,5 @@
-﻿using DTech.Application.DTOs.response.admin;
-using DTech.Application.DTOs.response.admin.advertisement;
+﻿using DTech.Application.DTOs.Response.Admin;
+using DTech.Application.DTOs.Response.Admin.Advertisement;
 
 namespace DTech.Application.Interfaces
 {

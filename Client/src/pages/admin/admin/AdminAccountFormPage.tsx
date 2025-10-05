@@ -41,7 +41,7 @@ const AdminAccountFormPage: React.FC = () => {
   // Fetch roles
   useEffect(() => {
     (async () => {
-      const res = await adminService.getRolesData<{ id: string; name: string }>("/api/admin/get-roles", token ?? "");
+      const res = await adminService.getSelectData<{ id: string; name: string }>("/api/admin/get-roles", token ?? "", "role");
       if (res.success && res.data) {
         setRoles(res.data.map(r => ({ value: r.id, label: r.name })));
       }

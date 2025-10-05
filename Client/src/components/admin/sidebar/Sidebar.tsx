@@ -9,13 +9,11 @@ import { useAuth } from "../../../context/AuthContext";
 interface AdminSidebarProps {
   client: Admin | null;
   mainPage?: string;
-  page?: string;
 }
 
 const Sidebar: React.FC<AdminSidebarProps> = ({
   client,
   mainPage = "",
-  page = "",
 }) => {
   const { user } = useAuth();
   const [infoOpen, setInfoOpen] = useState(mainPage === "information");

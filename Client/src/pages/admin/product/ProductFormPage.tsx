@@ -5,7 +5,7 @@ import { useAuth } from "../../../context/AuthContext";
 import CardWrapped from "../CardWrapped";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
-import { type ProductForm } from "../../../types/Product";
+import { type ProductFormProp } from "../../../types/Product";
 import ProductBasicInfoTab from "./ProductBasicInfoTab";
 import ProductSpecificationTab from "./SpecificationTab";
 import ProductImagesTab from "./ProductImagesTab";
@@ -18,102 +18,81 @@ const ProductFormPage: React.FC = () => {
 
     const mode: "create" | "edit" = location.pathname.includes("edit") ? "edit" : "create";
 
-    const [form, setForm] = useState<ProductForm>({
-        id: 0,
-        name: "",
-        slug: "",
-        warranty: "",
-        statusProduct: "",
-        price: 0,
-        discount: 0,
-        priceAfterDiscount: 0,
-        madeIn: "",
-        description: "",
+    const [form, setForm] = useState<ProductFormProp>({
+        productInfor: {
+            id: 0,
+            name: "",
+            slug: "",
+            warranty: "",
+            statusProduct: "",
+            price: 0,
+            discount: 0,
+            priceAfterDiscount: 0,
+            madeIn: "",
+            description: "",
+            photo: "",
+        },
+        specifications: [],
+        productImages: [],
     });
 
-    const [preview, setPreview] = useState<string>("");
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<"basic" | "specs" | "images">("basic");
+    const [image, setImage] = useState<string>("");
+    const [categories, setCategory] = useState<{ value: number; label: string }[]>([]);
+    const [brands, setBrand] = useState<{ value: number; label: string }[]>([]);
+
+    useEffect(() => {
+        (async () => {
+            const categoryRes = await adminService.getSelectData<{ id: number; name: string }>("/api/product/get-categories", token ?? "", "category");
+            const brandRes = await adminService.getSelectData<{ id: number; name: string }>("/api/product/get-brands", token ?? "", "category");
+            if (categoryRes.success && categoryRes.data) {
+                setCategory(categoryRes.data.map(r => ({ value: r.id, label: r.name })));
+            }
+
+            if (brandRes.success && brandRes.data) {
+                setBrand(brandRes.data.map(r => ({ value: r.id, label: r.name })));
+            }
+        })();
+    }, [token]);
 
     useEffect(() => {
         if (mode === "edit" && id) {
             (async () => {
-                const res = await adminService.getSingleData<ProductForm>(`/api/product/get/${id}`, token ?? "");
-                if (res) {
-                    setForm(res as unknown as ProductForm);
-                    setPreview((res as any).photo ?? "");
+                setLoading(true);
+                const res = await adminService.getSingleData<ProductFormProp>(`/api/product/get/${id}`, token ?? "");
+                if (res.data && res.success) {
+                    setForm({
+                        productInfor: res.data.productInfor,
+                        specifications: res.data.specifications ?? [],
+                        productImages: res.data.productImages ?? [],
+                    });
+                    setImage(res.data?.productInfor?.photo ?? "");
                 }
+                setLoading(false);
             })();
         }
     }, [id, mode, token]);
 
-    // handle input change
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value, type } = e.target;
-        setForm({
-            ...form,
-            [name]:
-                type === "number"
-                    ? Number(value)
-                    : name === "statusProduct"
-                        ? value === "true"
-                        : value,
-        });
-    };
-
-    // handle file input
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            const file = e.target.files[0];
-            setForm({ ...form, photoUpload: file });
-            setPreview(URL.createObjectURL(file));
-        }
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append("Name", form.name ?? "");
-        formData.append("Warranty", form.warranty ?? "");
-        formData.append("StatusProduct", form.statusProduct ? "true" : "false");
-        formData.append("Price", form.price?.toString() ?? "0");
-        formData.append("Discount", form.discount?.toString() ?? "0");
-        formData.append("PriceAfterDiscount", form.priceAfterDiscount?.toString() ?? "0");
-        formData.append("MadeIn", form.madeIn ?? "");
-        formData.append("Description", form.description ?? "");
-        formData.append("Photo", form.photo ?? "");
-
-        if (form.photoUpload) {
-            formData.append("PhotoUpload", form.photoUpload);
-        }
-
+    const handleSaveAll = async () => {
         setLoading(true);
-        const res = mode === "create"
-            ? await adminService.createData("/api/product/create", formData, token ?? "")
-            : await adminService.updateData("/api/product/update", id ?? "", formData, token ?? "");
+        try {
+            const res =
+                mode === "create"
+                    ? await adminService.createData("/api/product/create-all", form, token ?? "")
+                    : await adminService.updateData("/api/product/update-all", form.productInfor.id ?? "", form, token ?? "");
 
-        if (res.success && mode === "create") {
-            setLoading(false);
-            navigate("/admin/product", {
-                state: {
-                    alert: {
-                        message: "Product created successfully!",
-                        type: "success",
-                    },
-                },
-            });
-        } else if (res.success && mode === "edit") {
-            const updatedRes = await adminService.getSingleData<ProductForm>(`/api/product/get/${id}`, token ?? "");
-            if (updatedRes) {
-                setForm(updatedRes as unknown as ProductForm);
-                setPreview((updatedRes as any).photo ?? "");
-                setAlert({ message: "Product updated successfully!", type: "success" });
+            if (res) {
+                setAlert({ message: "All product data saved successfully!", type: "success" });
+            } else {
+                setAlert({ message: "Failed to save product.", type: "error" });
             }
+        } catch (err) {
+            console.error(err);
+            setAlert({ message: "Error saving all product data.", type: "error" });
+        } finally {
             setLoading(false);
-        } else {
-            setLoading(false);
-            setAlert({ message: res.message || "Submit form failed!", type: "error" });
         }
     };
 
@@ -133,77 +112,107 @@ const ProductFormPage: React.FC = () => {
                 </div>
             )}
             <CardWrapped title="Product Form">
-                <form onSubmit={handleSubmit}>
-                    <div className="card">
-                        <div className="card-header text-center">
-                            <h3>{mode === "create" ? "Create Product" : "Edit Product"}</h3>
-                            <div>
-                                <button
-                                    type="button"
-                                    className={`btn btn-sm me-2 ${activeTab === "basic" ? "btn-primary" : "btn-outline-primary"}`}
-                                    onClick={() => setActiveTab("basic")}
-                                >
-                                    Basic Info
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`btn btn-sm me-2 ${activeTab === "specs" ? "btn-primary" : "btn-outline-primary"}`}
-                                    onClick={() => setActiveTab("specs")}
-                                >
-                                    Specifications
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`btn btn-sm ${activeTab === "images" ? "btn-primary" : "btn-outline-primary"}`}
-                                    onClick={() => setActiveTab("images")}
-                                >
-                                    Images
-                                </button>
-                            </div>
-                        </div>
-                        <div className="card-body">
-                            <div className="card-body">
-                                {activeTab === "basic" && (
-                                    <ProductBasicInfoTab
-                                        form={form}
-                                        setForm={setForm}
-                                        mode={mode}
-                                        preview={preview}
-                                        handleFileChange={handleFileChange}
-                                        handleChange={handleChange}
-                                    />
-                                )}
-
-                                {activeTab === "specs" && (
-                                    <ProductSpecificationTab
-                                        productId={form.id}
-                                        specifications={form.specifications ?? []}
-                                        setForm={setForm}
-                                    />
-                                )}
-
-                                {activeTab === "images" && (
-                                    <ProductImagesTab
-                                        productId={form.id}
-                                        productImages={form.productImages ?? []}
-                                    />
-                                )}
-                            </div>
-                            <div className="card-footer">
-                                <button type="submit" className="btn btn-primary me-2">
-                                    <i className="fa-solid fa-floppy-disk"></i> Save
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => navigate("/admin/product")}
-                                    className="btn btn-secondary"
-                                >
-                                    <i className="fa-solid fa-right-from-bracket fa-rotate-180"></i> Back to List
-                                </button>
-                            </div>
+                <div className="card">
+                    <div className="card-header text-center">
+                        <h3>{mode === "create" ? "Create Product" : "Edit Product"}</h3>
+                        <div>
+                            <button
+                                type="button"
+                                className={`btn btn-sm me-2 ${activeTab === "basic" ? "btn-primary" : "btn-outline-primary"}`}
+                                onClick={() => setActiveTab("basic")}
+                            >
+                                Basic Info
+                            </button>
+                            <button
+                                type="button"
+                                className={`btn btn-sm me-2 ${activeTab === "specs" ? "btn-primary" : "btn-outline-primary"}`}
+                                onClick={() => setActiveTab("specs")}
+                            >
+                                Specifications
+                            </button>
+                            <button
+                                type="button"
+                                className={`btn btn-sm ${activeTab === "images" ? "btn-primary" : "btn-outline-primary"}`}
+                                onClick={() => setActiveTab("images")}
+                            >
+                                Images
+                            </button>
                         </div>
                     </div>
-                </form>
+                    <div className="card-body">
+                        <div className="card-body">
+                            {activeTab === "basic" && (
+                                <ProductBasicInfoTab
+                                    productId={form.productInfor.id}
+                                    categories={categories}
+                                    brands={brands}
+                                    token={token ?? ""}
+                                    form={form.productInfor}
+                                    mode={mode}
+                                    setLoading={setLoading}
+                                    setAlert={setAlert}
+                                    image={image}
+                                    onChange={(updated) =>
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            productInfor: updated
+                                        }))
+                                    }
+                                />
+                            )}
+
+                            {activeTab === "specs" && (
+                                <ProductSpecificationTab
+                                    productId={form.productInfor.id}
+                                    specifications={form.specifications ?? []}
+                                    mode={mode}
+                                    token={token ?? ""}
+                                    setLoading={setLoading}
+                                    setAlert={setAlert}
+                                    onChange={(updated) =>
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            specifications: updated
+                                        }))
+                                    }
+                                />
+                            )}
+
+                            {activeTab === "images" && (
+                                <ProductImagesTab
+                                    productId={form.productInfor.id}
+                                    productImages={form.productImages ?? []}
+                                    mode={mode}
+                                    token={token ?? ""}
+                                    setLoading={setLoading}
+                                    setAlert={setAlert}
+                                    onChange={(updated) =>
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            productImages: updated
+                                        }))
+                                    }
+                                />
+                            )}
+                        </div>
+                        <div className="card-footer">
+                            <button
+                                type="button"
+                                onClick={handleSaveAll}
+                                className="btn btn-primary me-2"
+                            >
+                                <i className="fa-solid fa-floppy-disk"></i> Save All
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate("/admin/product")}
+                                className="btn btn-secondary"
+                            >
+                                <i className="fa-solid fa-right-from-bracket fa-rotate-180"></i> Back to List
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </CardWrapped>
         </>
     );

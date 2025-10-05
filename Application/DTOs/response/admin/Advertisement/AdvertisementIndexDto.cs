@@ -1,4 +1,4 @@
-﻿namespace DTech.Application.DTOs.response.admin.advertisement
+﻿namespace DTech.Application.DTOs.Response.Admin.Advertisement
 {
     public class AdvertisementIndexDto
     {

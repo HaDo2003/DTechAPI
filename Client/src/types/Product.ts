@@ -49,15 +49,19 @@ export interface ProductForm {
     madeIn?: string | null;
     views?: number;
     promotionalGift?: string | null;
+    description?: string;
     photo?: string;
     photoUpload?: File;
-    description?: string;
     categoryId?: number | string;
     brandId?: number | string;
     createDate?: string;
     createdBy?: string;
     updateDate?: string;
     updatedBy?: string;
+}
+
+export interface ProductFormProp {
+    productInfor: ProductForm;
     specifications?: Specification[];
     productImages?: ProductImage[];
 }

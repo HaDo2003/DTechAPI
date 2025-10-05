@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
-using DTech.Application.DTOs.response.admin;
+using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace DTech.Application.Services
 {
@@ -151,7 +153,7 @@ namespace DTech.Application.Services
                 var idList = ids.Split(',')
                                 .Select(id => int.TryParse(id, out var parsedId) ? parsedId : (int?)null)
                                 .Where(id => id.HasValue)
-                                .Select(id => id.Value)
+                                .Select(id => id!.Value)
                                 .ToList();
                 if (idList.Count == 0)
                 {
@@ -252,48 +254,53 @@ namespace DTech.Application.Services
             };
         }
 
-        public async Task<IndexResDto<ProductDetailDto>> GetProductDetailAsync(int productId)
+        public async Task<IndexResDto<ProductResDto>> GetProductDetailAsync(int productId)
         {
             var product = await productRepo.GetProductByIdAsync(productId);
             if (product == null)
             {
-                return new IndexResDto<ProductDetailDto>
+                return new IndexResDto<ProductResDto>
                 {
                     Success = false,
                     Message = "Product not found"
                 };
             }
 
-            var dto = new ProductDetailDto
+            var dto = new ProductResDto
             {
-                Id = product.ProductId,
-                Name = product.Name,
-                Slug = product.Slug,
-                Warranty = product.Warranty,
-                StatusProduct = product.StatusProduct switch
-                {
-                    true => "In stock",
-                    false => "Out of stock",
-                    null => "Unknown"
-                },
-                InitialCost = product.InitialCost,
-                Price = product.Price,
-                Discount = product.Discount,
-                PriceAfterDiscount = product.PriceAfterDiscount,
-                EndDateDiscount = product.EndDateDiscount,
-                DateOfManufacture = product.DateOfManufacture,
-                MadeIn = product.MadeIn,
-                Views = product.Views,
-                PromotionalGift = product.PromotionalGift,
-                Photo = product.Photo,
-                Description = product.Description,
-                BrandId = product.BrandId,
-                CategoryId = product.CategoryId,
-                CreateDate = product.CreateDate,
-                CreatedBy = product.CreatedBy,
-                UpdateDate = product.UpdateDate,
-                UpdatedBy = product.UpdatedBy,
-                Specifications = product.Specifications != null && product.Specifications.Count != 0
+                ProductInfor = product != null 
+                ? new ProductDetailDto {
+                    Id = product.ProductId,
+                    Name = product.Name,
+                    Slug = product.Slug,
+                    Warranty = product.Warranty,
+                    StatusProduct = product.StatusProduct switch
+                    {
+                        true => "In stock",
+                        false => "Out of stock",
+                        null => "Unknown"
+                    },
+                    InitialCost = product.InitialCost,
+                    Price = product.Price,
+                    Discount = product.Discount,
+                    PriceAfterDiscount = product.PriceAfterDiscount,
+                    EndDateDiscount = product.EndDateDiscount,
+                    DateOfManufacture = product.DateOfManufacture,
+                    MadeIn = product.MadeIn,
+                    Views = product.Views,
+                    PromotionalGift = product.PromotionalGift,
+                    Photo = product.Photo,
+                    Description = product.Description,
+                    BrandId = product.BrandId,
+                    CategoryId = product.CategoryId,
+                    CreateDate = product.CreateDate,
+                    CreatedBy = product.CreatedBy,
+                    UpdateDate = product.UpdateDate,
+                    UpdatedBy = product.UpdatedBy,
+                }
+                : null,
+                
+                Specifications = product != null && product.Specifications != null && product.Specifications.Count != 0
                     ? [.. product.Specifications.Select(spec => new SpecificationDto
                     {
                         SpecId = spec.SpecId,
@@ -301,7 +308,7 @@ namespace DTech.Application.Services
                         Detail = spec.Detail
                     })]
                     : [],
-                ProductImages = product.ProductImages != null && product.ProductImages.Count != 0
+                ProductImages = product != null && product.ProductImages != null && product.ProductImages.Count != 0
                     ? [.. product.ProductImages.Select(img => new ProductImageDto
                     {
                         ImageId = img.ImageId,
@@ -310,15 +317,57 @@ namespace DTech.Application.Services
                     : [],
             };
 
-            return new IndexResDto<ProductDetailDto>
+            return new IndexResDto<ProductResDto>
             {
                 Success = true,
                 Data = dto
             };
         }
 
-        public async Task<IndexResDto<object?>> CreateProductAsync(ProductDetailDto model, string? currentUserId)
+        public async Task<List<SelectResDto>> GetCategoriesAsync()
         {
+            var categories = await categoryRepo.GetAvailableCategoriesAsync();
+            if (categories == null || categories.Count == 0)
+            {
+                return [];
+            }
+
+            var categoriesDtos = categories.Select(cat => new SelectResDto
+            {
+                Id = cat.CategoryId,
+                Name = cat.Name,
+            }).ToList();
+
+            return categoriesDtos;
+        }
+        public async Task<List<SelectResDto>> GetBrandsAsync()
+        {
+            var brands = await brandRepo.GetAvailableBrandsAsync();
+            if (brands == null || brands.Count == 0)
+            {
+                return [];
+            }
+
+            var brandsDtos = brands.Select(br => new SelectResDto
+            {
+                Id = br.BrandId,
+                Name = br.Name,
+            }).ToList();
+
+            return brandsDtos;
+        }
+
+        public async Task<IndexResDto<object?>> CreateProductAsync(ProductDetailDto? model, string? currentUserId)
+        {
+            if(model == null)
+            {
+                return new IndexResDto<object?>
+                {
+                    Success = false,
+                    Message = "The data is null",
+                    Data = null
+                };
+            }
             try
             {
                 Product product = new()
@@ -335,7 +384,9 @@ namespace DTech.Application.Services
                     InitialCost = model.InitialCost,
                     Price = model.Price,
                     Discount = model.Discount,
-                    PriceAfterDiscount = model.PriceAfterDiscount,
+                    PriceAfterDiscount = model.Discount > 0
+                        ? ((decimal)model.Price! - ((decimal)model.Price * ((decimal)model.Discount / 100)))
+                        : model.Price,
                     EndDateDiscount = model.EndDateDiscount,
                     DateOfManufacture = model.DateOfManufacture,
                     MadeIn = model.MadeIn,
@@ -397,7 +448,7 @@ namespace DTech.Application.Services
                 {
                     Success = true,
                     Message = "Product created successfully",
-                    Data = null
+                    Data = product.ProductId
                 };
             }
             catch (Exception ex)
@@ -417,6 +468,7 @@ namespace DTech.Application.Services
             {
                 Product product = new()
                 {
+                    ProductId = productId,
                     Name = model.Name,
                     Slug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-"),
                     Warranty = model.Warranty,
@@ -429,13 +481,16 @@ namespace DTech.Application.Services
                     InitialCost = model.InitialCost,
                     Price = model.Price,
                     Discount = model.Discount,
-                    PriceAfterDiscount = model.PriceAfterDiscount,
+                    PriceAfterDiscount = model.Discount > 0
+                        ? ((decimal)model.Price! - ((decimal)model.Price * ((decimal)model.Discount / 100)))
+                        : model.Price,
                     EndDateDiscount = model.EndDateDiscount,
                     DateOfManufacture = model.DateOfManufacture,
                     MadeIn = model.MadeIn,
                     Views = model.Views,
                     PromotionalGift = model.PromotionalGift,
                     Description = model.Description,
+                    Photo = model.Photo,
                     BrandId = model.BrandId,
                     CategoryId = model.CategoryId,
                     CreateDate = DateTime.UtcNow,
@@ -494,6 +549,170 @@ namespace DTech.Application.Services
                 {
                     Success = true,
                     Message = "Product updated successfully",
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new IndexResDto<object?>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<IndexResDto<object?>> UpdateProductSpecificationAsync(int productId, List<SpecificationDto> model, string? currentUserId)
+        {
+            try
+            {
+                var existingSpecs = await productRepo.GetSpecificationAsync(productId);
+                var existingSpecIds = existingSpecs.Select(s => s.SpecId).ToList();
+                var incomingSpecIds = model.Where(m => m.SpecId > 0).Select(m => m.SpecId).ToList();
+
+                // Delete removed specifications
+                var specsToDelete = existingSpecs
+                    .Where(s => !incomingSpecIds.Contains(s.SpecId))
+                    .ToList();
+
+                if (specsToDelete.Count != 0)
+                    await productRepo.DeleteSpecificationsAsync([.. specsToDelete.Select(i => i.SpecId)]);
+
+                foreach (var spec in model)
+                {
+                    var slug = spec.SpecName?.ToLower().Replace(" ", "-");
+                    if (spec.SpecId > 0)
+                    {
+                        // 🔹 Update existing specification
+                        var existingSpec = existingSpecs.FirstOrDefault(s => s.SpecId == spec.SpecId);
+                        if (existingSpec != null)
+                        {
+                            existingSpec.SpecName = spec.SpecName;
+                            existingSpec.Detail = spec.Detail;
+                            existingSpec.Slug = slug ?? existingSpec.Slug;
+                        }
+                    }
+                    else
+                    {
+                        var newSpec = new Specification
+                        {
+                            ProductId = productId,
+                            SpecName = spec.SpecName,
+                            Detail = spec.Detail,
+                            Slug = slug,
+                        };
+                        await productRepo.AddSpecificationAsync(newSpec);
+                    }
+                }
+
+                var result = await productRepo.SaveSpecificationsAsync();
+                if (!result) {
+                    return new IndexResDto<object?>
+                    {
+                        Success = true,
+                        Message = "Specifications updated failure.",
+                        Data = null
+                    };
+                }
+                return new IndexResDto<object?>
+                {
+                    Success = true,
+                    Message = "Specifications updated successfully.",
+                    Data = null
+                };
+            } catch (Exception ex)
+            {
+                return new IndexResDto<object?>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<IndexResDto<object?>> UpdateProductImageAsync(
+            int productId,
+            List<ProductImageDto> model,
+            string? currentUserId
+        )
+        {
+            try
+            {
+                // Get existing images
+                var existingImages = await productRepo.GetImageAsync(productId);
+                var existingImageIds = existingImages.Select(i => i.ImageId).ToList();
+                var incomingImageIds = model.Where(m => m.ImageId > 0).Select(m => m.ImageId).ToList();
+
+                // Delete removed images in batch
+                var imagesToDelete = existingImages
+                    .Where(i => !incomingImageIds.Contains(i.ImageId))
+                    .ToList();
+
+                if (imagesToDelete.Count != 0)
+                    await productRepo.DeleteImagesAsync([.. imagesToDelete.Select(i => i.ImageId)]);
+
+                // Prepare tasks for new or updated images
+                var uploadTasks = model.Select(async img =>
+                {
+                    if (img.ImageUpload != null && img.ImageUpload.Length > 0)
+                    {
+                        // If existing, replace
+                        if (img.ImageId > 0)
+                        {
+                            var existingImage = existingImages.FirstOrDefault(i => i.ImageId == img.ImageId);
+                            if (existingImage != null)
+                            {
+                                string newUrl = await cloudinaryService.ChangeImageAsync(
+                                    oldfile: existingImage.Image ?? string.Empty,
+                                    newfile: img.ImageUpload,
+                                    filepath: folderName
+                                );
+                                existingImage.Image = newUrl;
+                            }
+                        }
+                        else
+                        {
+                            // New image
+                            string newUrl = await cloudinaryService.UploadImageAsync(
+                                img.ImageUpload,
+                                folderName
+                            );
+                            return new ProductImage
+                            {
+                                ProductId = productId,
+                                Image = newUrl
+                            };
+                        }
+                    }
+                    return null;
+                });
+
+                // Wait for all uploads in parallel
+                var uploadedImages = (await Task.WhenAll(uploadTasks))
+                    .OfType<ProductImage>()
+                    .ToList();
+
+                // Add new uploaded images in batch
+                if (uploadedImages.Count != 0)
+                    await productRepo.AddImagesAsync(uploadedImages);
+
+                // Save everything once
+                var result = await productRepo.SaveImagesAsync();
+
+                if (!result)
+                    return new IndexResDto<object?>
+                    {
+                        Success = false,
+                        Message = "Image update failed.",
+                        Data = null
+                    };
+
+                return new IndexResDto<object?>
+                {
+                    Success = true,
+                    Message = "Images updated successfully.",
                     Data = null
                 };
             }

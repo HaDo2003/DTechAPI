@@ -1,6 +1,6 @@
 ﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
-using DTech.Application.DTOs.response.admin;
+using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
 using DTech.Domain.Entities;
 
@@ -20,9 +20,13 @@ namespace DTech.Application.Interfaces
 
         // For Admin
         Task<IndexResDto<List<ProductIndexDto>>> GetProductsAsync();
-        Task<IndexResDto<ProductDetailDto>> GetProductDetailAsync(int productId);
-        Task<IndexResDto<object?>> CreateProductAsync(ProductDetailDto model, string? currentUserId);
+        Task<IndexResDto<ProductResDto>> GetProductDetailAsync(int productId);
+        Task<List<SelectResDto>> GetCategoriesAsync();
+        Task<List<SelectResDto>> GetBrandsAsync();
+        Task<IndexResDto<object?>> CreateProductAsync(ProductDetailDto? model, string? currentUserId);
         Task<IndexResDto<object?>> UpdateProductAsync(int productId, ProductDetailDto model, string? currentUserId);
+        Task<IndexResDto<object?>> UpdateProductSpecificationAsync(int productId, List<SpecificationDto> model, string? currentUserId);
+        Task<IndexResDto<object?>> UpdateProductImageAsync(int productId, List<ProductImageDto> model, string? currentUserId);
         Task<IndexResDto<object?>> DeleteProductAsync(int productId);
     }
 }

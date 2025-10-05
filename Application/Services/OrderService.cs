@@ -1,8 +1,6 @@
-﻿using DTech.Application.DTOs.response.admin;
-using DTech.Application.DTOs.response.admin.advertisement;
+﻿using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Order;
 using DTech.Application.Interfaces;
-using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
 
 namespace DTech.Application.Services

@@ -1,5 +1,5 @@
 ﻿using DTech.API.Helper;
-using DTech.Application.DTOs.response.admin.admin;
+using DTech.Application.DTOs.Response.Admin.Admin;
 using DTech.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

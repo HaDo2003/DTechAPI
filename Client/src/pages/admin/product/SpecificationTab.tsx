@@ -1,14 +1,27 @@
 import React, { useState } from "react";
-import type { ProductForm } from "../../../types/Product";
 import type { Specification } from "../../../types/Specification";
+import { adminService } from "../../../services/AdminService";
 
 interface Props {
     productId: number | string;
+    token: string;
     specifications: Specification[];
-    setForm: React.Dispatch<React.SetStateAction<ProductForm>>;
+    mode: "create" | "edit";
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    setAlert: React.Dispatch<React.SetStateAction<{ message: string; type: "success" | "error" | "info" } | null>>;
+    onChange: (updatedForm: Specification[]) => void;
 }
 
-const SpecificationTab: React.FC<Props> = ({ productId, specifications, setForm }) => {
+const SpecificationTab: React.FC<Props> = ({
+    productId,
+    token,
+    specifications: initialSpecs,
+    mode,
+    setLoading,
+    setAlert,
+    onChange
+}) => {
+    const [specifications, setSpecifications] = useState<Specification[]>(initialSpecs);
     const [newSpec, setNewSpec] = useState<Specification>({
         specId: 0,
         specName: "",
@@ -18,28 +31,20 @@ const SpecificationTab: React.FC<Props> = ({ productId, specifications, setForm 
     const handleChangeSpec = (index: number, field: keyof Specification, value: string) => {
         const updatedSpecs = [...specifications];
         updatedSpecs[index] = { ...updatedSpecs[index], [field]: value };
-
-        setForm(prev => ({
-            ...prev,
-            specifications: updatedSpecs,
-        }));
+        setSpecifications(updatedSpecs);
+        onChange(updatedSpecs);
     };
 
     const handleAddSpec = () => {
         if (!newSpec.specName || !newSpec.detail) {
-            alert("Please enter both Specification Name and Detail.");
+            setAlert({ message: "Please enter both Specification Name and Detail.", type: "error" });
             return;
         }
 
         const updatedSpecs = [...specifications, { ...newSpec }];
-
-        setForm(prev => ({
-            ...prev,
-            specifications: updatedSpecs,
-        }));
-
-        // reset input
+        setSpecifications(updatedSpecs);
         setNewSpec({ specId: 0, specName: "", detail: "" });
+        onChange(updatedSpecs);
     };
 
     const handleRemoveSpec = (index: number) => {
@@ -47,15 +52,29 @@ const SpecificationTab: React.FC<Props> = ({ productId, specifications, setForm 
 
         const updatedSpecs = [...specifications];
         updatedSpecs.splice(index, 1);
+        setSpecifications(updatedSpecs);
+        onChange(updatedSpecs);
+    };
 
-        setForm(prev => ({
-            ...prev,
-            specifications: updatedSpecs,
-        }));
+    const handleSubmitSpecifications = async () => {
+        setLoading(true);
+        const res = await adminService.updateData(
+            "/api/product/update-specs",
+            productId.toString(),
+            specifications,
+            token ?? ""
+        );
+        setLoading(false);
+
+        if (res.success) {
+            setAlert({ message: "Specifications updated successfully!", type: "success" });
+        } else {
+            setAlert({ message: res.message || "Failed to update specifications!", type: "error" });
+        }
     };
 
     return (
-        <div>
+        <form onSubmit={handleSubmitSpecifications}>
             <table className="table">
                 <thead>
                     <tr>
@@ -141,7 +160,18 @@ const SpecificationTab: React.FC<Props> = ({ productId, specifications, setForm 
                     </div>
                 </div>
             </div>
-        </div>
+
+            {mode === "edit" && (
+                <>
+                    {/* Save button */}
+                    <div className="mt-3">
+                        <button className="btn btn-primary" type="button" onClick={handleSubmitSpecifications}>
+                            <i className="fa-solid fa-floppy-disk fa-sm"></i>Save Specifications
+                        </button>
+                    </div>
+                </>
+            )}
+        </form>
     );
 };
 

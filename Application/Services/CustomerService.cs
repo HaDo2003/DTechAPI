@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
-using DTech.Application.DTOs.response.admin;
-using DTech.Application.DTOs.response.admin.advertisement;
+using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Customer;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;

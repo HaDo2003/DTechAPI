@@ -102,5 +102,13 @@ namespace DTech.Infrastructure.Repositories
             else
                 return (false, "Failed to delete brand");
         }
+        public async Task<List<Brand>?> GetAvailableBrandsAsync()
+        {
+            return await context.Brands
+                .AsNoTracking()
+                .Where(c => c.Status == StatusEnums.Available)
+                .OrderBy(c => c.BrandId)
+                .ToListAsync();
+        }
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace DTech.Application.DTOs.Response.Admin.Category
+﻿namespace DTech.Application.DTOs.Response.Admin
 {
-    public class ParentResDto
+    public class SelectResDto
     {
         public int Id { get; set; }
         public string? Name { get; set; }

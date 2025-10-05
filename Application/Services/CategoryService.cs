@@ -1,4 +1,4 @@
-﻿using DTech.Application.DTOs.response.admin;
+﻿using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Category;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
@@ -216,7 +216,7 @@ namespace DTech.Application.Services
             }
         }
 
-        public async Task<List<ParentResDto>> GetParentsAsync()
+        public async Task<List<SelectResDto>> GetParentsAsync()
         {
             var parent = await categoryRepo.GetAllCategoriesAsync();
             if (parent == null || parent.Count == 0)
@@ -224,7 +224,7 @@ namespace DTech.Application.Services
                 return [];
             }
 
-            var parentDtos = parent.Select(par => new ParentResDto
+            var parentDtos = parent.Select(par => new SelectResDto
             {
                 Id = par.CategoryId,
                 Name = par.Name,

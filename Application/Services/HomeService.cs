@@ -9,8 +9,8 @@ namespace DTech.Application.Services
     public class HomeService(
         IAdvertisementRepository advertisementRepo,
         IProductRepository productRepo,
-        ICategoryRepository categoryRepo,
-        IMapper _mapper) : IHomeService
+        ICategoryRepository categoryRepo
+    ) : IHomeService
     {
         public async Task<object> GetHomePageDataAsync()
         {
@@ -52,7 +52,7 @@ namespace DTech.Application.Services
             if (categoryId == null)
                 return [];
 
-            return await productRepo.GetProductsByCategoryIdAsync(new List<int> { categoryId.Value });
+            return await productRepo.GetProductsByCategoryIdAsync([categoryId.Value]);
         }
 
         private static Task<List<ProductDto>> MapProductsToDto(List<Product> products)

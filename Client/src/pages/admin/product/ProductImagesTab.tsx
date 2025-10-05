@@ -1,78 +1,98 @@
-import React, { useState, type ChangeEvent } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import type { ProductImage } from "../../../types/ProductImage";
+import { adminService } from "../../../services/AdminService";
 
 interface Props {
     productId: number | string;
+    token: string;
     productImages: ProductImage[];
+    mode: "create" | "edit";
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    setAlert: React.Dispatch<React.SetStateAction<{ message: string; type: "success" | "error" | "info" } | null>>;
+    onChange: (updatedForm: ProductImage[]) => void;
 }
 
-const ProductImagesTab: React.FC<Props> = ({ productId, productImages }) => {
+const ProductImagesTab: React.FC<Props> = ({
+    productId,
+    token,
+    productImages,
+    mode,
+    setLoading,
+    setAlert,
+    onChange
+}) => {
     const [images, setImages] = useState<ProductImage[]>(productImages);
-    const [newImage, setNewImage] = useState<File | null>(null);
     const maxImages = 4;
 
     // Handle preview of new file
-    const handleNewImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setNewImage(e.target.files[0]);
-        }
+    const handleChangeImage = (index: number, file: File) => {
+        const updated = [...images];
+        updated[index] = {
+            ...updated[index],
+            image: URL.createObjectURL(file),
+            imageUpload: file,
+        };
+        setImages(updated);
+        onChange(updated);
     };
 
     // Add new image to list
-    const handleAddImage = () => {
-        if (!newImage) {
-            alert("Please select an image.");
+    const handleAddImage = (file: File) => {
+        if (images.length >= maxImages) {
+            setAlert({ message: `Maximum ${maxImages} images allowed`, type: "error" });
             return;
         }
 
-        const newImageDto: ProductImage = {
+        const newImage: ProductImage = {
             imageId: 0,
-            image: URL.createObjectURL(newImage),
-            imageUpload: newImage,
+            image: URL.createObjectURL(file),
+            imageUpload: file,
         };
-
-        setImages([...images, newImageDto]);
-        setNewImage(null);
+        setImages([...images, newImage]);
+        onChange([...images, newImage]);
     };
 
-    // Remove image (also call backend)
-    const handleRemoveImage = async (imageId: number) => {
+    const handleRemoveImage = (index: number) => {
         if (!window.confirm("Are you sure you want to delete this image?")) return;
 
-        try {
-            const response = await axios.post("/Products/RemoveImage", { imageId });
-            if (response.data.success) {
-                setImages(images.filter((img) => img.imageId !== imageId));
-            } else {
-                alert(response.data.message);
-            }
-        } catch (err) {
-            alert("Error deleting image.");
-        }
+        setImages(images.filter((_, i) => i !== index));
+        onChange(images.filter((_, i) => i !== index));
     };
 
-    // Submit form with images
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
 
         const formData = new FormData();
-        formData.append("productId", productId.toString());
 
-        images.forEach((img, index) => {
-            formData.append(`ProductImages[${index}].ImageId`, img.imageId.toString());
-            if (img.imageUpload) {
-                formData.append(`ProductImages[${index}].ImageUpload`, img.imageUpload);
+        images.forEach((img) => {
+            if (img.imageId) {
+                // Existing image, maybe replacing file
+                formData.append("ImageIds", img.imageId.toString());
+                formData.append("ImageUploads", img.imageUpload ?? new Blob());
+            } else if (img.imageUpload) {
+                // New image
+                formData.append("NewUploads", img.imageUpload);
             }
         });
 
         try {
-            await axios.post("/Products/SaveImages", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            alert("Images saved successfully!");
+            const res = await adminService.updateImageData(
+                "/api/product/update-images",
+                productId.toString(),
+                formData,
+                token ?? ""
+            );
+
+            if (res.success) {
+                setAlert({ message: "Images updated successfully!", type: "success" });
+            } else {
+                setAlert({ message: res.message || "Failed to update images!", type: "error" });
+            }
         } catch (err) {
-            alert("Error saving images.");
+            setAlert({ message: "Error updating images!", type: "error" });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -139,41 +159,31 @@ const ProductImagesTab: React.FC<Props> = ({ productId, productImages }) => {
             {/* New image upload row */}
             {images.length < maxImages && (
                 <div className="row ps-2 mb-3">
-                    <div className="col-2">
-                        {newImage && (
-                            <img
-                                alt=""
-                                src={URL.createObjectURL(newImage)}
-                                className="img-thumbnail"
-                                style={{ maxWidth: "150px", maxHeight: "150px" }}
-                            />
-                        )}
-                    </div>
-                    <div className="col-3">
+                    <div className="col-5">
                         <input
                             type="file"
-                            className="form-control-file"
                             accept="image/*"
-                            onChange={handleNewImageChange}
+                            className="form-control"
+                            onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                    handleAddImage(e.target.files[0]);
+                                }
+                            }}
                         />
-                    </div>
-                    <div className="col-7">
-                        <button
-                            type="button"
-                            className="btn btn-success"
-                            onClick={handleAddImage}
-                        >
-                            <i className="fa-solid fa-plus"></i>
-                        </button>
                     </div>
                 </div>
             )}
-
-            <button type="submit" className="btn btn-primary mt-3">
-                <i className="fa-solid fa-floppy-disk fa-sm"></i> Save
-            </button>
+            {mode === "edit" && (
+                <>
+                    {/* Save button */}
+                    <div className="mt-3">
+                        <button type="submit" className="btn btn-primary mt-3">
+                            <i className="fa-solid fa-floppy-disk fa-sm"></i> Save Images
+                        </button>
+                    </div>
+                </>
+            )}
         </form>
-
     );
 };
 

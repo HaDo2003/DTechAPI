@@ -1,7 +1,7 @@
 ﻿using DTech.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 
-namespace DTech.Application.DTOs.response.admin.advertisement
+namespace DTech.Application.DTOs.Response.Admin.Advertisement
 {
     public class AdvertisementDetailDto
     {
