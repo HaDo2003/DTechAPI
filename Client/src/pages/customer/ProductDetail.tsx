@@ -23,6 +23,8 @@ import { useAuth } from "../../context/AuthContext";
 import { checkOutService } from "../../services/CheckOutService";
 import { useCart } from "../../context/CartContext";
 
+import ThreeDModelViewer from "../../components/customer/productDetail/ModelViewer";
+
 const ProductDetail: React.FC = () => {
     const { user, token } = useAuth();
     const { fetchCart } = useCart();
@@ -40,6 +42,7 @@ const ProductDetail: React.FC = () => {
     const [commentList, setCommentList] = useState<ProductCommentResponse[]>(product?.productComments ?? [])
     const [isSpecOpen, setIsSpecOpen] = useState(false);
     const RVData = useRecentlyViewed();
+    const [is3DViewOpen, setIs3DViewOpen] = useState(false);
 
     useEffect(() => {
         document.title = "DTech - Product Detail";
@@ -215,6 +218,20 @@ const ProductDetail: React.FC = () => {
                                 alt={product.name}
                             />
                         </div>
+                        <div className="text-center mt-2">
+                            <button
+                                className="btn btn-primary rounded-3 px-4"
+                                onClick={() => setIs3DViewOpen(true)}
+                            >
+                                <i className="fas fa-cube me-2"></i>
+                                View in 3D
+                            </button>
+                        </div>
+
+                        <ThreeDModelViewer
+                            isOpen={is3DViewOpen}
+                            onClose={() => setIs3DViewOpen(false)}
+                        />
 
                         {product.productImages && product.productImages.length > 0 && (
                             <div className="d-flex flex-wrap justify-content-center gap-2 mt-2">

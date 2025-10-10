@@ -6,7 +6,7 @@ import { GenericTable } from "../../components/admin/page/Column";
 import { adminService } from "../../services/AdminService";
 import { useAuth } from "../../context/AuthContext";
 import Loading from "../../components/shared/Loading";
-import CardWrapped from "./CardWrapped";
+import CardWrapped from "../../components/admin/CardWrapped";
 import AlertForm from "../../components/customer/AlertForm";
 
 const ManagementPage: React.FC = () => {

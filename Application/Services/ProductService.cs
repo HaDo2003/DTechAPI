@@ -7,6 +7,7 @@ using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
 
@@ -37,7 +38,7 @@ namespace DTech.Application.Services
                 var product = await productRepo.GetBySlugAsync(slug, category.CategoryId, brand.BrandId)
                     ?? throw new Exception($"Product with slug '{slug}' not found in category '{category.Name}' and brand '{brand.Name}'.");
 
-                var relatedProducts = await productRepo.GetRelatedProductsAsync(product.ProductId, brand.BrandId);
+                var relatedProducts = await productRepo.GetRelatedProductsAsync(brand.BrandId, product.ProductId);
 
                 await productRepo.IncrementProductViewsAsync(product.ProductId);
 
@@ -754,6 +755,41 @@ namespace DTech.Application.Services
                 {
                     Success = false,
                     Message = $"An error occurred: {ex.Message}",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<IndexResDto<object?>> UploadGlbAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return new IndexResDto<object?>()
+                {
+                    Success = false,
+                    Message = "No file provided",
+                    Data = null
+                };
+            }
+
+            try
+            {
+                // Call Cloudinary service
+                string url = await cloudinaryService.UploadGlbAsync(file, "Pre-thesis/Product/3DModel");
+
+                return new IndexResDto<object?>()
+                {
+                    Success = true,
+                    Message = "File uploaded successfully",
+                    Data = new { Url = url }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new IndexResDto<object?>()
+                {
+                    Success = false,
+                    Message = $"Upload failed: {ex.Message}",
                     Data = null
                 };
             }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { adminService } from "../../../services/AdminService";
 import { useAuth } from "../../../context/AuthContext";
-import CardWrapped from "../CardWrapped";
+import CardWrapped from "../../../components/admin/CardWrapped";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
 import { type ProductFormProp } from "../../../types/Product";

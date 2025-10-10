@@ -25,16 +25,16 @@ const ProductImagesTab: React.FC<Props> = ({
     const maxImages = 4;
 
     // Handle preview of new file
-    const handleChangeImage = (index: number, file: File) => {
-        const updated = [...images];
-        updated[index] = {
-            ...updated[index],
-            image: URL.createObjectURL(file),
-            imageUpload: file,
-        };
-        setImages(updated);
-        onChange(updated);
-    };
+    // const handleChangeImage = (index: number, file: File) => {
+    //     const updated = [...images];
+    //     updated[index] = {
+    //         ...updated[index],
+    //         image: URL.createObjectURL(file),
+    //         imageUpload: file,
+    //     };
+    //     setImages(updated);
+    //     onChange(updated);
+    // };
 
     // Add new image to list
     const handleAddImage = (file: File) => {

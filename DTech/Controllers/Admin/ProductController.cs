@@ -1,7 +1,9 @@
 ﻿using DTech.API.Helper;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
 using DTech.Application.Interfaces;
+using DTech.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +13,8 @@ namespace DTech.API.Controllers.Admin
     [Route("api/[controller]")]
     [Authorize(Roles = "Admin, Seller")]
     public class ProductController(
-        IProductService productService
+        IProductService productService,
+        ICloudinaryService cloudinaryService
     ) : ControllerBase
     {
         [HttpGet("get-products")]
@@ -227,6 +230,26 @@ namespace DTech.API.Controllers.Admin
             var response = await productService.DeleteProductAsync(id);
             return ControllerHelper.HandleResponse(response, this);
         }
-    }
 
+        [HttpPost("glb")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadGlb([FromForm] GlbReq request)
+        {
+            var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
+            var file = request.File;
+            if (file == null)
+                return BadRequest("No file uploaded");
+
+            try
+            {
+                await productService.UploadGlbAsync(file);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+    }
 }

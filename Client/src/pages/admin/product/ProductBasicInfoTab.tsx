@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import InputField from "../InputField";
+import InputField from "../../../components/admin/InputField";
 import { type ProductForm } from "../../../types/Product";
 import RichTextEditor from "../../../components/admin/TextEditor";
 import DOMPurify from "../../../utils/santitizeConfig";

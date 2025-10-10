@@ -101,6 +101,24 @@ namespace DTech.Infrastructure.Services
             }
         }
 
+        public async Task<string> UploadGlbAsync(IFormFile file, string folderName)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("No file provided");
+
+            using var stream = file.OpenReadStream();
+
+            var uploadParams = new RawUploadParams
+            {
+                File = new FileDescription(file.FileName, stream),
+                Folder = folderName,
+            };
+
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            return uploadResult.SecureUrl.ToString();
+        }
+
         private static string? ExtractPublicIdFromUrl(string url)
         {
             try

@@ -1,5 +1,5 @@
 import DOMPurify from "../../utils/santitizeConfig";
-import CardWrapped from "./CardWrapped";
+import CardWrapped from "../../components/admin/CardWrapped";
 
 interface DeletePageProps<T extends { id: string | number }> {
   entityName: string;
