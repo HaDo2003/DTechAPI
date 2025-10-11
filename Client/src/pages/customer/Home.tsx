@@ -3,8 +3,9 @@ import { getHomeData, type HomePageData } from "../../services/HomeService";
 import Slider from "../../components/customer/homepage/Slider";
 import ProductGrid from "../../components/customer/ProductGrid";
 import FeaturedCategory from "../../components/customer/homepage/FeaturedCategory";
-import Loading from "../../components/shared/Loading";
 import { useRecentlyViewed } from "../../utils/useRecentlyViewed";
+import SkeletonSlider from "../../components/customer/skeleton/SkeletonSlider";
+import SkeletonProductGrid from "../../components/customer/skeleton/SkeletonProductGrid";
 
 const HomePage: React.FC = () => {
   const [data, setData] = useState<HomePageData | null>(null);
@@ -21,22 +22,16 @@ const HomePage: React.FC = () => {
   return (
     <>
       <div>
-        {data && <Slider advertisements={data.advertisements} />}
-        {data && <ProductGrid products={data.hotProducts} Title="Hot Sales" />}
-        <FeaturedCategory />
-        {data && <ProductGrid products={data.laptopProducts} Title="Laptop" />}
-        {data && <ProductGrid products={data.smartphoneProducts} Title="Smart Phone" />}
-        {data && <ProductGrid products={data.tabletProducts} Title="Tablet" />}
-        {data && <ProductGrid products={data.accessoriesProducts} Title="Accessory" />}
-        {RVData.length > 0 && <ProductGrid products={RVData} Title="Recently Viewed Products" />}
-      </div>
-      {loading && (
-        <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
-          <Loading />
-        </div>
-      )}
+      {loading ? <SkeletonSlider /> : data && <Slider advertisements={data.advertisements} />}
+      {loading ? <SkeletonProductGrid /> : data && <ProductGrid products={data.hotProducts} Title="Hot Sales" />}
+      <FeaturedCategory />
+      {loading ? <SkeletonProductGrid /> : data && <ProductGrid products={data.laptopProducts} Title="Laptop" />}
+      {loading ? <SkeletonProductGrid /> : data && <ProductGrid products={data.smartphoneProducts} Title="Smart Phone" />}
+      {loading ? <SkeletonProductGrid /> : data && <ProductGrid products={data.tabletProducts} Title="Tablet" />}
+      {loading ? <SkeletonProductGrid /> : data && <ProductGrid products={data.accessoriesProducts} Title="Accessory" />}
+      {loading ? <SkeletonProductGrid /> : RVData.length > 0 && <ProductGrid products={RVData} Title="Recently Viewed Products" />}
+    </div>
     </>
-
   );
 };
 

@@ -20,6 +20,18 @@ import "admin-lte/dist/js/adminlte.min.js";
 // Apex Chart
 import "apexcharts/dist/apexcharts.css";
 
+// Swiper
+// @ts-ignore
+import "swiper/css";
+// @ts-ignore
+import "swiper/css/navigation";
+
+// Skeleton
+import 'react-loading-skeleton/dist/skeleton.css';
+
+// Inner Image Zoom
+import 'react-inner-image-zoom/lib/styles.min.css';
+
 //Provider
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext.ts';

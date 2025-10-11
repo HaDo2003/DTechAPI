@@ -4,8 +4,8 @@ import ProductCard from "../../components/customer/ProductCard";
 import { type Product } from "../../types/Product";
 import { type Brand } from "../../types/Brand";
 import { getCategoryProducts, getCategoryBrandProducts } from "../../services/CategoryService";
-import Loading from "../../components/shared/Loading";
 import NotFound from "./NotFound";
+import SkeletonCategoryGrid from "../../components/customer/skeleton/SkeletonCategoryGrid";
 
 const CategoryPage: React.FC = () => {
     const navigate = useNavigate();
@@ -76,75 +76,71 @@ const CategoryPage: React.FC = () => {
 
     return (
         <>
-            <div className="container">
-                <div className="d-flex align-items-center justify-content-center">
-                    <h2>{title}</h2>
-                </div>
+            <>
+                {loading ? (
+                    <SkeletonCategoryGrid />
+                ) : (
+                    <div className="container">
+                        <div className="d-flex align-items-center justify-content-center">
+                            <h2>{title}</h2>
+                        </div>
 
-                {/* Brand Logos */}
-                {brands.length > 0 && (
-                    <div className="container my-4">
-                        <div className="category-nav">
-                            <div className="row text-center">
-                                {brands.map((brand) => (
-                                    <div className="col" key={brand.slug}>
-                                        <Link
-                                            to={`/${categorySlug}/${brand.slug}`}
-                                            className="category-item"
-                                        >
-                                            <div className="icon-container">
-                                                <img
-                                                    src={brand.logo}
-                                                    className="card-img-top p-1 w-100 mx-auto d-block"
-                                                    alt={brand.name}
-                                                />
+                        {brands.length > 0 && (
+                            <div className="container my-4">
+                                <div className="category-nav">
+                                    <div className="row text-center">
+                                        {brands.map((brand) => (
+                                            <div className="col" key={brand.slug}>
+                                                <Link
+                                                    to={`/${categorySlug}/${brand.slug}`}
+                                                    className="category-item"
+                                                >
+                                                    <div className="icon-container">
+                                                        <img
+                                                            src={brand.logo}
+                                                            className="card-img-top p-1 w-100 mx-auto d-block"
+                                                            alt={brand.name}
+                                                        />
+                                                    </div>
+                                                </Link>
                                             </div>
-                                        </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="d-flex flex-wrap gap-2 px-3 mb-4">
+                            <h4>Sort By: </h4>
+                            {sortOptions.map(({ label, value }) => (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    onClick={() => handleSortChange(value)}
+                                    className={`btn btn-custom ${sortOrder === value ? "btn-active" : "btn-outline-secondary"
+                                        }`}
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="position-relative">
+                            <div
+                                id="product-list"
+                                className="ps-lg-3 row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xl-5 row-cols-xxl-5 g-md-1 g-lg-0 g-xxl-2"
+                            >
+                                {products.map((product) => (
+                                    <div className="col" key={product.productId}>
+                                        <ProductCard product={product} />
                                     </div>
                                 ))}
                             </div>
                         </div>
                     </div>
                 )}
-
-                {/* Sort Options */}
-                <div className="d-flex flex-wrap gap-2 px-3 mb-4">
-                    <h4>Sort By: </h4>
-                    {sortOptions.map(({ label, value }) => (
-                        <button
-                            key={value}
-                            type="button"
-                            onClick={() => handleSortChange(value)}
-                            className={`btn btn-custom ${sortOrder === value ? "btn-active" : "btn-outline-secondary"}`}
-                        >
-                            {label}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Products */}
-                <div className="position-relative">
-                    <div
-                        id="product-list"
-                        className="ps-lg-3 row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xl-5 row-cols-xxl-5 g-md-1 g-lg-0 g-xxl-2"
-                    >
-                        {products.map((product) => (
-                            <div className="col" key={product.productId}>
-                                <ProductCard product={product} />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-            {
-                loading && (
-                    <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
-                        <Loading />
-                    </div>
-                )
-            }
+            </>
         </>
-
     );
 };
 

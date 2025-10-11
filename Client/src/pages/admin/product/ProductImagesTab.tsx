@@ -22,7 +22,6 @@ const ProductImagesTab: React.FC<Props> = ({
     onChange
 }) => {
     const [images, setImages] = useState<ProductImage[]>(productImages);
-    const maxImages = 4;
 
     // Handle preview of new file
     // const handleChangeImage = (index: number, file: File) => {
@@ -38,10 +37,6 @@ const ProductImagesTab: React.FC<Props> = ({
 
     // Add new image to list
     const handleAddImage = (file: File) => {
-        if (images.length >= maxImages) {
-            setAlert({ message: `Maximum ${maxImages} images allowed`, type: "error" });
-            return;
-        }
 
         const newImage: ProductImage = {
             imageId: 0,
@@ -157,22 +152,21 @@ const ProductImagesTab: React.FC<Props> = ({
             </table>
 
             {/* New image upload row */}
-            {images.length < maxImages && (
-                <div className="row ps-2 mb-3">
-                    <div className="col-5">
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="form-control"
-                            onChange={(e) => {
-                                if (e.target.files && e.target.files[0]) {
-                                    handleAddImage(e.target.files[0]);
-                                }
-                            }}
-                        />
-                    </div>
+            <div className="row ps-2 mb-3">
+                <div className="col-5">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        className="form-control"
+                        onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                                handleAddImage(e.target.files[0]);
+                            }
+                        }}
+                    />
                 </div>
-            )}
+            </div>
+
             {mode === "edit" && (
                 <>
                     {/* Save button */}

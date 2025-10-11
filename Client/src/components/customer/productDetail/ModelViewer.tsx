@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, Html } from '@react-three/drei';
-import Model from '../3d/model';
+import Model from '../3d/Model';
 
 interface ThreeDModelViewerProps {
   isOpen: boolean;

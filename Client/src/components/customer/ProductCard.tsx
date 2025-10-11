@@ -12,7 +12,10 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const formattedFinalPrice = priceFormatter(product.priceAfterDiscount);
     const formattedOriginalPrice = priceFormatter(product.price);
-    const discountPercent = product.discount?.toFixed(0);
+    const discountPercent =
+        product.discount && product.discount > 0
+            ? Math.round(product.discount)
+            : 0;
     const categorySlug = product.category.slug;
     const brandSlug = product.brand.slug;
     const handleView = () => {
@@ -42,6 +45,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                         className="card-img-top p-1 w-100 mx-auto d-block"
                         alt={product.name}
                     />
+                </div>
+
+                <div className="overlay-buttons d-flex flex-column gap-2">
+                    <button
+                        className="btn-preview"
+                        onClick={(e) => { e.preventDefault(); alert("Preview clicked!"); }}
+                    >
+                        <i className="fas fa-eye"></i>
+                    </button>
+                    <button
+                        className="btn-wishlist-card"
+                        onClick={(e) => { e.preventDefault(); alert("Added to wishlist!"); }}
+                    >
+                        <i className="fas fa-heart"></i>
+                    </button>
                 </div>
 
                 <div className="card-body p-2">

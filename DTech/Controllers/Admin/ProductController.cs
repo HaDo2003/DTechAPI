@@ -3,7 +3,6 @@ using DTech.Application.DTOs.response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
 using DTech.Application.Interfaces;
-using DTech.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,8 +12,7 @@ namespace DTech.API.Controllers.Admin
     [Route("api/[controller]")]
     [Authorize(Roles = "Admin, Seller")]
     public class ProductController(
-        IProductService productService,
-        ICloudinaryService cloudinaryService
+        IProductService productService
     ) : ControllerBase
     {
         [HttpGet("get-products")]

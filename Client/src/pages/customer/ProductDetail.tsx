@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { productService } from "../../services/ProductService";
 import { type Product } from "../../types/Product";
 import { priceFormatter } from "../../utils/priceFormatter";
 import DOMPurify from "dompurify";
 import NotFound from "./NotFound";
+import InnerImageZoom from 'react-inner-image-zoom';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
 
 // Components
 import ProductGrid from "../../components/customer/ProductGrid";
 import SpecificationsWindow from "../../components/customer/productDetail/SpecificationsWindow";
 import ProductCommentForm from "../../components/customer/productDetail/ProductCommentForm";
 import ProductInfoItem from "../../components/customer/productDetail/ProductInfoItem";
-import Loading from "../../components/shared/Loading";
 import AlertForm from "../../components/customer/AlertForm";
 
 // Service
@@ -24,6 +26,7 @@ import { checkOutService } from "../../services/CheckOutService";
 import { useCart } from "../../context/CartContext";
 
 import ThreeDModelViewer from "../../components/customer/productDetail/ModelViewer";
+import SkeletonProductDetail from "../../components/customer/skeleton/SkeletonProductDetail";
 
 const ProductDetail: React.FC = () => {
     const { user, token } = useAuth();
@@ -43,6 +46,7 @@ const ProductDetail: React.FC = () => {
     const [isSpecOpen, setIsSpecOpen] = useState(false);
     const RVData = useRecentlyViewed();
     const [is3DViewOpen, setIs3DViewOpen] = useState(false);
+    const swiperRef = useRef<any>(null);
 
     useEffect(() => {
         document.title = "DTech - Product Detail";
@@ -67,7 +71,7 @@ const ProductDetail: React.FC = () => {
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
-                <Loading />
+                return <SkeletonProductDetail />;
             </div>
         );
     }
@@ -206,21 +210,80 @@ const ProductDetail: React.FC = () => {
                     {/* LEFT: Product Image */}
                     <div className="col-12 col-lg-5 d-flex flex-column justify-content-center position-relative">
                         {product.discount > 0 && (
-                            <div className="position-absolute end-0 top-0 mx-3 my-2">
+                            <div className="position-absolute end-0 top-0 mx-3 my-2" style={{ zIndex: 10 }}>
                                 <span className="badge bg-danger rounded-pill fs-5 px-3 py-2">-{discountPercent}%</span>
                             </div>
                         )}
                         <div className="border rounded shadow-sm p-2 mb-2 bg-white d-flex justify-content-center align-items-center main-div-img-size">
-                            <img
-                                id="mainProductImage"
+                            <InnerImageZoom
                                 src={mainImage}
-                                className="img-fluid rounded main-img"
-                                alt={product.name}
+                                zoomSrc={mainImage}
+                                zoomType="hover"
+                                zoomScale={1.8}
+                                className="main-img rounded"
+                                hideHint={true}
+                                hasSpacer={true}
                             />
                         </div>
+
+                        {product.productImages && product.productImages.length > 0 && (
+                            <div className="mt-2 position-relative">
+                                <Swiper
+                                    modules={[Navigation]}
+                                    spaceBetween={1}
+                                    slidesPerView={6}
+                                    navigation={{
+                                        nextEl: ".swiper-button-next-custom",
+                                        prevEl: ".swiper-button-prev-custom",
+                                    }}
+                                    grabCursor
+                                    className="thumbnail-slider"
+                                    onSwiper={(swiper) => (swiperRef.current = swiper)}
+                                >
+                                    {/* Main product photo first */}
+                                    <SwiperSlide key="main-photo">
+                                        <div className="border rounded p-1 sub-div-img">
+                                            <img
+                                                src={product.photo}
+                                                alt={product.name}
+                                                className="rounded thumbnail-img cursor-pointer"
+                                                onClick={() => handleImageClick(product.photo)}
+                                            />
+                                        </div>
+                                    </SwiperSlide>
+
+                                    {/* Other images */}
+                                    {product.productImages.map((image, index) => (
+                                        <SwiperSlide key={image.imageId}>
+                                            <div className="border rounded p-1 sub-div-img">
+                                                <img
+                                                    src={image.image}
+                                                    alt={`Image ${image.imageId}`}
+                                                    className="rounded thumbnail-img cursor-pointer"
+                                                    onClick={() => {
+                                                        handleImageClick(image.image);
+                                                        swiperRef.current?.slideTo(index);
+                                                    }}
+                                                />
+                                            </div>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+
+                                {/* Small Navigation Buttons */}
+                                <div className="swiper-button-prev-custom d-flex justify-content-center align-items-center">
+                                    <i className="fa-solid fa-chevron-left"></i>
+                                </div>
+
+                                <div className="swiper-button-next-custom d-flex justify-content-center align-items-center">
+                                    <i className="fa-solid fa-chevron-right"></i>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="text-center mt-2">
                             <button
-                                className="btn btn-primary rounded-3 px-4"
+                                className="btn-3d-view d-flex align-items-center justify-content-center"
                                 onClick={() => setIs3DViewOpen(true)}
                             >
                                 <i className="fas fa-cube me-2"></i>
@@ -232,29 +295,6 @@ const ProductDetail: React.FC = () => {
                             isOpen={is3DViewOpen}
                             onClose={() => setIs3DViewOpen(false)}
                         />
-
-                        {product.productImages && product.productImages.length > 0 && (
-                            <div className="d-flex flex-wrap justify-content-center gap-2 mt-2">
-                                <div className="border rounded p-1 sub-div-img">
-                                    <img
-                                        src={product.photo}
-                                        alt={product.name}
-                                        className="rounded thumbnail-img cursor-pointer"
-                                        onClick={() => handleImageClick(product.photo)}
-                                    />
-                                </div>
-                                {product.productImages.map((image) => (
-                                    <div key={image.imageId} className="border rounded p-1 sub-div-img">
-                                        <img
-                                            src={image.image}
-                                            alt={`Image ${image.imageId}`}
-                                            className="rounded thumbnail-img cursor-pointer"
-                                            onClick={() => handleImageClick(image.image)}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
                     {/* RIGHT: Product Details */}
@@ -328,6 +368,12 @@ const ProductDetail: React.FC = () => {
 
                                 <button type="button" className="btn-add-to-cart" onClick={handleAddToCart}>
                                     <i className="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+
+                                <button type="button" className="btn-wishlist" onClick={() =>
+                                    setAlert({ message: "Added to wishlist!", type: "success" })
+                                }>
+                                    <i className="fas fa-heart"></i>
                                 </button>
                             </div>
 
