@@ -256,6 +256,70 @@ namespace DTech.Infrastructure.Repositories
             return false;
         }
 
+        // For wishlist table
+        public async Task<bool> CheckWishlistAsync(string customerId, int productId)
+        {
+            return await context.WishLists.AnyAsync(w => w.CustomerId == customerId && w.ProductId == productId);
+        }
+        public async Task<bool> AddProductToWishlistAsync(string? customerId, int? productId)
+        {
+            if(customerId != null && productId != null)
+            {
+                WishList wl = new()
+                {
+                    CustomerId = customerId,
+                    ProductId = productId,
+                };
+                context.WishLists.Add(wl);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<List<WishList>> GetAllWishlistByCustomerIdAync(string? customerId)
+        {
+            if (customerId == null)
+                return [];
+
+            return await context.WishLists.
+                Where(w => w.CustomerId == customerId)
+                .OrderByDescending(w => w.WishListId)
+                .ToListAsync();
+        }
+
+        public async Task<bool> RemoveProductFromWishlistAsync(string? customerId, int? productId)
+        {
+            if(customerId == null || productId == null)
+                return false;
+
+            var wishlist = await context
+                .WishLists
+                .FirstOrDefaultAsync(w => w.CustomerId == customerId && w.ProductId == productId);
+
+            if (wishlist != null)
+            {
+                try
+                {
+                    context.WishLists.Remove(wishlist);
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return false;
+                }
+                catch (DbUpdateException)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         // For Search History
         public async Task SaveSearchHistory(string customerId, string query)
         {

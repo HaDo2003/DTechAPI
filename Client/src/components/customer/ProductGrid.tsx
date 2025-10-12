@@ -1,7 +1,9 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ProductCard from "./ProductCard";
 import { type Product } from "../../types/Product";
 import { Link } from "react-router-dom";
+import { customerService } from "../../services/CustomerService";
+import { useAuth } from "../../context/AuthContext";
 
 interface ProductGridProps {
     products: Product[];
@@ -9,6 +11,8 @@ interface ProductGridProps {
 }
 
 const ProductGrid: React.FC<ProductGridProps> = ({ products, Title }) => {
+    const { token } = useAuth();
+    const [wishlistIds, setWishlistIds] = useState<number[]>([]);
 
     const sliderId = `slider_${crypto.randomUUID().replace(/-/g, "")}`;
     const sliderRef = useRef<HTMLDivElement>(null);
@@ -36,6 +40,24 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, Title }) => {
             sliderRef.current.scrollBy({ left: 300, behavior: "smooth" });
         }
     };
+
+    const fetchWishlist = async () => {
+        if (!token) return;
+        try {
+            const res = await customerService.getWishlists<{ productId: number }>(token);
+            if (res.success && res.data) {
+                setWishlistIds(res.data.map((w) => w.productId));
+            } else {
+                setWishlistIds([]);
+            }
+        } catch {
+            setWishlistIds([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchWishlist();
+    }, [token]);
 
     return (
         <div className={sectionClass}>
@@ -72,7 +94,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, Title }) => {
                 >
                     {products.slice(0, 10).map((product) => (
                         <div key={product.productId} className="slider-item flex-shrink-0">
-                            <ProductCard product={product} />
+                            <ProductCard
+                                product={product}
+                                wishlists={wishlistIds}
+                                onWishlistChange={fetchWishlist}
+                            />
                         </div>
                     ))}
                 </div>

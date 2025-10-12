@@ -1,6 +1,8 @@
 ﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
+using DTech.Application.Services;
+using DTech.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -70,9 +72,27 @@ namespace DTech.API.Controllers
                 Brands = null,
                 InitialSort = sortOrder ?? "default",
                 CategorySlug = categorySlug,
-                //BrandSlug = brandSlug
             };
             return Ok(result);
+        }
+
+        [HttpGet("all-products")]
+        public async Task<IActionResult> GetAllProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 15, [FromQuery] string? sortOrder = "newest")
+        {
+            var products = await productService.GetAllProductsAsync(page, pageSize, sortOrder);
+            if (products == null || products.Products.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(new
+            {
+                title = "All Products",
+                products = products.Products,
+                brands = products.Brands,
+                totalPages = products.TotalPages,
+                totalItems = products.TotalItems
+            });
         }
 
         [HttpGet("recentlyView")]

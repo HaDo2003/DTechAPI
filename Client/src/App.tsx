@@ -53,6 +53,7 @@ import PostCategoryFormPage from "./pages/admin/post-category/PostCategoryFormPa
 import PostCategoryDelete from "./pages/admin/post-category/PostCategoryDelete";
 import ProductFormPage from "./pages/admin/product/ProductFormPage";
 import ProductDelete from "./pages/admin/product/ProductDelete";
+import Wishlist from "./pages/customer/Wishlist";
 
 function App() {
   return (
@@ -84,6 +85,7 @@ function App() {
             <Route path="profile" element={<CustomerAccount />} />
             <Route path="cart" element={<CartPage />} />
             <Route path="check-out" element={<Checkout />} />
+            <Route path="wishlist" element={<Wishlist />} />
           </Route>
         </Route>
 

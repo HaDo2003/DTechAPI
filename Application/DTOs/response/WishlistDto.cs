@@ -4,6 +4,6 @@
     {
         public int WishListId { get; set; }
         public int? ProductId { get; set; }
-        public virtual ProductDto? Product { get; set; }
+        public ProductDto? Product { get; set; }
     }
 }

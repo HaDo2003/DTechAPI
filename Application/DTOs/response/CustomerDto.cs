@@ -12,9 +12,8 @@
         public string? Gender { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public string? Image { get; set; }
-        public virtual ICollection<CustomerAddressDto> CustomerAddresses { get; set; } = [];
-        public virtual ICollection<CustomerCouponDto> CustomerCoupons { get; set; } = [];
-        public virtual ICollection<WishlistDto> Wishlists { get; set; } = [];
-        public virtual ICollection<OrderDto> Orders { get; set; } = [];
+        public ICollection<CustomerAddressDto> CustomerAddresses { get; set; } = [];
+        public ICollection<CustomerCouponDto> CustomerCoupons { get; set; } = [];
+        public ICollection<OrderDto> Orders { get; set; } = [];
     }
 }

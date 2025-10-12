@@ -2,7 +2,6 @@
 using DTech.Application.DTOs.response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Customer;
-using DTech.Domain.Entities;
 
 namespace DTech.Application.Interfaces
 {
@@ -17,6 +16,9 @@ namespace DTech.Application.Interfaces
         Task<MessageResponse> SendContactAsync(ContactDto model);
         Task<AddressResponse> SwitchDefaultAsync(string customerId, int addressId);
         Task<OrderDetailResDto> GetOrderDetailAsync(string customerId, string orderId);
+        Task<MessageResponse> AddProductToWishlistAsync(string customerId, int productId);
+        Task<IndexResDto<List<WishlistDto>>> GetWishlistAsync(string customerId);
+        Task<MessageResponse> RemoveProductFromWishlistAsync(string customerId, int productId);
 
         // For Admin
         Task<IndexResDto<List<CustomerIndexDto>>> GetCustomersAsync();

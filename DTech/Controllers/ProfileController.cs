@@ -142,5 +142,50 @@ namespace DTech.API.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("get-wishlists")]
+        public async Task<IActionResult> AddWishlists()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var response = await customerService.GetWishlistAsync(userId);
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+
+            return Ok(response.Data);
+        }
+
+        [HttpPost("add-wishlist/{productId}")]
+        public async Task<IActionResult> AddWishlist(int productId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var response = await customerService.AddProductToWishlistAsync(userId, productId);
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+
+            return Ok(response);
+        }
+
+        [HttpDelete("remove-wishlist/{productId}")]
+        public async Task<IActionResult> RemoveWishlist(int productId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var response = await customerService.RemoveProductFromWishlistAsync(userId, productId);
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+
+            return Ok(response);
+        }
     }
 }

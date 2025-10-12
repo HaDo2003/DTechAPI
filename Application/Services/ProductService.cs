@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
 using DTech.Application.Interfaces;
@@ -10,6 +11,7 @@ using DTech.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DTech.Application.Services
 {
@@ -142,6 +144,51 @@ namespace DTech.Application.Services
             }
         }
 
+        // Get all products
+        public async Task<PaginatedProductResDto?> GetAllProductsAsync(int page, int pageSize, string? sortOrder)
+        {
+            try
+            {
+                if (page <= 0) page = 1;
+                if (pageSize <= 0) pageSize = 12;
+
+                var query = productRepo.GetAllProductsQuery();
+
+                query = QuerySortOrders(sortOrder, query);
+
+                int totalItems = await query.CountAsync();
+                int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var products = await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var productDtos = _mapper.Map<List<ProductDto>>(products);
+
+
+                var brands = productDtos
+                    .Where(p => p.Brand != null)
+                    .Select(p => p.Brand)
+                    .DistinctBy(b => b!.BrandId)
+                    .ToList();
+
+                return new PaginatedProductResDto
+                {
+                    Products = productDtos,
+                    Brands = brands,
+                    TotalPages = totalPages,
+                    TotalItems = totalItems,
+                    Title = "All Products"
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         //Get recently viewed products by their IDs
         public async Task<List<ProductDto>> GetRecentlyViewedProductsAsync(string? ids)
         {
@@ -186,6 +233,20 @@ namespace DTech.Application.Services
                 "price_asc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderBy(p => p.Price)],
                 "price_desc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderByDescending(p => p.Price)],
                 _ => products
+            };
+        }
+
+        private static IQueryable<Product> QuerySortOrders(string? sortOrder, IQueryable<Product> query)
+        {
+            return sortOrder switch
+            {
+                "newest" => query.OrderByDescending(p => p.ProductId),
+                "discount" => query.OrderByDescending(p => p.Discount),
+                "name_asc" => query.OrderBy(p => p.Name),
+                "name_desc" => query.OrderByDescending(p => p.Name),
+                "price_asc" => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                _ => query
             };
         }
 

@@ -111,6 +111,15 @@ namespace DTech.Infrastructure.Repositories
             return product;
         }
 
+        public IQueryable<Product> GetAllProductsQuery()
+        {
+            return context.Products
+                .AsNoTracking()
+                .Include(p => p.Brand)
+                .Include(p => p.Category)
+                .Where(p => p.Status == StatusEnums.Available);
+        }
+
         public async Task<bool> IncrementProductViewsAsync(int? productId)
         {
             try
@@ -183,8 +192,11 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.Products.AnyAsync(a => a.ProductId == productId);
         }
-        public async Task<Product?> GetProductByIdAsync(int productId)
+        public async Task<Product?> GetProductByIdAsync(int? productId)
         {
+            if (productId == null)
+                return null;
+
             var product = await context.Products
                 .AsNoTracking()
                 .Include(a => a.Brand)

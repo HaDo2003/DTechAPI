@@ -12,6 +12,7 @@ namespace DTech.Application.Services
     public class CustomerService(
         ICustomerRepository customerRepo,
         IOrderRepository orderRepo,
+        IProductRepository productRepo,
         IMapper mapper,
         ICloudinaryService cloudinaryService,
         IBackgroundTaskQueue backgroundTaskQueue,
@@ -221,6 +222,66 @@ namespace DTech.Application.Services
             };
 
             return model;
+        }
+
+        public async Task<MessageResponse> AddProductToWishlistAsync(string customerId, int productId)
+        {
+            var customer = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customer)
+                return new MessageResponse { Success = false, Message = "Customer not found" };
+
+            var result = await customerRepo.AddProductToWishlistAsync(customerId, productId);
+            if (!result)
+                return new MessageResponse { Success = false, Message = "Failed to add product to wishlist" };
+
+            return new MessageResponse { Success = true, Message = "Add product to wishlist successfully" };
+        }
+
+        public async Task<IndexResDto<List<WishlistDto>>> GetWishlistAsync(string customerId)
+        {
+            var customer = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customer)
+                return new IndexResDto<List<WishlistDto>> { 
+                    Success = false, 
+                    Message = "Customer not found" 
+                };
+
+            var wls = await customerRepo.GetAllWishlistByCustomerIdAync(customerId);
+
+            var wishListDtos = new List<WishlistDto>();
+            foreach (var wishlist in wls)
+            {
+                var product = await productRepo.GetProductByIdAsync(wishlist.ProductId);
+                wishListDtos.Add(new WishlistDto
+                {
+                    WishListId = wishlist.WishListId,
+                    ProductId = wishlist.ProductId,
+                    Product = product != null ? mapper.Map<ProductDto>(product) : null
+                });
+            }
+
+            return new IndexResDto<List<WishlistDto>>
+            {
+                Success = true,
+                Data = [.. wishListDtos]
+            };
+        }
+
+        public async Task<MessageResponse> RemoveProductFromWishlistAsync(string customerId, int productId)
+        {
+            var customer = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customer)
+                return new MessageResponse { Success = false, Message = "Customer not found" };
+
+            var isWishlist = await customerRepo.CheckWishlistAsync(customerId, productId);
+            if (!isWishlist)
+                return new MessageResponse { Success = false, Message = "Failed to remove product from wishlist" };
+
+            var result = await customerRepo.RemoveProductFromWishlistAsync(customerId, productId);
+            if (!result)
+                return new MessageResponse { Success = false, Message = "Failed to remove product from wishlist" };
+
+            return new MessageResponse { Success = true, Message = "Remove product from wishlist successfully" };
         }
 
         // For Admin

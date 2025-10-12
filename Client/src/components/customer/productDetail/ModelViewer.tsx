@@ -2,6 +2,7 @@ import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, Html } from '@react-three/drei';
 import Model from '../3d/Model';
+import ColorPickerPanel from '../3d/ColorPickerPanel';
 
 interface ThreeDModelViewerProps {
   isOpen: boolean;
@@ -28,6 +29,8 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
   const [autoRotate, setAutoRotate] = useState<boolean>(true);
   const [controlsEnabled, setControlsEnabled] = useState<boolean>(true);
   const [, setIsVisible] = useState(isOpen);
+  const [backgroundColor, setBackgroundColor] = useState<string>('#0f3460');
+  const [productColor, setProductColor] = useState<string>('#c0c0c0');
 
   useEffect(() => {
     if (isOpen) {
@@ -42,6 +45,8 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
   useGLTF.preload(
     modelUrl || 'https://res.cloudinary.com/dwbibirzk/raw/upload/v1760026964/Pre-thesis/Product/3DModel/olanmpyo1owc1hp3gbdx.glb'
   );
+
+  const canvasBackground = `linear-gradient(to bottom, ${backgroundColor} 0%, ${adjustColor(backgroundColor, -20)} 50%, ${adjustColor(backgroundColor, -40)} 100%)`;
 
   return (
     <div
@@ -73,7 +78,8 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
             frameloop={isOpen ? 'always' : 'demand'}
             className="canvas-custom"
             style={{
-              opacity: isOpen ? 1 : 0
+              opacity: isOpen ? 1 : 0,
+              background: canvasBackground
             }}
             camera={{ position: [0, 2, 5], fov: 70, near: 0.01, far: 2000 }}
           >
@@ -91,7 +97,13 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
 
             {/* 3D Model with Suspense */}
             <Suspense fallback={<CanvasLoader />}>
-              <Model isOpen={isOpen} key={modelUrl} modelUrl={modelUrl} autoRotate={autoRotate} />
+              <Model
+                isOpen={isOpen}
+                key={modelUrl}
+                modelUrl={modelUrl}
+                autoRotate={autoRotate}
+                productColor={productColor}
+              />
               <Environment preset="studio" environmentIntensity={0.5} resolution={256} />
             </Suspense>
 
@@ -119,6 +131,13 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
               />
             )}
           </Canvas>
+
+          <ColorPickerPanel
+            backgroundColor={backgroundColor}
+            productColor={productColor}
+            onBackgroundColorChange={setBackgroundColor}
+            onProductColorChange={setProductColor}
+          />
 
           {/* Floating Controls Panel */}
           <div
@@ -178,7 +197,7 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
             <div className="col-md-3">
               <small className="text-light">
                 <i className="fas fa-hand-pointer me-1 text-info"></i>
-                <strong>Auto:</strong> Toggle Button
+                <strong>Customize:</strong> Bottom Left
               </small>
             </div>
           </div>
@@ -187,5 +206,13 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
     </div>
   );
 };
+
+function adjustColor(color: string, amount: number): string {
+  const num = parseInt(color.replace('#', ''), 16);
+  const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+  const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+  const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+}
 
 export default ThreeDModelViewer;

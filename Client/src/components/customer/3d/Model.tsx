@@ -7,11 +7,11 @@ interface ModelProps {
   isOpen: boolean;
   modelUrl?: string;
   autoRotate: boolean;
+  productColor: string;
 }
 
-
 // 3D Model Component
-const Model: React.FC<ModelProps> = ({ isOpen, modelUrl, autoRotate }) => {
+const Model: React.FC<ModelProps> = ({ isOpen, modelUrl, autoRotate, productColor }) => {
   const groupRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF(
     modelUrl || 'https://res.cloudinary.com/dwbibirzk/raw/upload/v1760026964/Pre-thesis/Product/3DModel/olanmpyo1owc1hp3gbdx.glb', true
@@ -72,6 +72,15 @@ const Model: React.FC<ModelProps> = ({ isOpen, modelUrl, autoRotate }) => {
       groupRef.current.rotation.y += 0.005;
     }
   });
+
+  // useEffect(() => {
+  //   scene.traverse((child: any) => {
+  //     if (child.isMesh && child.material) {
+  //       child.material = child.material.clone();
+  //       child.material.color.set(productColor);
+  //     }
+  //   });
+  // }, [productColor, scene]);
 
   return (
     <group ref={groupRef}>

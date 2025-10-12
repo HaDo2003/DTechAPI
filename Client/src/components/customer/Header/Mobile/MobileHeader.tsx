@@ -193,7 +193,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
                     </header>
 
                     <ul className="list-unstyled">
-                        <MainMenuItem label="Introduce" onClick={() => onNavigate('/')} />
+                        <MainMenuItem label="All Products" onClick={() => onNavigate('/all-products')} />
                         <MainMenuItem label="Laptop" onClick={() => onNavigate('/laptop')} />
                         <MainMenuItem label="Smart Phone" onClick={() => onNavigate('/smart-phone')} />
                         <MainMenuItem label="Tablet" onClick={() => onNavigate('/tablet')} />

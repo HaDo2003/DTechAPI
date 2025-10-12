@@ -7,7 +7,6 @@ import Tabs, { type Tab } from "../../components/customer/profile/Tabs";
 import Profile from "../../components/customer/profile/Profile";
 import Orders from "../../components/customer/profile/Orders";
 import Coupons from "../../components/customer/profile/Coupons";
-import Wishlist from "../../components/customer/profile/Wishlists";
 import Address from "../../components/customer/profile/Address";
 import ChangePassword from "../../components/customer/profile/ChangePassword";
 import AlertForm from "../../components/customer/AlertForm";
@@ -24,13 +23,13 @@ const CustomerAccount: React.FC = () => {
         { key: "profile", label: "Customer Information", content: <Profile customer={customer} /> },
         { key: "orders", label: "My Order", content: <Orders orders={customer?.orders} /> },
         { key: "coupons", label: "My Coupon", content: <Coupons coupons={customer?.customerCoupons} /> },
-        { key: "wishlist", label: "My Wishlists", content: <Wishlist wishlists={customer?.wishlists} /> },
+        { key: "wishlist", label: "My Wishlists" },
         { key: "address", label: "Address", content: <Address addresses={customer?.customerAddresses} /> },
         { key: "password", label: "Change Password", content: <ChangePassword /> },
     ];
 
     useEffect(() => {
-        if (token === null) 
+        if (token === null)
             return;
 
         setLoading(true);
@@ -70,7 +69,7 @@ const CustomerAccount: React.FC = () => {
                     </div>
                 </div>
             </div>
-            
+
             {alert && (
                 <AlertForm
                     message={alert.message}

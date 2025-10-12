@@ -271,7 +271,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                         <div className={`collapse navbar-collapse ${isMenuOpen ? 'show' : ''}`}>
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0 w-100 flex-nowrap d-flex gap-custom">
                                 <MenuItem label="Home" path="/" />
-                                <MenuItem label="Introduce" path="/" />
+                                <MenuItem label="All Products" path="/all-products" />
                                 <MenuItem label="Laptop" path="/laptop" />
                                 <MenuItem label="Mobile" path="/smart-phone" />
                                 <MenuItem label="Tablet" path="/tablet" />

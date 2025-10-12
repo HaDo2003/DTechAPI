@@ -33,6 +33,12 @@ namespace DTech.Domain.Interfaces
         // For Feedback table
         Task<bool> SendContactAsync(Feedback model);
 
+        // For wishlist table
+        Task<bool> CheckWishlistAsync(string customerId, int productId);
+        Task<bool> AddProductToWishlistAsync(string? customerId, int? productId);
+        Task<List<WishList>> GetAllWishlistByCustomerIdAync(string? customerId);
+        Task<bool> RemoveProductFromWishlistAsync(string? customerId, int? productId);
+
         // For Search History
         Task SaveSearchHistory(string customerId, string query);
     }

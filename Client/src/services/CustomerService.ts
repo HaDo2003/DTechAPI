@@ -4,6 +4,7 @@ import { type MessageResponse } from "../types/MessageReponse";
 import { type CustomerAddress, type CustomerAddressResponse } from "../types/CustomerAddress";
 import type { Contact } from "../types/Contact";
 import type { OrderDetailResponse } from "../types/Order";
+import type { ServiceResponse } from "../types/Admin";
 
 export const customerService = {
     async getCustomerProfile(token: string): Promise<Customer> {
@@ -212,8 +213,8 @@ export const customerService = {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            return { 
-                success: true, 
+            return {
+                success: true,
                 message: response.data.message || "Change default successfully" ,
                 addressId: response.data.addressId
             };
@@ -257,5 +258,92 @@ export const customerService = {
             }
             return { success: false, message: "Unexpected error occurred" };
         }
-    }
+    },
+
+    async getWishlists<T>(token: string): Promise<ServiceResponse<T[]>> {
+        try {
+            const response = await axios.get<T[]>(`/api/profile/get-wishlists`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return {
+                success: true,
+                data: response.data
+            };
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to get wishlists. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
+    },
+
+    async addWishlist(token: string, productId: number): Promise<MessageResponse> {
+        try {
+            const response = await axios.post<MessageResponse>(`/api/profile/add-wishlist/${productId}`, null, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return {
+                success: true,
+                message: response.data.message || "Add wishlist successfully",
+            };
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to add new wishlist. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
+    },
+
+    async removeWishlist(token: string, productId: number): Promise<MessageResponse> {
+        try {
+            const response = await axios.delete<MessageResponse>(`/api/profile/remove-wishlist/${productId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return {
+                success: true,
+                message: response.data.message || "Remove wishlist successfully",
+            };
+        }catch (err) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to add new wishlist. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
+    },
 }

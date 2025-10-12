@@ -403,7 +403,7 @@ Header
 }
 
 .gap-custom {
-    gap: 5.9rem;
+    gap: 5.1rem;
 }
 
 @media(max-width: 1399.98px) {
@@ -729,7 +729,7 @@ Product Card
     padding: 0.35em 0.65em;
     font-weight: 700;
     text-transform: uppercase;
-    z-index: 1000 !important;
+    z-index: 50 !important;
 }
 
 /* Gift info and sold count styling */
@@ -772,13 +772,17 @@ Product Card
 
 .btn-preview {
     position: relative;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
     border: none;
-    border-radius: 6px;
-    padding: 6px 8px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-preview:hover {
@@ -810,18 +814,28 @@ Product Card
 
 .btn-wishlist-card {
     position: relative;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 1px solid #e74c3c;
-    color: #e74c3c;
-    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     padding: 6px 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    justify-content: center;
+}
+
+.btn-wishlist-card-white {
+    color: #fff;
+}
+
+.btn-wishlist-card-red {
+    color: #e74c3c;
 }
 
 .btn-wishlist-card:hover {
-    background-color: #e74c3c;
-    color: #fff;
+    background-color: #fff;
+    color: #e74c3c;
 }
 
 /* Tooltip for Wishlist */
@@ -846,6 +860,88 @@ Product Card
 
 .btn-wishlist-card:hover::after {
     opacity: 1;
+}
+
+/*=========================================================
+Product Preview Modal
+===========================================================*/
+.overlay-preview {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    z-index: 1055;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.25s ease forwards;
+}
+
+/* Inner modal container */
+.overlay-preview-content {
+    z-index: 1051;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    width: 80%;
+    height: 80%;
+    max-width: 110vh;
+    max-height: 60vh;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+}
+
+/* Prevent body scroll when preview open */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Scrollbar styling */
+.overlay-preview-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.overlay-preview-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+/* Optional close button */
+.btn-close-preview {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    z-index: 1060;
+}
+
+.btn-close-preview:hover {
+    background: #f5f5f5;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /*=========================================================
@@ -923,7 +1019,6 @@ Home
     right: -10px;
 }
 
-/*Hot sale background*/
 .bg-hot-sales {
     background: linear-gradient(180deg, #f5263f 0%, #a40013 100%);
     border: 1px solid #f99;
@@ -933,7 +1028,6 @@ Home
 
 .hot-sales-bg .product-card {
     background-color: white;
-    /* keep product cards clean */
 }
 
 .hot-sales-bg .slider-btn {
@@ -1292,7 +1386,7 @@ Product Detail
 
 .swiper-button-prev-custom:hover,
 .swiper-button-next-custom:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
 .swiper-button-prev-custom::after,
@@ -1304,7 +1398,7 @@ Product Detail
 
 .swiper-button-prev-custom i,
 .swiper-button-next-custom i {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 .swiper-button-prev-custom {
@@ -1412,7 +1506,6 @@ Product Detail
     transition: opacity 0.4s ease;
     background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
 }
-
 
 /*=========================================================
 Product Comment

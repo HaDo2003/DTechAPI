@@ -8,18 +8,27 @@ export interface CategoryPageProps {
   brands?: Brand[];
   initialSort?: string;
   categorySlug: string;
+  totalPages?: number;
+  totalItems?: number;
 }
 
 export const getCategoryProducts = async (slug: string, sortOrder?: string): Promise<CategoryPageProps> => {
-  const res = await axios.get<CategoryPageProps>(`/api/Product/${slug}`, {
+  const res = await axios.get<CategoryPageProps>(`/api/product/${slug}`, {
     params: { sortOrder }
   });
   return res.data;
 };
 
 export const getCategoryBrandProducts = async (categorySlug: string, brandSlug: string, sortOrder?: string): Promise<CategoryPageProps> => {
-  const res = await axios.get<CategoryPageProps>(`/api/Product/${categorySlug}/${brandSlug}`, {
+  const res = await axios.get<CategoryPageProps>(`/api/product/${categorySlug}/${brandSlug}`, {
     params: { sortOrder }
+  });
+  return res.data;
+};
+
+export const getAllProducts = async (page: number, pageSize: number, sortOrder?: string): Promise<CategoryPageProps> => {
+  const res = await axios.get<CategoryPageProps>('/api/product/all-products', {
+    params: { page, pageSize, sortOrder },
   });
   return res.data;
 };

@@ -4,6 +4,7 @@ import type { Product } from "../../types/Product";
 import ProductCard from "../../components/customer/ProductCard";
 import { useAuth } from "../../context/AuthContext";
 import { searchService } from "../../services/SearchService";
+import { customerService } from "../../services/CustomerService";
 
 const SearchPage: React.FC = () => {
     const { token } = useAuth();
@@ -12,6 +13,7 @@ const SearchPage: React.FC = () => {
     const [sortOrder, setSortOrder] = useState("newest");
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
+    const [wishlistIds, setWishlistIds] = useState<number[]>([]);
 
     const sortOptions = [
         { label: "Newest", value: "newest" },
@@ -21,6 +23,20 @@ const SearchPage: React.FC = () => {
         { label: "Price ↑", value: "price_asc" },
         { label: "Price ↓", value: "price_desc" },
     ];
+
+    const fetchWishlist = async () => {
+        if (!token) return;
+        try {
+            const res = await customerService.getWishlists<{ productId: number }>(token);
+            if (res.success && res.data) {
+                setWishlistIds(res.data.map((w) => w.productId));
+            } else {
+                setWishlistIds([]);
+            }
+        } catch {
+            setWishlistIds([]);
+        }
+    };
 
     useEffect(() => {
         if (!query) return;
@@ -40,6 +56,10 @@ const SearchPage: React.FC = () => {
         fetchData();
 
     }, [query, sortOrder]);
+
+    useEffect(() => {
+        fetchWishlist();
+    }, [token]);
 
     return (
         <div>
@@ -81,7 +101,11 @@ const SearchPage: React.FC = () => {
                         {products.length > 0 ? (
                             products.map((product) => (
                                 <div className="col" key={product.productId}>
-                                    <ProductCard product={product} />
+                                    <ProductCard
+                                        product={product}
+                                        wishlists={wishlistIds}
+                                        onWishlistChange={fetchWishlist}
+                                    />
                                 </div>
                             ))
                         ) : (

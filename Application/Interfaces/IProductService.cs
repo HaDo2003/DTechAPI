@@ -1,9 +1,10 @@
 ﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
-using DTech.Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DTech.Application.Interfaces
 {
@@ -14,7 +15,7 @@ namespace DTech.Application.Interfaces
         Task<List<ProductDto>?> GetProductsByCategoryAsync(string? categorySlug, string? sortOrder);
 
         Task<List<ProductDto>?> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, string? sortOrder);
-
+        Task<PaginatedProductResDto?> GetAllProductsAsync(int page, int pageSize, string? sortOrder);
         Task<List<ProductDto>> GetRecentlyViewedProductsAsync(string? ids);
         Task<ProductCommentDto> PostCommentAsync(ProductCommentRequestDto model);
         Task<List<ProductDto>> SearchProductsAsync(string query, string sortOrder, string? customerId);

@@ -1,9 +1,10 @@
 import React, { useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 export interface Tab {
   key: string;
   label: string;
-  content: ReactNode;
+  content?: ReactNode;
 }
 
 interface TabsProps {
@@ -17,6 +18,14 @@ const Tabs: React.FC<TabsProps> = ({ tabs, defaultActive, fullName, onLogout}) =
   const [activeTab, setActiveTab] = useState<string>(
     defaultActive || tabs[0].key
   );
+  const navigate = useNavigate();
+  const handleTabClick = (key: string) => {
+    if (key === "wishlist") {
+      navigate("/wishlist");
+      return;
+    }
+    setActiveTab(key);
+  };
 
   return (
     <div className="row">
@@ -30,7 +39,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs, defaultActive, fullName, onLogout}) =
               key={tab.key}
               className={`m-3 li-custom cursor-pointer ${activeTab === tab.key ? "active" : ""
                 }`}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => handleTabClick(tab.key)}
             >
               {tab.label}
             </li>
