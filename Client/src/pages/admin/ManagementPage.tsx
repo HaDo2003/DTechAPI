@@ -19,11 +19,9 @@ const ManagementPage: React.FC = () => {
     const navigate = useNavigate();
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>((location.state as any)?.alert || null);
 
-    // console.log("Config:", config);
     useEffect(() => {
         const tableId = "#dataTable";
 
-        // Destroy previous instance if exists
         if ($.fn.dataTable.isDataTable(tableId)) {
             $(tableId).DataTable().destroy();
         }

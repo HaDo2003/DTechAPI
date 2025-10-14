@@ -85,7 +85,7 @@ export const checkOutService = {
             return { ...res.data, success: true };
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                let message: string = "Failed to fetch customer profile. Please try again.";
+                let message: string = "Failed to place order. Please try again.";
                 if (typeof err.response?.data === "string") {
                     message = err.response.data;
                 }

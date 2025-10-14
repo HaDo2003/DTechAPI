@@ -238,13 +238,37 @@ export const customerService = {
 
     async getOrderDetail(token: string, orderId: string): Promise<OrderDetailResponse> {
         try {
-            const response = await axios.get<Customer>(`/api/profile/get-order-detail/${orderId}`, {
+            const response = await axios.get<OrderDetailResponse>(`/api/profile/get-order-detail/${orderId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             return { ...response.data, success: true, message: "Fetch order detail successfully" };
         } catch (err: any) {
             if (axios.isAxiosError(err)) {
                 let message: string = "Failed to fetch order detail. Please try again.";
+                if (typeof err.response?.data === "string") {
+                    message = err.response.data;
+                }
+                else if (typeof err.response?.data?.message === "string") {
+                    message = err.response.data.message;
+                }
+                else {
+                    message = JSON.stringify(err.response?.data);
+                }
+                return { success: false, message };
+            }
+            return { success: false, message: "Unexpected error occurred" };
+        }
+    },
+
+    async cancelOrder(token: string, orderId: string): Promise<OrderDetailResponse> {
+        try {
+            const response = await axios.put<OrderDetailResponse>(`/api/profile/cancel-order/${orderId}`, {}, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return { ...response.data, success: true, message: "Cancel order successfully" };
+        } catch (err: any) {
+            if (axios.isAxiosError(err)) {
+                let message: string = "Failed to cancel order. Please try again.";
                 if (typeof err.response?.data === "string") {
                     message = err.response.data;
                 }

@@ -42,7 +42,8 @@ namespace DTech.Application.Mapping
 
             CreateMap<CustomerAddress, CustomerAddressDto>();
             CreateMap<CustomerCoupon, CustomerCouponDto>();
-            CreateMap<Order, OrderDto>();
+            CreateMap<Order, OrderDto>()
+                .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.Status != null ? src.Status.Description : null));
             CreateMap<WishList, WishlistDto>();
             CreateMap<ApplicationUser, CustomerDto>();
 

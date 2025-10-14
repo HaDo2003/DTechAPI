@@ -140,6 +140,26 @@ export const adminService = {
             return handleAxiosError(err, `Failed to fetch ${typeOfData}. Please try again.`);
         }
     },
+
+    async updateOrderStatus<T>(
+        endpoint: string,
+        token?: string,
+        id?: string,
+        newStatus?: string
+    ): Promise<ServiceResponse<T>> {
+        try {
+            const response = await axios.put<ServiceResponse<T>>(
+                `${endpoint}/${id}`,
+                {statusName: newStatus },
+                {
+                    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                }
+            );
+            return response.data;
+        } catch (err: any) {
+            return handleAxiosError(err, `Failed to update ${newStatus}. Please try again.`);
+        }
+    },
 }
 
 function handleAxiosError(err: any, defaultMessage: string): ServiceResponse<any> {

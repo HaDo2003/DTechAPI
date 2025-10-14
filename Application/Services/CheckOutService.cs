@@ -202,7 +202,8 @@ namespace DTech.Application.Services
                     Name = cp.Product!.Name,
                     Photo = cp.Product.Photo,
                     Quantity = cp.Quantity,
-                    Price = cp.Product.PriceAfterDiscount  * cp.Quantity
+                    Price = cp.Product.PriceAfterDiscount  * cp.Quantity,
+                    PromotionalGift = cp.Product.PromotionalGift ?? string.Empty,
                 })
                 .ToList();
 
@@ -342,7 +343,7 @@ namespace DTech.Application.Services
                 ShippingId = shippingId,
                 PaymentId = paymentId,
                 StatusId = 1,
-                OrderDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                OrderDate = DateTime.UtcNow,
                 Name = model.BillingName,
                 Phone = model.BillingPhone,
                 Email = model.Email,
@@ -373,6 +374,7 @@ namespace DTech.Application.Services
                 Price = cartProduct.Product!.PriceAfterDiscount,
                 Quantity = cartProduct.Quantity,
                 CostAtPurchase = cartProduct.Product!.PriceAfterDiscount * cartProduct.Quantity,
+                PromotionalGift = cartProduct.Product?.PromotionalGift,
             }).ToList();
             
             return await orderRepo.AddOrderDetailAsync(orderDetails);
@@ -391,7 +393,8 @@ namespace DTech.Application.Services
                     ProductId = firstItem.ProductId.Value,
                     Price = firstItem.Price ?? 0,
                     Quantity = firstItem.Quantity,
-                    CostAtPurchase = (firstItem.Price ?? 0) * firstItem.Quantity
+                    CostAtPurchase = (firstItem.Price ?? 0) * firstItem.Quantity,
+                    PromotionalGift = firstItem.PromotionalGift
                 }
             };
 

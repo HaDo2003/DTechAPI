@@ -16,6 +16,7 @@ namespace DTech.Application.Interfaces
         Task<MessageResponse> SendContactAsync(ContactDto model);
         Task<AddressResponse> SwitchDefaultAsync(string customerId, int addressId);
         Task<OrderDetailResDto> GetOrderDetailAsync(string customerId, string orderId);
+        Task<OrderDetailResDto> CancelOrderAsync(string customerId, string orderId);
         Task<MessageResponse> AddProductToWishlistAsync(string customerId, int productId);
         Task<IndexResDto<List<WishlistDto>>> GetWishlistAsync(string customerId);
         Task<MessageResponse> RemoveProductFromWishlistAsync(string customerId, int productId);

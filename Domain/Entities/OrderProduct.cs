@@ -18,6 +18,7 @@ public partial class OrderProduct
     public int? Quantity { get; set; }
 
     public decimal? CostAtPurchase { get; set; }
+    public string? PromotionalGift { get; set; }
 
     public virtual Order Order { get; set; } = null!;
 

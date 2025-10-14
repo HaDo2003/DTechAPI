@@ -4,16 +4,19 @@ import { customerService } from "../../../services/CustomerService";
 import { useAuth } from "../../../context/AuthContext";
 import Loading from "../../shared/Loading";
 import { priceFormatter } from "../../../utils/priceFormatter";
+import AlertForm from "../AlertForm";
 
 type OrderDetailProps = {
     orderId: string;
     onClose?: () => void;
+    onRefresh?: () => Promise<void>;
 };
 
-const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose }) => {
+const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose, onRefresh }) => {
     const { token } = useAuth();
     const [order, setOrder] = useState<OrderDetailResponse | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
 
     useEffect(() => {
         const fetchOrder = async () => {
@@ -30,6 +33,23 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose }) => {
 
         fetchOrder();
     }, [orderId]);
+
+    const onCancelOrder = async () => {
+        if (window.confirm("Are you sure you want to cancel this order? This action cannot be undone.")) {
+            try {
+                setLoading(true);
+                const data = await customerService.cancelOrder(token ?? "", orderId);
+                if (data.success) {
+                    setOrder(data);
+                    setAlert({ message: "Cancel order successfully", type: "success" });
+                }
+            } catch (err) {
+                setAlert({ message: "Fail to cancel order", type: "error" });
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
 
     if (loading) return <Loading />;
     if (!order) return <p>No order detail found.</p>;
@@ -104,7 +124,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose }) => {
                                         </thead>
                                         <tbody>
                                             {order.orderProducts?.map((item) => (
-                                                <tr key={item.productId}>
+                                                <tr key={item.id}>
                                                     <td>
                                                         <div className="d-flex align-items-center">
                                                             <img
@@ -168,12 +188,26 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose }) => {
                 </div>
                 {onClose && (
                     <div className="text-end mt-3">
+                        {!["Order Canceled", "Order Returned", "Order Completed", "Delivered"].includes(
+                            order.statusName ?? ""
+                        ) && (
+                                <button className="btn btn-danger me-2" onClick={onCancelOrder}>
+                                    Cancel Order
+                                </button>
+                            )}
                         <button className="btn btn-secondary" onClick={onClose}>
                             Close
                         </button>
                     </div>
                 )}
             </div>
+            {alert && (
+                <AlertForm
+                    message={alert.message}
+                    type={alert.type}
+                    onClose={() => setAlert(null)}
+                />
+            )}
         </>
     );
 };

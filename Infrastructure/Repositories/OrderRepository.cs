@@ -72,6 +72,7 @@ namespace DTech.Infrastructure.Repositories
             {
                 if (orderId == null) return null;
                 return await context.Orders
+                    .Include(o => o.Status)
                     .Include(o => o.Payment)
                     .ThenInclude(p => p!.PaymentMethod)
                     .Include(o => o.OrderProducts)
@@ -105,12 +106,44 @@ namespace DTech.Infrastructure.Repositories
             }
         }
 
+        public async Task<Order?> UpdateStatusAsync(string orderId, string customerId, int orderStatusId)
+        {
+            var order = await context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId && o.CustomerId == customerId);
+            if (order == null)
+                return null;
+
+            var status = await context.OrderStatuses.FirstOrDefaultAsync(o => o.StatusId == orderStatusId);
+            if (status == null)
+                return null;
+
+            order.StatusId = orderStatusId;
+            context.Orders.Update(order);
+            await context.SaveChangesAsync();
+            return order;
+        }
+
         public async Task<List<Order>?> GetAllOrdersAsync()
         {
             return await context.Orders
                 .AsNoTracking()
                 .Include(o => o.Status)
+                .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
+        }
+
+        public async Task<bool> UpdateOrderStatusAsync(Order? order, string statusName)
+        {
+            if(order == null)
+                return false;
+
+            var status = await context.OrderStatuses.FirstOrDefaultAsync(o => o.Description == statusName);
+            if (status == null)
+                return false;
+
+            order.StatusId = status.StatusId;
+            context.Orders.Update(order);
+            await context.SaveChangesAsync();
+            return true;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DTech.API.Helper;
+using DTech.Application.DTOs.Request.admin;
 using DTech.Application.DTOs.Response.Admin.Order;
 using DTech.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -30,6 +31,16 @@ namespace DTech.API.Controllers.Admin
             if (unauthorized != null) return unauthorized;
 
             var response = await orderService.GetOrderDetailAsync(id);
+            return ControllerHelper.HandleResponse(response, this);
+        }
+
+        [HttpPut("update-status/{orderId}")]
+        public async Task<IActionResult> UpdateOrderSatus(string orderId, [FromBody] UpdateOrderStatusResDto dto)
+        {
+            var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
+
+            var response = await orderService.UpdateOrderStatusAsync(orderId, dto.StatusName);
             return ControllerHelper.HandleResponse(response, this);
         }
     }

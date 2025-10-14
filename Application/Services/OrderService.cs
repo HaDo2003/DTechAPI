@@ -50,6 +50,7 @@ namespace DTech.Application.Services
             var orderDetail = new OrderDetailDto
             {
                 Id = order.OrderId,
+                StatusName = order.Status != null ? order.Status.Description : string.Empty,
                 Email = order.Email,
                 BillingName = order.Name,
                 BillingPhone = order.Phone,
@@ -67,7 +68,8 @@ namespace DTech.Application.Services
                     ProductName = op.Product?.Name,
                     Quantity = op.Quantity,
                     Price = op.Price,
-                    Total = op.CostAtPurchase
+                    Total = op.CostAtPurchase,
+                    PromotionalGift = op.PromotionalGift
                 }).ToList() ?? [],
 
                 Payment = order.Payment == null ? null : new PaymentResDto
@@ -81,6 +83,43 @@ namespace DTech.Application.Services
             {
                 Success = true,
                 Data = orderDetail
+            };
+        }
+        public async Task<IndexResDto<string>> UpdateOrderStatusAsync(string orderId, string? statusName)
+        {
+            var order = await orderRepo.GetOrderByIdAsync(orderId);
+            if (order == null)
+            {
+                return new IndexResDto<string>
+                {
+                    Success = false,
+                    Message = "Order not found"
+                };
+            }
+
+            if(statusName == null)
+            {
+                return new IndexResDto<string>
+                {
+                    Success = false,
+                    Message = "Status not found"
+                };
+            }
+
+            var result = await orderRepo.UpdateOrderStatusAsync(order, statusName);
+            if(!result)
+            {
+                return new IndexResDto<string>
+                {
+                    Success = false,
+                    Message = "Update order status fail"
+                };
+            }
+
+            return new IndexResDto<string>
+            {
+                Success = true,
+                Message = "Update order status successfully"
             };
         }
     }

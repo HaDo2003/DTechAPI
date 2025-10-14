@@ -21,7 +21,7 @@ public partial class Order
     public int? StatusId { get; set; }
 
     [Display(Name = "Order Date")]
-    public DateOnly? OrderDate { get; set; }
+    public DateTime? OrderDate { get; set; }
 
     //Billing 
     [Display(Name = "Billing Name")]

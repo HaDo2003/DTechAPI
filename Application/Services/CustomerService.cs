@@ -224,6 +224,51 @@ namespace DTech.Application.Services
             return model;
         }
 
+        public async Task<OrderDetailResDto> CancelOrderAsync(string customerId, string orderId)
+        {
+            var customer = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customer)
+                return new OrderDetailResDto { Success = false, Message = "Customer not found" };
+
+            int orderStatusId = 7;
+            var orderUpdated = await orderRepo.UpdateStatusAsync(orderId, customerId, orderStatusId);
+            if(orderUpdated == null) 
+                return new OrderDetailResDto { Success = false, Message = "Fail to cancel order" };
+
+            OrderDetailResDto model = new()
+            {
+                OrderId = orderUpdated.OrderId,
+                OrderDate = orderUpdated.OrderDate,
+                Name = orderUpdated.Name,
+                NameReceive = orderUpdated.NameReceive,
+                ShippingAddress = orderUpdated.ShippingAddress,
+                Address = orderUpdated.Address,
+                StatusName = orderUpdated.Status?.Description ?? "Unknown",
+                Note = orderUpdated.Note,
+                CostDiscount = orderUpdated.CostDiscount,
+                ShippingCost = orderUpdated.ShippingCost,
+                FinalCost = orderUpdated.FinalCost,
+                Payment = orderUpdated.Payment == null
+                    ? null
+                    : new PaymentDto
+                    {
+                        Status = orderUpdated.Payment.Status,
+                        PaymentMethodName = orderUpdated.Payment.PaymentMethod!.Description ?? string.Empty,
+                    },
+                OrderProducts = orderUpdated.OrderProducts?.Select(op => new OrderProductDto
+                {
+                    Id = op.Id,
+                    Name = op.Product.Name,
+                    Photo = op.Product.Photo,
+                    Price = op.Product.Price,
+                    Quantity = op.Quantity,
+                    CostAtPurchase = op.CostAtPurchase,
+                }).ToList()
+            };
+
+            return model;
+        }
+
         public async Task<MessageResponse> AddProductToWishlistAsync(string customerId, int productId)
         {
             var customer = await customerRepo.CheckCustomerAsync(customerId);

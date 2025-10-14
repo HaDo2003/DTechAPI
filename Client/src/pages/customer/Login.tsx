@@ -7,8 +7,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import AlertForm from "../../components/customer/AlertForm";
 import GoogleButton from "../../components/customer/auth/GoogleButton";
+import { useCart } from "../../context/CartContext";
 
 const Login: React.FC = () => {
+    const { fetchCart } = useCart();
     const [account, setAccount] = useState("");
     const [password, setPassword] = useState("");
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
@@ -29,7 +31,10 @@ const Login: React.FC = () => {
             if (res.success) {
                 login(res.token!);
                 setAlert({ message: "Login successful", type: "success" });
-                navigate("/");
+                setTimeout(async () => {
+                    await fetchCart();
+                    navigate("/");
+                }, 100);
             } else {
                 setAlert({ message: res.message || "Login failed", type: "error" });
             }

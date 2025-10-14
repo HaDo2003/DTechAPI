@@ -135,7 +135,25 @@ namespace DTech.API.Controllers
 
             var response = await customerService.GetOrderDetailAsync(userId, orderId);
             if (response == null)
-                return NotFound(new { Message = "User not found." });
+                return NotFound(new { Message = "Order not found." });
+
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+
+            return Ok(response);
+        }
+
+        [HttpPut("cancel-order/{orderId}")]
+        public async Task<IActionResult> CancelOrderAsync(string orderId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var response = await customerService.CancelOrderAsync(userId, orderId);
+            if (response == null)
+                return NotFound(new { Message = "Order not found." });
 
             if (!response.Success)
                 return BadRequest(new { response.Message });

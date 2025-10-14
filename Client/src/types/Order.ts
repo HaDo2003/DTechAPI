@@ -10,6 +10,7 @@ export interface Order {
 
 export interface OrderForm{
     id: number | string;
+    statusName?: string;
     email?: string;
     billingName?: string;
     billingPhone?: string;
@@ -31,6 +32,7 @@ export interface OrderForm{
         quantity: number;
         price: number;
         total: number;
+        promotionalGift?: string;
     }[];
 }
 
@@ -71,6 +73,7 @@ export interface OrderItem {
     photo: string;
     quantity: number;
     price: number;
+    promotionalGift?: string;
 }
 
 export interface CouponResponse {
@@ -97,7 +100,7 @@ export interface OrderDetailResponse extends MessageResponse {
 }
 
 interface OrderProduct {
-    productId?: string;
+    id?: string;
     name?: string;
     photo?: string;
     price?: number;

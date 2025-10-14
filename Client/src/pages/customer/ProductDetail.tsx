@@ -548,7 +548,8 @@ const ProductDetail: React.FC = () => {
                                                     <div className="col-md-6 text-end">
                                                         {cmt.cmtDate
                                                             ? new Date(cmt.cmtDate).toLocaleDateString("en-GB")
-                                                            : "No date"}                                                    </div>
+                                                            : "No date"}
+                                                    </div>
                                                 </div>
                                                 <div className="cmt-custom px-3 py-2 mb-3">
                                                     <div className="row">

@@ -109,7 +109,37 @@ export const managementConfig: Record<
       { key: "billingName", label: "Customer Name" },
       { key: "orderDate", label: "Order Date" },
       { key: "finalCost", label: "Final Cost" },
-      { key: "status", label: "Status" },
+      {
+        key: "status",
+        label: "Status",
+        render: (item) => {
+          const status = item.status?.toLowerCase();
+
+          let colorClass = "";
+          switch (status) {
+            case "order placed":
+              colorClass = "text-primary fw-bold";
+              break;
+            case "order processing":
+            case "shipped":
+            case "out for delivery":
+              colorClass = "text-info fw-bold";
+              break;
+            case "delivered":
+            case "order completed":
+              colorClass = "text-success fw-bold";
+              break;
+            case "order canceled":
+            case "order returned":
+              colorClass = "text-danger fw-bold";
+              break;
+            default:
+              colorClass = "text-secondary";
+          }
+
+          return <span className={colorClass}>{item.status}</span>;
+        },
+      },
       { key: "actions", label: "Function" },
     ],
   },

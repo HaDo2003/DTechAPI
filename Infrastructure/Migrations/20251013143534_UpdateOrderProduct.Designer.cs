@@ -3,6 +3,7 @@ using System;
 using DTech.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DTech.Infrastructure.Migrations
 {
     [DbContext(typeof(DTechDbContext))]
-    partial class DTechDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251013143534_UpdateOrderProduct")]
+    partial class UpdateOrderProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -560,8 +563,8 @@ namespace DTech.Infrastructure.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("OrderDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("OrderDate")
+                        .HasColumnType("date");
 
                     b.Property<int?>("PaymentId")
                         .HasColumnType("integer");

@@ -19,9 +19,32 @@ const CustomerAccount: React.FC = () => {
     const [customer, setCustomer] = useState<Customer | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+
+    const fetchCustomer = async () => {
+        try {
+            if (!token) {
+                setAlert({ message: "User token is missing. Please login again.", type: "error" });
+                setLoading(false);
+                return;
+            }
+            setLoading(true);
+            const data = await customerService.getCustomerProfile(token);
+            if (data.success) {
+                setCustomer(data);
+                setAlert(null);
+            } else {
+                setAlert({ message: data.message || "Failed to load customer data.", type: "error" });
+            }
+        } catch (err) {
+            setAlert({ message: "Failed to load customer data, please try again. " + err, type: "error" });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const tabs: Tab[] = [
         { key: "profile", label: "Customer Information", content: <Profile customer={customer} /> },
-        { key: "orders", label: "My Order", content: <Orders orders={customer?.orders} /> },
+        { key: "orders", label: "My Order", content: <Orders orders={customer?.orders} onRefresh={fetchCustomer} /> },
         { key: "coupons", label: "My Coupon", content: <Coupons coupons={customer?.customerCoupons} /> },
         { key: "wishlist", label: "My Wishlists" },
         { key: "address", label: "Address", content: <Address addresses={customer?.customerAddresses} /> },
@@ -32,31 +55,10 @@ const CustomerAccount: React.FC = () => {
         if (token === null)
             return;
 
-        setLoading(true);
-
-        const fetchCustomer = async () => {
-            try {
-                if (!token) {
-                    setAlert({ message: "User token is missing. Please login again.", type: "error" });
-                    setLoading(false);
-                    return;
-                }
-                const data = await customerService.getCustomerProfile(token);
-                if (data.success) {
-                    setCustomer(data);
-                    setAlert(null);
-                } else {
-                    setAlert({ message: data.message || "Failed to load customer data.", type: "error" });
-                }
-            } catch (err) {
-                setAlert({ message: "Failed to load customer data, please try again. " + err, type: "error" });
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchCustomer();
     }, [token]);
+
+
 
     return (
         <>

@@ -57,7 +57,9 @@ namespace DTech.Infrastructure.Repositories
 
                 customer.Orders = await context.Orders
                     .AsNoTracking()
+                    .Include(o => o.Status)
                     .Where(o => o.CustomerId == customerId)
+                    .OrderByDescending(o => o.OrderDate)
                     .ToListAsync();
 
                 customer.CustomerCoupons = await context.CustomerCoupons

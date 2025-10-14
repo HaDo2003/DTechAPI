@@ -11,9 +11,11 @@ import ShippingInformation from "../../components/customer/checkOut/ShippingInfo
 import InputForCheckOut from "../../components/customer/checkOut/InputForCheckOut";
 import Loading from "../../components/shared/Loading";
 import AlertForm from "../../components/customer/AlertForm";
+import { useCart } from "../../context/CartContext";
 
 const Checkout: React.FC = () => {
     const { token } = useAuth();
+    const { fetchCart } = useCart();
     const navigate = useNavigate();
     const location = useLocation();
     const buyNowData = location.state as CheckOut | undefined;
@@ -41,9 +43,9 @@ const Checkout: React.FC = () => {
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
 
     useEffect(() => {
-        if (token === null) 
+        if (token === null)
             return;
-        
+
         if (buyNowData) {
             if (!buyNowData.paymentMethod && (buyNowData.paymentMethods?.length ?? 0) > 0) {
                 const cod = buyNowData.paymentMethods!.find(pm => pm.description === "COD");
@@ -111,12 +113,13 @@ const Checkout: React.FC = () => {
         setLoading(true);
         try {
             const res = await checkOutService.placeOrder(
-                token!, 
+                token!,
                 formData,
                 buyNowData ? true : false
             );
             console.log(formData);
             if (res && res.success) {
+                await fetchCart();
                 navigate(`/order-success/${res.orderId}`, { state: res });
             } else {
                 navigate("/order-fail");
