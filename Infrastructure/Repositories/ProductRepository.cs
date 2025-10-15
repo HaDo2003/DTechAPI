@@ -377,6 +377,9 @@ namespace DTech.Infrastructure.Repositories
             existingProduct.UpdatedBy = product.UpdatedBy;
             existingProduct.Status = product.Status;
 
+            Console.WriteLine($"[DEBUG] product.StatusProduct = '{product.StatusProduct}'");
+            Console.WriteLine($"[DEBUG] existingProduct StatusProduct = {existingProduct.StatusProduct}");
+
             context.Products.Update(existingProduct);
             var result = await context.SaveChangesAsync();
             if (result > 0)

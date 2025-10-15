@@ -56,7 +56,6 @@ export const adminService = {
             const headers: any = {
                 ...(token && { Authorization: `Bearer ${token}` }),
                 ...(!isFormData && { "Content-Type": "application/json" }),
-                ...(isFormData && { "Content-Type": "multipart/form-data" })
             };
 
             const response = await axios.post<ServiceResponse<T>>(endpoint, data, { headers });

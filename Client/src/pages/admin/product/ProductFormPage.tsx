@@ -78,12 +78,49 @@ const ProductFormPage: React.FC = () => {
     const handleSaveAll = async () => {
         setLoading(true);
         try {
+            const fd = new FormData();
+            const info = form;
+
+            fd.append("ProductInfor.Name", info.productInfor.name ?? "");
+            fd.append("ProductInfor.Warranty", info.productInfor.warranty ?? "");
+            fd.append("ProductInfor.StatusProduct", info.productInfor.statusProduct ?? "");
+            fd.append("ProductInfor.InitialCost", info.productInfor.initialCost?.toString() ?? "0")
+            fd.append("ProductInfor.Price", info.productInfor.price?.toString() ?? "0");
+            fd.append("ProductInfor.Discount", info.productInfor.discount?.toString() ?? "0");
+            fd.append("ProductInfor.EndDateDiscount", info.productInfor.endDateDiscount ?? "");
+            fd.append("ProductInfor.DateOfManufacture", info.productInfor.dateOfManufacture ?? "");
+            fd.append("ProductInfor.MadeIn", info.productInfor.madeIn ?? "");
+            fd.append("ProductInfor.PromotionalGift", info.productInfor.promotionalGift ?? "");
+            fd.append("ProductInfor.Description", info.productInfor.description ?? "");
+            fd.append("ProductInfor.Photo", info.productInfor.photo ?? "");
+            fd.append("ProductInfor.CategoryId", String(info.productInfor.categoryId) ?? "0");
+            fd.append("ProductInfor.BrandId", String(info.productInfor.brandId) ?? "0");
+
+            if (info.productInfor.photoUpload) {
+                fd.append("ProductInfor.PhotoUpload", info.productInfor.photoUpload);
+            }
+
+            if (info.specifications && info.specifications.length > 0) {
+                info.specifications.forEach((spec, index) => {
+                    fd.append(`Specifications[${index}].SpecName`, spec.specName);
+                    fd.append(`Specifications[${index}].Detail`, spec.detail);
+                });
+            }
+
+            if (info.productImages && info.productImages.length > 0) {
+                info.productImages.forEach((img, _) => {
+                    if (img.imageUpload) {
+                        fd.append("NewImageUploads", img.imageUpload);
+                    }
+                });
+            }
+
             const res =
                 mode === "create"
-                    ? await adminService.createData("/api/product/create-all", form, token ?? "")
-                    : await adminService.updateData("/api/product/update-all", form.productInfor.id ?? "", form, token ?? "");
+                    ? await adminService.createData("/api/product/create-all", fd, token ?? "")
+                    : await adminService.updateData("/api/product/update-all", form.productInfor.id ?? "", fd, token ?? "");
 
-            if (res) {
+            if (res?.success) {
                 setAlert({ message: "All product data saved successfully!", type: "success" });
             } else {
                 setAlert({ message: "Failed to save product.", type: "error" });

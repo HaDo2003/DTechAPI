@@ -238,8 +238,8 @@ const ProductBasicInfoTab: React.FC<Props> = ({
                             className="form-control"
                             required
                         >
-                            <option value="Instock">In stock</option>
-                            <option value="Outofstock">Out of stock</option>
+                            <option value="in stock">In stock</option>
+                            <option value="out of stock">Out of stock</option>
                         </select>
                     </div>
                 </div>

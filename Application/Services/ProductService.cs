@@ -338,8 +338,8 @@ namespace DTech.Application.Services
                     Warranty = product.Warranty,
                     StatusProduct = product.StatusProduct switch
                     {
-                        true => "In stock",
-                        false => "Out of stock",
+                        true => "in stock",
+                        false => "out of stock",
                         null => "Unknown"
                     },
                     InitialCost = product.InitialCost,
@@ -437,11 +437,11 @@ namespace DTech.Application.Services
                     Name = model.Name,
                     Slug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-"),
                     Warranty = model.Warranty,
-                    StatusProduct = model.StatusProduct?.ToLower() switch
+                    StatusProduct = model.StatusProduct?.Trim().ToLower() switch
                     {
                         "in stock" => true,
                         "out of stock" => false,
-                        _ => null
+                        _ => false
                     },
                     InitialCost = model.InitialCost,
                     Price = model.Price,
@@ -534,11 +534,11 @@ namespace DTech.Application.Services
                     Name = model.Name,
                     Slug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-"),
                     Warranty = model.Warranty,
-                    StatusProduct = model.StatusProduct?.ToLower() switch
+                    StatusProduct = model.StatusProduct?.Trim().ToLower() switch
                     {
                         "in stock" => true,
                         "out of stock" => false,
-                        _ => null
+                        _ => false
                     },
                     InitialCost = model.InitialCost,
                     Price = model.Price,
