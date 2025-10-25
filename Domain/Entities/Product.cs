@@ -88,4 +88,5 @@ public partial class Product
     public virtual ICollection<ProductImage> ProductImages { get; set; } = [];
 
     public virtual ICollection<Specification> Specifications { get; set; } = [];
+    public virtual ICollection<ProductColor> ProductColors { get; set; } = [];
 }

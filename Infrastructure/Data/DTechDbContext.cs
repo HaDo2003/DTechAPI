@@ -53,6 +53,8 @@ namespace DTech.Infrastructure.Data
         public virtual DbSet<ProductComment> ProductComments { get; set; }
 
         public virtual DbSet<ProductImage> ProductImages { get; set; }
+        public virtual DbSet<ProductColor> ProductColors { get; set; }
+        public virtual DbSet<ProductModel> ProductModels { get; set; }
 
         public virtual DbSet<Shipping> Shippings { get; set; }
 
@@ -96,6 +98,16 @@ namespace DTech.Infrastructure.Data
             }
 
             base.OnModelCreating(modelBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ProductModel>()
+                .HasOne(pm => pm.ProductColor)
+                .WithOne(pc => pc.ProductModel)
+                .HasForeignKey<ProductModel>(pm => pm.ColorId);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using DTech.Domain.Entities;
-
-namespace DTech.Application.DTOs.response
+﻿namespace DTech.Application.DTOs.response
 {
     public class ProductDto
     {
@@ -23,11 +21,11 @@ namespace DTech.Application.DTOs.response
         public CategoryDto? Category { get; set; }
         public BrandDto? Brand { get; set; }
 
-        public virtual List<ProductCommentDto> ProductComments { get; set; } = [];
+        public List<ProductCommentDto> ProductComments { get; set; } = [];
 
-        public virtual List<ProductImageDto> ProductImages { get; set; } = [];
+        public List<ProductImageDto> ProductImages { get; set; } = [];
 
-        public virtual List<SpecificationDto> Specifications { get; set; } = [];
-        public virtual List<RelatedProductDto> RelatedProducts { get; set; } = [];
+        public List<SpecificationDto> Specifications { get; set; } = [];
+        public List<RelatedProductDto> RelatedProducts { get; set; } = [];
     }
 }

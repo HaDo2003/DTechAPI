@@ -11,7 +11,7 @@ namespace DTech.API.Controllers
     ) : ControllerBase
     {
         [HttpPost("send-contact")]
-        public async Task<IActionResult> SendContactAsync([FromBody] ContactDto model)
+        public async Task<IActionResult> SendContact([FromBody] ContactDto model)
         {
             var response = await customerService.SendContactAsync(model);
             if (!response.Success)

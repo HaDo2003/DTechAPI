@@ -35,7 +35,6 @@ namespace DTech.Application.Services
 
             return await BuildCheckoutModelAsync(customer, cart);
         }
-
         public async Task<CheckOutDto> BuyNowAsync(string customerId, BuyNowReqDto modelReq)
         {
             var customer = await customerRepo.GetCustomerByIdAsync(customerId);
@@ -63,7 +62,6 @@ namespace DTech.Application.Services
 
             return await BuildCheckoutModelAsync(customer, tempCart);
         }
-
         public async Task<OrderSummaryResDto> ApplyCouponAsync(string code, string customerId)
         {
             var customerExists = await customerRepo.CheckCustomerAsync(customerId);

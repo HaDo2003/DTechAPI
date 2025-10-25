@@ -17,7 +17,6 @@ namespace DTech.Infrastructure.Repositories
                 .OrderBy(a => a.Order)
                 .ToListAsync();
         }
-
         public async Task<List<Advertisement>?> GetAllAdvertisementsAsync()
         {
             return await context.Advertisements

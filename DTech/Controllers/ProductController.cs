@@ -15,7 +15,7 @@ namespace DTech.API.Controllers
     ) : ControllerBase
     {
         [HttpGet("{categorySlug}/{brandSlug}/{slug}")]
-        public async Task<IActionResult> GetProductDetailAsync(string categorySlug, string brandSlug, string slug)
+        public async Task<IActionResult> GetProductDetail(string categorySlug, string brandSlug, string slug)
         {
             var product = await productService.ProductDetailAsync(categorySlug, brandSlug, slug);
             if (product == null)
@@ -26,7 +26,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpGet("{categorySlug}")]
-        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategoryAsync(string categorySlug,[FromQuery] string? sortOrder)
+        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategory(string categorySlug,[FromQuery] string? sortOrder)
         {
             var products = await productService.GetProductsByCategoryAsync(categorySlug, sortOrder);
             if (products == null || products.Count == 0)
@@ -55,7 +55,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpGet("{categorySlug}/{brandSlug}")]
-        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategoryAndBrandAsync(string categorySlug, string brandSlug, [FromQuery] string? sortOrder)
+        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategoryAndBrand(string categorySlug, string brandSlug, [FromQuery] string? sortOrder)
         {
             var products = await productService.GetProductsByCategoryAndBrandAsync(categorySlug, brandSlug, sortOrder);
             if (products == null || products.Count == 0)
@@ -103,7 +103,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpPost("post-comment")]
-        public async Task<IActionResult> PostCommentAsync([FromBody] ProductCommentRequestDto model)
+        public async Task<IActionResult> PostComment([FromBody] ProductCommentRequestDto model)
         {
             var response = await productService.PostCommentAsync(model);
             if(!response.Success)

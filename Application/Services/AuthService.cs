@@ -5,7 +5,6 @@ using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
 using Google.Apis.Auth;
-using Google.Apis.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -15,11 +14,11 @@ namespace DTech.Application.Services
 {
     public class AuthService(
         ICustomerRepository customerRepo,
-        IMapper mapper,
-        UserManager<ApplicationUser> userManager,
         ITokenService tokenService,
         IEmailService emailService,
         IBackgroundTaskQueue backgroundTaskQueue,
+        IMapper mapper,
+        UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager,
         IHttpClientFactory httpClientFactory
     ) : IAuthService

@@ -14,7 +14,7 @@ namespace DTech.API.Controllers
     ) : ControllerBase
     {
         [HttpGet("me")]
-        public async Task<IActionResult> FetchProfileAsync()
+        public async Task<IActionResult> FetchProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -32,7 +32,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpPut("update-profile")]
-        public async Task<IActionResult> UpdateProfileAsync([FromForm] UpdateProfileDto model)
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -47,7 +47,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto model)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             
@@ -62,7 +62,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpPost("add-new-address")]
-        public async Task<IActionResult> AddAddressAsync([FromBody] AddAddressDto model)
+        public async Task<IActionResult> AddAddress([FromBody] AddAddressDto model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -81,7 +81,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpPut("edit-address")]
-        public async Task<IActionResult> EditAddressAsync([FromBody] EditAddressDto model)
+        public async Task<IActionResult> EditAddress([FromBody] EditAddressDto model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -96,7 +96,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpDelete("delete-address/{addressId}")]
-        public async Task<IActionResult> DeleteAddressAsync(int addressId)
+        public async Task<IActionResult> DeleteAddress(int addressId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -111,7 +111,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpPut("switch-default-address/{addressId}")]
-        public async Task<IActionResult> SwitchDefaultAsync(int addressId)
+        public async Task<IActionResult> SwitchDefault(int addressId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -126,7 +126,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpGet("get-order-detail/{orderId}")]
-        public async Task<IActionResult> GetOrderDetailAsync(string orderId)
+        public async Task<IActionResult> GetOrderDetail(string orderId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -144,7 +144,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpPut("cancel-order/{orderId}")]
-        public async Task<IActionResult> CancelOrderAsync(string orderId)
+        public async Task<IActionResult> CancelOrder(string orderId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -162,7 +162,7 @@ namespace DTech.API.Controllers
         }
 
         [HttpGet("get-wishlists")]
-        public async Task<IActionResult> AddWishlists()
+        public async Task<IActionResult> GetWishlists()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 

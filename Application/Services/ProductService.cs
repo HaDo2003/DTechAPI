@@ -10,8 +10,6 @@ using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DTech.Application.Services
 {

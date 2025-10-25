@@ -1,5 +1,4 @@
-﻿using CloudinaryDotNet.Actions;
-using DTech.Application.Interfaces;
+﻿using DTech.Application.Interfaces;
 using DTech.Application.Settings;
 using DTech.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
