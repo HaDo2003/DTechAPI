@@ -359,7 +359,14 @@ namespace DTech.Application.Services
                     UpdatedBy = product.UpdatedBy,
                 }
                 : null,
-                
+                ProductColors = product != null && product.ProductColors != null && product.ProductColors.Count != 0
+                    ? [.. product.ProductColors.Select(color => new ProductColorDto
+                    {
+                        ColorId = color.ColorId,
+                        ColorName = color.ColorName,
+                        ColorCode = color.ColorCode
+                    })]
+                    : [],
                 Specifications = product != null && product.Specifications != null && product.Specifications.Count != 0
                     ? [.. product.Specifications.Select(spec => new SpecificationDto
                     {
@@ -372,7 +379,8 @@ namespace DTech.Application.Services
                     ? [.. product.ProductImages.Select(img => new ProductImageDto
                     {
                         ImageId = img.ImageId,
-                        Image = img.Image
+                        Image = img.Image,
+                        ColorId = img.ColorId
                     })]
                     : [],
             };
@@ -623,6 +631,72 @@ namespace DTech.Application.Services
             }
         }
 
+        public async Task<IndexResDto<object?>> UpdateProductColorsAsync(int productId, List<ProductColorDto> model, string? currentUserId)
+        {
+            try
+            {
+                var existingColors = await productRepo.GetColorAsync(productId);
+                var existingColorsIds = existingColors.Select(c => c.ColorId).ToList();
+                var incomingColorsIds = model.Where(m => m.ColorId > 0).Select(m => m.ColorId).ToList();
+
+                // Delete removed colors
+                var colorToDelete = existingColors
+                    .Where(c => !incomingColorsIds.Contains(c.ColorId))
+                    .ToList();
+
+                if (colorToDelete.Count != 0)
+                    await productRepo.DeleteColorsAsync([.. colorToDelete.Select(i => i.ColorId)]);
+
+                foreach (var color in model)
+                {
+                    if (color.ColorId > 0)
+                    {
+                        // 🔹 Update existing color
+                        var existingColor = existingColors.FirstOrDefault(c => c.ColorId == color.ColorId);
+                        if (existingColor != null)
+                        {
+                            existingColor.ColorName = color.ColorName ?? "";
+                            existingColor.ColorCode = color.ColorCode;
+                        }
+                    }
+                    else
+                    {
+                        var newColor = new ProductColor
+                        {
+                            ProductId = productId,
+                            ColorName = color.ColorName ?? "",
+                            ColorCode = color.ColorCode
+                        };
+                        await productRepo.AddColorAsync(newColor);
+                    }
+                }
+                var result = await productRepo.SaveColorsAsync();
+                if (!result)
+                {
+                    return new IndexResDto<object?>
+                    {
+                        Success = true,
+                        Message = "Colors updated failure.",
+                        Data = null
+                    };
+                }
+                return new IndexResDto<object?>
+                {
+                    Success = true,
+                    Message = "Colors updated successfully.",
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new IndexResDto<object?>
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    Data = null
+                };
+            }
+        }
         public async Task<IndexResDto<object?>> UpdateProductSpecificationAsync(int productId, List<SpecificationDto> model, string? currentUserId)
         {
             try
@@ -730,6 +804,7 @@ namespace DTech.Application.Services
                                     filepath: folderName
                                 );
                                 existingImage.Image = newUrl;
+                                existingImage.ColorId = img.ColorId;
                             }
                         }
                         else
@@ -742,7 +817,8 @@ namespace DTech.Application.Services
                             return new ProductImage
                             {
                                 ProductId = productId,
-                                Image = newUrl
+                                Image = newUrl,
+                                ColorId = img.ColorId
                             };
                         }
                     }

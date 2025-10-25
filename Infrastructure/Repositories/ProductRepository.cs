@@ -203,6 +203,7 @@ namespace DTech.Infrastructure.Repositories
                 .Include(a => a.Category)
                 .Include(p => p.Specifications)
                 .Include(p => p.ProductImages)
+                .Include(p => p.ProductColors)
                 .FirstOrDefaultAsync(a => a.ProductId == productId);
 
             return product;
@@ -310,6 +311,41 @@ namespace DTech.Infrastructure.Repositories
             return await context.SaveChangesAsync() > 0;
         }
 
+        // Repo for Product Color
+        public async Task<List<ProductColor>> GetColorAsync(int productId)
+        {
+            return await context.ProductColors
+                .AsNoTracking()
+                .Where(a => a.ProductId == productId)
+                .ToListAsync();
+        }
+
+        public async Task AddColorAsync(ProductColor newColor)
+        {
+            if (newColor == null)
+                return;
+
+            await context.ProductColors.AddAsync(newColor);
+        }
+
+        public async Task DeleteColorsAsync(List<int> colorIds)
+        {
+            if (colorIds == null || colorIds.Count == 0)
+                return;
+
+            var colors = await context.ProductColors
+                .Where(color => colorIds.Contains(color.ColorId))
+                .ToListAsync();
+
+            if(colors.Count != 0)
+            {
+                context.ProductColors.RemoveRange(colors);
+            }
+        }
+        public async Task<bool> SaveColorsAsync()
+        {
+            return await context.SaveChangesAsync() > 0;
+        }
         // For admin
 
         public async Task<List<Product>?> GetAllProductsAsync()

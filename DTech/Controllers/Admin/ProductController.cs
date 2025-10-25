@@ -1,5 +1,6 @@
 ﻿using DTech.API.Helper;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
 using DTech.Application.Interfaces;
@@ -171,6 +172,15 @@ namespace DTech.API.Controllers.Admin
             return ControllerHelper.HandleResponse(response, this);
         }
 
+        [HttpPut("update-colors/{id}")]
+        public async Task<IActionResult> UpdateProductColors(int id, [FromBody] List<ProductColorDto> colors)
+        {
+            var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            if (unauthorized != null) return unauthorized;
+            var response = await productService.UpdateProductColorsAsync(id, colors, userId);
+            return ControllerHelper.HandleResponse(response, this);
+        }
+
         [HttpPut("update-specs/{id}")]
         public async Task<IActionResult> UpdateProductSpecification(int id, [FromBody] List<SpecificationDto> model)
         {
@@ -185,7 +195,9 @@ namespace DTech.API.Controllers.Admin
         public async Task<IActionResult> UpdateProductImage(int id,
             [FromForm] List<IFormFile> ImageUploads,       
             [FromForm] List<int> ImageIds,
-            [FromForm] List<IFormFile> NewUploads
+            [FromForm] List<int> ColorIds,
+            [FromForm] List<IFormFile> NewUploads,
+            [FromForm] List<int> NewColorIds
         )
         {
             var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
@@ -195,14 +207,16 @@ namespace DTech.API.Controllers.Admin
             var existingDtos = ImageIds.Select((imageId, idx) => new ProductImageDto
             {
                 ImageId = imageId,
-                ImageUpload = ImageUploads.ElementAtOrDefault(idx)
+                ImageUpload = ImageUploads.ElementAtOrDefault(idx),
+                ColorId = ColorIds.ElementAtOrDefault(idx)
             }).ToList();
 
             // New images
             var newDtos = NewUploads.Select(file => new ProductImageDto
             {
                 ImageId = 0,
-                ImageUpload = file
+                ImageUpload = file,
+                ColorId = NewColorIds.ElementAtOrDefault(NewUploads.IndexOf(file))
             }).ToList();
 
             var model = existingDtos.Concat(newDtos).ToList();

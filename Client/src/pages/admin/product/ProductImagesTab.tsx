@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ProductImage } from "../../../types/ProductImage";
 import { adminService } from "../../../services/AdminService";
 
@@ -6,6 +6,7 @@ interface Props {
     productId: number | string;
     token: string;
     productImages: ProductImage[];
+    colors: { value: number; label: string; code: string }[];
     mode: "create" | "edit";
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     setAlert: React.Dispatch<React.SetStateAction<{ message: string; type: "success" | "error" | "info" } | null>>;
@@ -16,13 +17,13 @@ const ProductImagesTab: React.FC<Props> = ({
     productId,
     token,
     productImages,
+    colors,
     mode,
     setLoading,
     setAlert,
     onChange
 }) => {
     const [images, setImages] = useState<ProductImage[]>(productImages);
-
     // Handle preview of new file
     // const handleChangeImage = (index: number, file: File) => {
     //     const updated = [...images];
@@ -37,7 +38,6 @@ const ProductImagesTab: React.FC<Props> = ({
 
     // Add new image to list
     const handleAddImage = (file: File) => {
-
         const newImage: ProductImage = {
             imageId: 0,
             image: URL.createObjectURL(file),
@@ -57,7 +57,16 @@ const ProductImagesTab: React.FC<Props> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-
+        if (images.length === 0) {
+            setAlert({ message: "Please add at least one image.", type: "error" });
+            setLoading(false);
+            return;
+        }
+        if (images.some(img => !img.colorId)) {
+            setAlert({ message: "Please select color for all images.", type: "error" });
+            setLoading(false);
+            return;
+        }
         const formData = new FormData();
 
         images.forEach((img) => {
@@ -65,9 +74,11 @@ const ProductImagesTab: React.FC<Props> = ({
                 // Existing image, maybe replacing file
                 formData.append("ImageIds", img.imageId.toString());
                 formData.append("ImageUploads", img.imageUpload ?? new Blob());
+                formData.append("ColorIds", img.colorId?.toString() ?? "");
             } else if (img.imageUpload) {
                 // New image
                 formData.append("NewUploads", img.imageUpload);
+                formData.append("NewColorIds", img.colorId?.toString() ?? "");
             }
         });
 
@@ -96,8 +107,9 @@ const ProductImagesTab: React.FC<Props> = ({
             <table className="table">
                 <thead>
                     <tr>
-                        <th className="col-5">Image</th>
-                        <th className="col-5"></th>
+                        <th className="col-4">Image</th>
+                        <th className="col-3">Upload</th>
+                        <th className="col-3">Color</th>
                         <th className="col-2"></th>
                     </tr>
                 </thead>
@@ -131,6 +143,51 @@ const ProductImagesTab: React.FC<Props> = ({
                                             }
                                         }}
                                     />
+                                </td>
+                                <td>
+                                    <div className="col">
+                                        <div className="form-group">
+                                            <label className="d-none" htmlFor={`color-select-${index}`}>Color</label>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                                <select
+                                                    id={`color-select-${index}`}
+                                                    value={image.colorId ?? ""}
+                                                    onChange={(e) => {
+                                                        const updated = [...images];
+                                                        updated[index] = {
+                                                            ...updated[index],
+                                                            colorId: Number(e.target.value),
+                                                        };
+                                                        setImages(updated);
+                                                        onChange(updated);
+                                                    }}
+                                                    className="form-control"
+                                                    required
+                                                    style={{ flex: 1 }}
+                                                >
+                                                    <option value="">Select Color</option>
+                                                    {colors.map((color) => (
+                                                        <option key={color.value} value={color.value}>
+                                                            {color.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+
+                                                {image.colorId && (
+                                                    <div
+                                                        style={{
+                                                            width: "22px",
+                                                            height: "22px",
+                                                            borderRadius: "50%",
+                                                            backgroundColor:
+                                                                colors.find((c) => c.value === image.colorId)?.code || "#ccc",
+                                                            border: "1px solid #999",
+                                                        }}
+                                                    ></div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     <button

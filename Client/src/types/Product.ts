@@ -4,6 +4,8 @@ import { type ProductCommentResponse } from "./ProductComment";
 import { type ProductImage } from "./ProductImage";
 import { type Specification} from "./Specification";
 import type { MessageResponse } from "./MessageReponse";
+import type { ProductColor } from "./ProductColor";
+import type { ProductModel } from "./ProductModel";
 
 export interface Product {
     productId: number;
@@ -62,6 +64,8 @@ export interface ProductForm {
 
 export interface ProductFormProp {
     productInfor: ProductForm;
+    productColors?: ProductColor[];
     specifications?: Specification[];
     productImages?: ProductImage[];
+    productModels?: ProductModel[];
 }

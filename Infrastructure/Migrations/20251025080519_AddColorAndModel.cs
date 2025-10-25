@@ -18,12 +18,6 @@ namespace DTech.Infrastructure.Migrations
                 type: "integer",
                 nullable: true);
 
-            migrationBuilder.AddColumn<int>(
-                name: "ProductColorColorId",
-                table: "ProductImages",
-                type: "integer",
-                nullable: true);
-
             migrationBuilder.CreateTable(
                 name: "ProductColors",
                 columns: table => new
@@ -69,9 +63,9 @@ namespace DTech.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImages_ProductColorColorId",
+                name: "IX_ProductImages_ColorId",
                 table: "ProductImages",
-                column: "ProductColorColorId");
+                column: "ColorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductColors_ProductId",
@@ -85,9 +79,9 @@ namespace DTech.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_ProductImages_ProductColors_ProductColorColorId",
+                name: "FK_ProductImages_ProductColors_ColorId",
                 table: "ProductImages",
-                column: "ProductColorColorId",
+                column: "ColorId",
                 principalTable: "ProductColors",
                 principalColumn: "ColorId");
         }
@@ -96,7 +90,7 @@ namespace DTech.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_ProductImages_ProductColors_ProductColorColorId",
+                name: "FK_ProductImages_ProductColors_ColorId",
                 table: "ProductImages");
 
             migrationBuilder.DropTable(
@@ -106,15 +100,11 @@ namespace DTech.Infrastructure.Migrations
                 name: "ProductColors");
 
             migrationBuilder.DropIndex(
-                name: "IX_ProductImages_ProductColorColorId",
+                name: "IX_ProductImages_ColorId",
                 table: "ProductImages");
 
             migrationBuilder.DropColumn(
                 name: "ColorId",
-                table: "ProductImages");
-
-            migrationBuilder.DropColumn(
-                name: "ProductColorColorId",
                 table: "ProductImages");
         }
     }

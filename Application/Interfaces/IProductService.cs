@@ -26,11 +26,11 @@ namespace DTech.Application.Interfaces
         Task<List<SelectResDto>> GetCategoriesAsync();
         Task<List<SelectResDto>> GetBrandsAsync();
         Task<IndexResDto<object?>> CreateProductAsync(ProductDetailDto? model, string? currentUserId);
+        Task<IndexResDto<object?>> UpdateProductColorsAsync(int productId, List<ProductColorDto> model, string? currentUserId);
         Task<IndexResDto<object?>> UpdateProductAsync(int productId, ProductDetailDto model, string? currentUserId);
         Task<IndexResDto<object?>> UpdateProductSpecificationAsync(int productId, List<SpecificationDto> model, string? currentUserId);
         Task<IndexResDto<object?>> UpdateProductImageAsync(int productId, List<ProductImageDto> model, string? currentUserId);
         Task<IndexResDto<object?>> DeleteProductAsync(int productId);
-
         Task<IndexResDto<object?>> UploadGlbAsync(IFormFile file);
     }
 }

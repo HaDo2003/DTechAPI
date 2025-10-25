@@ -108,6 +108,11 @@ namespace DTech.Infrastructure.Data
                 .HasOne(pm => pm.ProductColor)
                 .WithOne(pc => pc.ProductModel)
                 .HasForeignKey<ProductModel>(pm => pm.ColorId);
+
+            modelBuilder.Entity<ProductImage>()
+                .HasOne(pi => pi.ProductColor)
+                .WithMany(pc => pc.ProductImages)
+                .HasForeignKey(pi => pi.ColorId);
         }
     }
 }

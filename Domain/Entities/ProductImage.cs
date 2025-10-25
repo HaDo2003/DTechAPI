@@ -10,6 +10,8 @@ public partial class ProductImage
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ImageId { get; set; }
     public int? ProductId { get; set; }
+
+    [ForeignKey(nameof(ProductColor))]
     public int? ColorId { get; set; }
     public string? Image { get; set; }
     public virtual Product? Product { get; set; }

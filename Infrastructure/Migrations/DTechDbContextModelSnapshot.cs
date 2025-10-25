@@ -1026,15 +1026,12 @@ namespace DTech.Infrastructure.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("text");
 
-                    b.Property<int?>("ProductColorColorId")
-                        .HasColumnType("integer");
-
                     b.Property<int?>("ProductId")
                         .HasColumnType("integer");
 
                     b.HasKey("ImageId");
 
-                    b.HasIndex("ProductColorColorId");
+                    b.HasIndex("ColorId");
 
                     b.HasIndex("ProductId");
 
@@ -1680,7 +1677,7 @@ namespace DTech.Infrastructure.Migrations
                 {
                     b.HasOne("DTech.Domain.Entities.ProductColor", "ProductColor")
                         .WithMany("ProductImages")
-                        .HasForeignKey("ProductColorColorId");
+                        .HasForeignKey("ColorId");
 
                     b.HasOne("DTech.Domain.Entities.Product", "Product")
                         .WithMany("ProductImages")

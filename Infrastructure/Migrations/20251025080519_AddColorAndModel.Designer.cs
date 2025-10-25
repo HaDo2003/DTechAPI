@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DTech.Infrastructure.Migrations
 {
     [DbContext(typeof(DTechDbContext))]
-    [Migration("20251025070915_AddColorAndModel")]
+    [Migration("20251025080519_AddColorAndModel")]
     partial class AddColorAndModel
     {
         /// <inheritdoc />
@@ -1029,15 +1029,12 @@ namespace DTech.Infrastructure.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("text");
 
-                    b.Property<int?>("ProductColorColorId")
-                        .HasColumnType("integer");
-
                     b.Property<int?>("ProductId")
                         .HasColumnType("integer");
 
                     b.HasKey("ImageId");
 
-                    b.HasIndex("ProductColorColorId");
+                    b.HasIndex("ColorId");
 
                     b.HasIndex("ProductId");
 
@@ -1683,7 +1680,7 @@ namespace DTech.Infrastructure.Migrations
                 {
                     b.HasOne("DTech.Domain.Entities.ProductColor", "ProductColor")
                         .WithMany("ProductImages")
-                        .HasForeignKey("ProductColorColorId");
+                        .HasForeignKey("ColorId");
 
                     b.HasOne("DTech.Domain.Entities.Product", "Product")
                         .WithMany("ProductImages")

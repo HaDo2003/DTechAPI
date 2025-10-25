@@ -35,6 +35,11 @@ namespace DTech.Domain.Interfaces
         Task DeleteSpecificationsAsync(List<int> specIds);
         Task<bool> SaveSpecificationsAsync();
 
+        // Repo for Product Color
+        Task<List<ProductColor>> GetColorAsync(int productId);
+        Task AddColorAsync(ProductColor newColor);
+        Task DeleteColorsAsync(List<int> colorIds);
+        Task<bool> SaveColorsAsync();
         //For admin
         Task<List<Product>?> GetAllProductsAsync();
         Task<bool> CheckIfProductExistsAsync(Product product);

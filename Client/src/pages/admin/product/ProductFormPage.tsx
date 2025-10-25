@@ -9,6 +9,8 @@ import { type ProductFormProp } from "../../../types/Product";
 import ProductBasicInfoTab from "./ProductBasicInfoTab";
 import ProductSpecificationTab from "./SpecificationTab";
 import ProductImagesTab from "./ProductImagesTab";
+import ProductColorTab from "./ProductColorTab";
+import ProductModelTab from "./ProductModelTab";
 
 const ProductFormPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -32,16 +34,19 @@ const ProductFormPage: React.FC = () => {
             description: "",
             photo: "",
         },
+        productColors: [],
         specifications: [],
         productImages: [],
+        productModels: [],
     });
 
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<"basic" | "specs" | "images">("basic");
+    const [activeTab, setActiveTab] = useState<"basic" | "colors" | "specs" | "images" | "models">("basic");
     const [image, setImage] = useState<string>("");
     const [categories, setCategory] = useState<{ value: number; label: string }[]>([]);
     const [brands, setBrand] = useState<{ value: number; label: string }[]>([]);
+    const [colors, setColors] = useState<{ value: number; label: string; code: string}[]>([]);
 
     useEffect(() => {
         (async () => {
@@ -65,9 +70,12 @@ const ProductFormPage: React.FC = () => {
                 if (res.data && res.success) {
                     setForm({
                         productInfor: res.data.productInfor,
+                        productColors: res.data.productColors ?? [],
+                        productModels: res.data.productModels ?? [],
                         specifications: res.data.specifications ?? [],
                         productImages: res.data.productImages ?? [],
                     });
+                    setColors(res.data.productColors?.map(c => ({ value: c.colorId, label: c.colorName, code: c.colorCode })) ?? []);
                     setImage(res.data?.productInfor?.photo ?? "");
                 }
                 setLoading(false);
@@ -100,6 +108,13 @@ const ProductFormPage: React.FC = () => {
                 fd.append("ProductInfor.PhotoUpload", info.productInfor.photoUpload);
             }
 
+            if (info.productColors && info.productColors.length > 0) {
+                info.productColors.forEach((color, index) => {
+                    fd.append(`ProductColors[${index}].ColorName`, color.colorName);
+                    fd.append(`ProductColors[${index}].ColorCode`, color.colorCode);
+                });
+            }
+
             if (info.specifications && info.specifications.length > 0) {
                 info.specifications.forEach((spec, index) => {
                     fd.append(`Specifications[${index}].SpecName`, spec.specName);
@@ -111,6 +126,14 @@ const ProductFormPage: React.FC = () => {
                 info.productImages.forEach((img, _) => {
                     if (img.imageUpload) {
                         fd.append("NewImageUploads", img.imageUpload);
+                    }
+                });
+            }
+
+            if (info.productModels && info.productModels.length > 0) {
+                info.productModels.forEach((model, _) => {
+                    if (model.modelUpload) {
+                        fd.append("NewModelUploads", model.modelUpload);
                     }
                 });
             }
@@ -162,18 +185,37 @@ const ProductFormPage: React.FC = () => {
                             </button>
                             <button
                                 type="button"
+                                className={`btn btn-sm me-2 ${activeTab === "colors" ? "btn-primary" : "btn-outline-primary"}`}
+                                onClick={() => setActiveTab("colors")}
+                            >
+                                Colors
+                            </button>
+                            <button
+                                type="button"
                                 className={`btn btn-sm me-2 ${activeTab === "specs" ? "btn-primary" : "btn-outline-primary"}`}
                                 onClick={() => setActiveTab("specs")}
                             >
                                 Specifications
                             </button>
-                            <button
-                                type="button"
-                                className={`btn btn-sm ${activeTab === "images" ? "btn-primary" : "btn-outline-primary"}`}
-                                onClick={() => setActiveTab("images")}
-                            >
-                                Images
-                            </button>
+                            {mode === "edit" &&
+                                <>
+                                    <button
+                                        type="button"
+                                        className={`btn btn-sm me-2 ${activeTab === "images" ? "btn-primary" : "btn-outline-primary"}`}
+                                        onClick={() => setActiveTab("images")}
+                                    >
+                                        Images
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`btn btn-sm ${activeTab === "models" ? "btn-primary" : "btn-outline-primary"}`}
+                                        onClick={() => setActiveTab("models")}
+                                    >
+                                        Models
+                                    </button>
+                                </>
+                            }
+
                         </div>
                     </div>
                     <div className="card-body">
@@ -193,6 +235,23 @@ const ProductFormPage: React.FC = () => {
                                         setForm((prev) => ({
                                             ...prev,
                                             productInfor: updated
+                                        }))
+                                    }
+                                />
+                            )}
+
+                            {activeTab === "colors" && (
+                                <ProductColorTab
+                                    productId={form.productInfor.id}
+                                    productColors={form.productColors ?? []}
+                                    mode={mode}
+                                    token={token ?? ""}
+                                    setLoading={setLoading}
+                                    setAlert={setAlert}
+                                    onChange={(updated) =>
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            productColors: updated
                                         }))
                                     }
                                 />
@@ -219,6 +278,7 @@ const ProductFormPage: React.FC = () => {
                                 <ProductImagesTab
                                     productId={form.productInfor.id}
                                     productImages={form.productImages ?? []}
+                                    colors={colors}
                                     mode={mode}
                                     token={token ?? ""}
                                     setLoading={setLoading}
@@ -227,6 +287,23 @@ const ProductFormPage: React.FC = () => {
                                         setForm((prev) => ({
                                             ...prev,
                                             productImages: updated
+                                        }))
+                                    }
+                                />
+                            )}
+
+                            {activeTab === "models" && (
+                                <ProductModelTab
+                                    productId={form.productInfor.id}
+                                    productModels={form.productModels ?? []}
+                                    mode={mode}
+                                    token={token ?? ""}
+                                    setLoading={setLoading}
+                                    setAlert={setAlert}
+                                    onChange={(updated) =>
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            productModels: updated
                                         }))
                                     }
                                 />
