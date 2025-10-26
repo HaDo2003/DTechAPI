@@ -193,30 +193,28 @@ namespace DTech.API.Controllers.Admin
 
         [HttpPut("update-images/{id}")]
         public async Task<IActionResult> UpdateProductImage(int id,
-            [FromForm] List<IFormFile> ImageUploads,       
-            [FromForm] List<int> ImageIds,
-            [FromForm] List<int> ColorIds,
-            [FromForm] List<IFormFile> NewUploads,
-            [FromForm] List<int> NewColorIds
+            [FromForm] ProductImageReqDto request
         )
         {
             var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
             if (unauthorized != null) return unauthorized;
 
             // Existing images
-            var existingDtos = ImageIds.Select((imageId, idx) => new ProductImageDto
+            var existingDtos = (request.ImageIds ?? []).Select((imageId, idx) => new ProductImageDto
             {
                 ImageId = imageId,
-                ImageUpload = ImageUploads.ElementAtOrDefault(idx),
-                ColorId = ColorIds.ElementAtOrDefault(idx)
+                ImageUpload = request.ImageUploads?.ElementAtOrDefault(idx),
+                ColorId = request.ColorIds?.ElementAtOrDefault(idx)
             }).ToList();
 
             // New images
-            var newDtos = NewUploads.Select(file => new ProductImageDto
+            var newDtos = (request.NewUploads ?? []).Select(file => new ProductImageDto
             {
                 ImageId = 0,
                 ImageUpload = file,
-                ColorId = NewColorIds.ElementAtOrDefault(NewUploads.IndexOf(file))
+                ColorId = (request.NewColorIds != null && request.NewUploads != null)
+                    ? request.NewColorIds.ElementAtOrDefault(request.NewUploads.IndexOf(file))
+                    : null
             }).ToList();
 
             var model = existingDtos.Concat(newDtos).ToList();
@@ -243,24 +241,24 @@ namespace DTech.API.Controllers.Admin
             return ControllerHelper.HandleResponse(response, this);
         }
 
-        [HttpPost("glb")]
+        [HttpPut("glb/{id}")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadGlb([FromForm] GlbReq request)
+        public async Task<IActionResult> UploadGlb(int id, [FromForm] GlbReq request)
         {
-            var (userId, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
+            var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
             if (unauthorized != null) return unauthorized;
-            var file = request.File;
-            if (file == null)
-                return BadRequest("No file uploaded");
+
+            if (request.Models == null || request.Models.Count == 0)
+                return BadRequest("No models uploaded");
 
             try
             {
-                await productService.UploadGlbAsync(file);
-                return Ok();
+                await productService.UploadGlbAsync(id, request);
+                return Ok(new { success = true, message = "Models uploaded successfully" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
     }

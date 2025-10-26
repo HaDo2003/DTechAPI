@@ -40,6 +40,13 @@ namespace DTech.Domain.Interfaces
         Task AddColorAsync(ProductColor newColor);
         Task DeleteColorsAsync(List<int> colorIds);
         Task<bool> SaveColorsAsync();
+
+        // Repo for Product Models
+        Task<List<ProductModel>> GetModelsAsync(int productId);
+        Task AddModelsAsync(List<ProductModel> models);
+        Task DeleteModelsAsync(List<int> modelIds);
+        Task<bool> SaveModelsAsync();
+
         //For admin
         Task<List<Product>?> GetAllProductsAsync();
         Task<bool> CheckIfProductExistsAsync(Product product);

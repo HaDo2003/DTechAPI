@@ -3,8 +3,6 @@ using DTech.Application.DTOs.response;
 using DTech.Application.DTOs.Response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace DTech.Application.Interfaces
 {
@@ -31,6 +29,6 @@ namespace DTech.Application.Interfaces
         Task<IndexResDto<object?>> UpdateProductSpecificationAsync(int productId, List<SpecificationDto> model, string? currentUserId);
         Task<IndexResDto<object?>> UpdateProductImageAsync(int productId, List<ProductImageDto> model, string? currentUserId);
         Task<IndexResDto<object?>> DeleteProductAsync(int productId);
-        Task<IndexResDto<object?>> UploadGlbAsync(IFormFile file);
+        Task<IndexResDto<object?>> UploadGlbAsync(int productId, GlbReq request);
     }
 }

@@ -27,6 +27,7 @@ import { useCart } from "../../context/CartContext";
 
 import ThreeDModelViewer from "../../components/customer/productDetail/ModelViewer";
 import SkeletonProductDetail from "../../components/customer/skeleton/SkeletonProductDetail";
+import { customerService } from "../../services/CustomerService";
 
 const ProductDetail: React.FC = () => {
     const { user, token } = useAuth();
@@ -46,6 +47,8 @@ const ProductDetail: React.FC = () => {
     const [isSpecOpen, setIsSpecOpen] = useState(false);
     const RVData = useRecentlyViewed();
     const [is3DViewOpen, setIs3DViewOpen] = useState(false);
+    const [isWishlisted, setIsWishlisted] = useState(false);
+    const [color, setColor] = useState<number>(0);
     const swiperRef = useRef<any>(null);
 
     useEffect(() => {
@@ -55,7 +58,11 @@ const ProductDetail: React.FC = () => {
             try {
                 const data = await productService.getProductData(categorySlug!, brandSlug!, slug!);
                 setProduct(data);
-                setMainImage(data.photo ?? "");
+                if (data.productImages && data.productImages.length > 0) {
+                    setMainImage(data.productImages[0].image);
+                } else {
+                    setMainImage(data.photo ?? "");
+                }
                 setCommentList(data.productComments ?? []);
             } catch (error) {
                 console.error("Failed to fetch product data:", error);
@@ -67,6 +74,35 @@ const ProductDetail: React.FC = () => {
         fetchProduct();
     }, [categorySlug, brandSlug, slug]);
 
+    const fetchWishlist = async () => {
+        if (!token || !product) return;
+        try {
+            const res = await customerService.getWishlists<{ productId: number }>(token);
+            if (res.success && res.data) {
+                const isInWishlist = res.data.some(w => w.productId === product.productId);
+                setIsWishlisted(isInWishlist);
+            } else {
+                setIsWishlisted(false);
+            }
+        } catch {
+            setIsWishlisted(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchWishlist();
+    }, [token, product]);
+
+    useEffect(() => {
+        if (!product || !product.productImages || product.productImages.length === 0) return;
+
+        const matchedImage = product.productImages.find(img => img.colorId === color);
+        if (matchedImage) {
+            setMainImage(matchedImage.image);
+            const matchedIndex = product.productImages.findIndex(img => img.imageId === matchedImage.imageId);
+            swiperRef.current?.slideTo(matchedIndex);
+        }
+    }, [color]);
 
     if (loading) {
         return (
@@ -123,10 +159,16 @@ const ProductDetail: React.FC = () => {
             return;
         }
 
+        if (color === null) {
+            setAlert({ message: "Please choose color of product", type: "error" });
+            return;
+        }
+
         try {
             const res = await cartService.addToCart(token, {
                 productId: product.productId,
-                quantity: quantity
+                quantity: quantity,
+                colorId: color,
             });
             if (res.success) {
                 setAlert({ message: res.message || "Added to cart!", type: "success" });
@@ -137,6 +179,43 @@ const ProductDetail: React.FC = () => {
             }
         } catch (err) {
             setAlert({ message: "Add to cart failed, please try again.", type: "error" });
+        }
+    };
+
+    const toggleWishlist = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (token === null) {
+            setAlert({ message: "Please login to add to cart", type: "error" });
+            setTimeout(() => {
+                navigate("/login");
+            }, 3000);
+            return;
+        }
+
+        if (isWishlisted) {
+            try {
+                const res = await customerService.removeWishlist(token, product.productId);
+                if (res.success) {
+                    setIsWishlisted(false);
+                    setAlert({ message: res.message || "Removed wishlist!", type: "success" });
+                } else {
+                    setAlert({ message: res.message || "Removed wishlist failed!", type: "error" });
+                }
+            } catch (err) {
+                setAlert({ message: "Removed wishlist failed, please try again.", type: "error" });
+            }
+        } else {
+            try {
+                const res = await customerService.addWishlist(token, product.productId);
+                if (res.success) {
+                    setIsWishlisted(true);
+                    setAlert({ message: res.message || "Added to wishlist!", type: "success" });
+                } else {
+                    setAlert({ message: res.message || "Add to wishlist failed!", type: "error" });
+                }
+            } catch (err) {
+                setAlert({ message: "Add to wishlist failed, please try again.", type: "error" });
+            }
         }
     };
 
@@ -240,18 +319,6 @@ const ProductDetail: React.FC = () => {
                                     className="thumbnail-slider"
                                     onSwiper={(swiper) => (swiperRef.current = swiper)}
                                 >
-                                    {/* Main product photo first */}
-                                    <SwiperSlide key="main-photo">
-                                        <div className="border rounded p-1 sub-div-img">
-                                            <img
-                                                src={product.photo}
-                                                alt={product.name}
-                                                className="rounded thumbnail-img cursor-pointer"
-                                                onClick={() => handleImageClick(product.photo)}
-                                            />
-                                        </div>
-                                    </SwiperSlide>
-
                                     {/* Other images */}
                                     {product.productImages.map((image, index) => (
                                         <SwiperSlide key={image.imageId}>
@@ -351,6 +418,31 @@ const ProductDetail: React.FC = () => {
                         )}
 
                         <div className="product-purchase-area">
+                            {product.productColors && product.productColors.length > 0 && (
+                                <div className="color-section my-3">
+                                    <label className="fw-semibold d-block mb-2 text-secondary">Choose Color:</label>
+                                    <div className="d-flex flex-wrap gap-3">
+                                        {product.productColors.map((colorOption) => (
+                                            <button
+                                                key={colorOption.colorId}
+                                                type="button"
+                                                className={`btn-color shadow-md ${color === colorOption.colorId ? "selected" : ""}`}
+                                                onClick={() => setColor(colorOption.colorId)}
+                                                style={{
+                                                    backgroundColor: colorOption.colorCode,
+                                                    borderColor: color === colorOption.colorId ? colorOption.colorCode : "#dee2e6",
+                                                }}
+                                                title={colorOption.colorName}
+                                            >
+                                                {color === colorOption.colorId && (
+                                                    <i className="fa-solid fa-check text-white checkmark"></i>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="quantity-section">
                                 <label htmlFor="quantity" className="quantity-label">Quantity:</label>
                                 <div className="quantity-control">
@@ -370,9 +462,12 @@ const ProductDetail: React.FC = () => {
                                     <i className="fas fa-shopping-cart"></i> Add to Cart
                                 </button>
 
-                                <button type="button" className="btn-wishlist" onClick={() =>
-                                    setAlert({ message: "Added to wishlist!", type: "success" })
-                                }>
+                                <button
+                                    type="button"
+                                    className={`btn-wishlist
+                                        ${isWishlisted ? "btn-wishlist-red" : "btn-wishlist-white"}`}
+                                    onClick={(e) => toggleWishlist(e)}
+                                >
                                     <i className="fas fa-heart"></i>
                                 </button>
                             </div>

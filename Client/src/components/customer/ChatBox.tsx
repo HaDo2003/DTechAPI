@@ -51,7 +51,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
 
       {/* Chat Widget */}
       <div className="chat-widget">
-        <button className="btn chat-btn" onClick={() => setIsOpen(!isOpen)}>
+        <button className="chat-btn" onClick={() => setIsOpen(!isOpen)}>
           <i className="fas fa-comments"></i>
         </button>
 

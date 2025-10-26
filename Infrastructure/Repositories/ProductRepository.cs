@@ -96,6 +96,10 @@ namespace DTech.Infrastructure.Repositories
 
             if (product != null)
             {
+                product.ProductColors = await context.ProductColors
+                    .Where(c => c.ProductId == product.ProductId)
+                    .ToListAsync();
+
                 product.Specifications = await context.Specifications
                     .Where(s => s.ProductId == product.ProductId)
                     .ToListAsync();
@@ -203,7 +207,7 @@ namespace DTech.Infrastructure.Repositories
                 .Include(a => a.Category)
                 .Include(p => p.Specifications)
                 .Include(p => p.ProductImages)
-                .Include(p => p.ProductColors)
+                .Include(p => p.ProductColors).ThenInclude(pc => pc.ProductModel)
                 .FirstOrDefaultAsync(a => a.ProductId == productId);
 
             return product;
@@ -343,6 +347,36 @@ namespace DTech.Infrastructure.Repositories
             }
         }
         public async Task<bool> SaveColorsAsync()
+        {
+            return await context.SaveChangesAsync() > 0;
+        }
+
+        // Repo for Product Models
+        public async Task<List<ProductModel>> GetModelsAsync(int productId)
+        {
+            return await context.ProductModels
+                .Where(m => m.ProductColor != null && m.ProductColor.ProductId == productId)
+                .ToListAsync();
+        }
+        public async Task AddModelsAsync(List<ProductModel> models)
+        {
+            if (models == null || models.Count == 0)
+                return;
+            await context.ProductModels.AddRangeAsync(models);
+        }
+        public async Task DeleteModelsAsync(List<int> modelIds)
+        {
+            if (modelIds == null || modelIds.Count == 0)
+                return;
+            var models = await context.ProductModels
+                .Where(model => modelIds.Contains(model.ModelId))
+                .ToListAsync();
+            if (models.Count != 0)
+            {
+                context.ProductModels.RemoveRange(models);
+            }
+        }
+        public async Task<bool> SaveModelsAsync()
         {
             return await context.SaveChangesAsync() > 0;
         }

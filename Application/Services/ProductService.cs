@@ -383,6 +383,17 @@ namespace DTech.Application.Services
                         ColorId = img.ColorId
                     })]
                     : [],
+                ProductModels = product != null && product.ProductColors != null
+                    ? [.. product.ProductColors
+                        .Where(pc => pc.ProductModel != null)
+                        .Select(pc => new ProductModelDto
+                        {
+                            ModelId = pc.ProductModel!.ModelId,
+                            ModelName = pc.ProductModel.ModelName,
+                            ModelUrl = pc.ProductModel.ModelUrl,
+                            ColorId = pc.ProductModel.ColorId
+                        })]
+                    : [],
             };
 
             return new IndexResDto<ProductResDto>
@@ -895,36 +906,116 @@ namespace DTech.Application.Services
             }
         }
 
-        public async Task<IndexResDto<object?>> UploadGlbAsync(IFormFile file)
+        public async Task<IndexResDto<object?>> UploadGlbAsync(
+            int productId,
+            GlbReq request
+        )
         {
-            if (file == null || file.Length == 0)
-            {
-                return new IndexResDto<object?>()
-                {
-                    Success = false,
-                    Message = "No file provided",
-                    Data = null
-                };
-            }
-
             try
             {
-                // Call Cloudinary service
-                string url = await cloudinaryService.UploadGlbAsync(file, "Pre-thesis/Product/3DModel");
+                // Get existing models
+                var existingModels = await productRepo.GetModelsAsync(productId);
+                var existingModelIds = existingModels.Select(m => m.ModelId).ToList();
+                var incomingModelIds = request.Models.Where(m => m.ModelId > 0).Select(m => m.ModelId).ToList();
 
-                return new IndexResDto<object?>()
+                // Delete removed models in batch
+                var modelsToDelete = existingModels
+                    .Where(m => !incomingModelIds.Contains(m.ModelId))
+                    .ToList();
+
+                if (modelsToDelete.Count != 0)
+                    await productRepo.DeleteModelsAsync([.. modelsToDelete.Select(m => m.ModelId)]);
+
+                // Prepare upload tasks
+                var uploadTasks = request.Models.Select(async model =>
+                {
+                    if (model.ModelId > 0)
+                    {
+                        var existingModel = existingModels.FirstOrDefault(m => m.ModelId == model.ModelId);
+                        if (existingModel != null)
+                        {
+                            existingModel.ColorId = model.ColorId;
+                            existingModel.ModelName = model.ModelName;
+
+                            if (model.ModelUpload != null && model.ModelUpload.Length > 0)
+                            {
+                                string newUrl = await cloudinaryService.UploadGlbAsync(
+                                    model.ModelUpload,
+                                    "Pre-thesis/Product/3DModel"
+                                );
+                                existingModel.ModelUrl = newUrl;
+                                existingModel.UploadedDate = DateTime.UtcNow;
+                                existingModel.ModelType = "glb";
+                            }
+                        }
+
+                        return (ProductModel?)null;
+                    }
+
+                    if (model.ModelUpload != null && model.ModelUpload.Length > 0)
+                    {
+                        string newUrl = await cloudinaryService.UploadGlbAsync(
+                            model.ModelUpload,
+                            "Pre-thesis/Product/3DModel"
+                        );
+
+                        return new ProductModel
+                        {
+                            ModelUrl = newUrl,
+                            ColorId = model.ColorId,
+                            ModelName = model.ModelName,
+                            UploadedDate = DateTime.UtcNow,
+                            ModelType = "glb"
+                        };
+                    }
+
+                    return (ProductModel?)null;
+                });
+
+                // Wait for uploads in parallel
+                var uploadedModels = (await Task.WhenAll(uploadTasks))
+                    .OfType<ProductModel>()
+                    .ToList();
+
+                Console.WriteLine("=== Models before saving ===");
+                foreach (var model in existingModels)
+                {
+                    Console.WriteLine($"Existing → Id: {model.ModelId}, Name: {model.ModelName}, ColorId: {model.ColorId}");
+                }
+                foreach (var model in uploadedModels)
+                {
+                    Console.WriteLine($"New → Name: {model.ModelName}, ColorId: {model.ColorId}");
+                }
+                Console.WriteLine("============================");
+
+                // Add new uploaded models
+                if (uploadedModels.Count != 0)
+                    await productRepo.AddModelsAsync(uploadedModels);
+
+                // Save changes once
+                var result = await productRepo.SaveModelsAsync();
+
+                if (!result)
+                    return new IndexResDto<object?>
+                    {
+                        Success = false,
+                        Message = "3D model update failed.",
+                        Data = null
+                    };
+
+                return new IndexResDto<object?>
                 {
                     Success = true,
-                    Message = "File uploaded successfully",
-                    Data = new { Url = url }
+                    Message = "3D models updated successfully.",
+                    Data = null
                 };
             }
             catch (Exception ex)
             {
-                return new IndexResDto<object?>()
+                return new IndexResDto<object?>
                 {
                     Success = false,
-                    Message = $"Upload failed: {ex.Message}",
+                    Message = $"An error occurred: {ex.Message}",
                     Data = null
                 };
             }

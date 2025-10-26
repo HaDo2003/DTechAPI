@@ -1,4 +1,6 @@
-﻿namespace DTech.Application.DTOs.response
+﻿using DTech.Application.DTOs.Response;
+
+namespace DTech.Application.DTOs.response
 {
     public class CartProductDto
     {
@@ -10,5 +12,6 @@
         public decimal? Discount { get; set; }
         public decimal? PriceAfterDiscount { get; set; }
         public string? Photo {  get; set; }
+        public ProductColorDto? Color { get; set; }
     }
 }

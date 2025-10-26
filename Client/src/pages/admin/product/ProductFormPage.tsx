@@ -6,11 +6,11 @@ import CardWrapped from "../../../components/admin/CardWrapped";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
 import { type ProductFormProp } from "../../../types/Product";
-import ProductBasicInfoTab from "./ProductBasicInfoTab";
-import ProductSpecificationTab from "./SpecificationTab";
-import ProductImagesTab from "./ProductImagesTab";
-import ProductColorTab from "./ProductColorTab";
-import ProductModelTab from "./ProductModelTab";
+import ProductBasicInfoTab from "../../../components/admin/product/ProductBasicInfoTab";
+import ProductSpecificationTab from "../../../components/admin/product/SpecificationTab";
+import ProductImagesTab from "../../../components/admin/product/ProductImagesTab";
+import ProductColorTab from "../../../components/admin/product/ProductColorTab";
+import ProductModelTab from "../../../components/admin/product/ProductModelTab";
 
 const ProductFormPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -142,8 +142,10 @@ const ProductFormPage: React.FC = () => {
                 mode === "create"
                     ? await adminService.createData("/api/product/create-all", fd, token ?? "")
                     : await adminService.updateData("/api/product/update-all", form.productInfor.id ?? "", fd, token ?? "");
-
-            if (res?.success) {
+            if(mode === "create" && res?.success) {
+                navigate(`/admin/product/edit/${res.data}`);
+                setAlert({ message: "Product created successfully!", type: "success" });
+            } else if (res?.success) {
                 setAlert({ message: "All product data saved successfully!", type: "success" });
             } else {
                 setAlert({ message: "Failed to save product.", type: "error" });
@@ -296,6 +298,7 @@ const ProductFormPage: React.FC = () => {
                                 <ProductModelTab
                                     productId={form.productInfor.id}
                                     productModels={form.productModels ?? []}
+                                    colors={colors}
                                     mode={mode}
                                     token={token ?? ""}
                                     setLoading={setLoading}

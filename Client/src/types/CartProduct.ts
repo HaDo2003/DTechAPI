@@ -1,6 +1,9 @@
+import type { ProductColor } from "./ProductColor";
+
 export interface CartProduct {
     productId: number;
     quantity: number;
+    colorId: number;
 }
 
 export interface CartProductEdit {
@@ -12,4 +15,5 @@ export interface CartProductEdit {
     discount?: number;
     priceAfterDiscount: number | null;
     photo?: string;
+    color?: ProductColor;
 }

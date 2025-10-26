@@ -114,7 +114,33 @@ export const adminService = {
 
             return response.data;
         } catch (err: any) {
-            return handleAxiosError(err, "Failed to update data. Please try again.");
+            return handleAxiosError(err, "Failed to update image. Please try again.");
+        }
+    },
+
+    async updateProductModels<T>(
+        endpoint: string,
+        id: string | number,
+        data: T | FormData,
+        token?: string
+    ): Promise<ServiceResponse<T>> {
+        try {
+            const isFormData = data instanceof FormData;
+
+            const headers: any = {
+                ...(token && { Authorization: `Bearer ${token}` }),
+                ...(!isFormData && { "Content-Type": "application/json" }),
+            };
+
+            const response = await axios.put<ServiceResponse<T>>(
+                `${endpoint}/${id}`,
+                data,
+                { headers }
+            );
+
+            return response.data;
+        } catch (err: any) {
+            return handleAxiosError(err, "Failed to update image. Please try again.");
         }
     },
 

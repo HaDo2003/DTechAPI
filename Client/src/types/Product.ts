@@ -26,6 +26,8 @@ export interface Product {
     category: Category;
     brand: Brand;
     productComments: ProductCommentResponse[];
+    productColors: ProductColor[];
+    productModels: ProductModel[];
     productImages: ProductImage[];
     specifications: Specification[];
     relatedProducts: Product[];

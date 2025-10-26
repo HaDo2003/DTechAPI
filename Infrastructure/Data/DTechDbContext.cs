@@ -113,6 +113,16 @@ namespace DTech.Infrastructure.Data
                 .HasOne(pi => pi.ProductColor)
                 .WithMany(pc => pc.ProductImages)
                 .HasForeignKey(pi => pi.ColorId);
+
+            modelBuilder.Entity<CartProduct>()
+                .HasOne(cp => cp.ProductColor)
+                .WithMany(pc => pc.CartProducts)
+                .HasForeignKey(cp => cp.ColorId);
+
+            modelBuilder.Entity<OrderProduct>()
+                .HasOne(cp => cp.ProductColor)
+                .WithMany(pc => pc.OrderProducts)
+                .HasForeignKey(cp => cp.ColorId);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Response;
 using DTech.Domain.Entities;
 
 namespace DTech.Application.Mapping
@@ -15,11 +16,13 @@ namespace DTech.Application.Mapping
             CreateMap<ProductImage, ProductImageDto>();
             CreateMap<ProductComment, ProductCommentDto>();
             CreateMap<Product, RelatedProductDto>();
+            CreateMap<ProductColor, ProductColorDto>();
 
             CreateMap<Product, ProductDto>()
             .ForMember(dest => dest.Specifications, opt => opt.MapFrom(src => src.Specifications))
             .ForMember(dest => dest.ProductImages, opt => opt.MapFrom(src => src.ProductImages))
-            .ForMember(dest => dest.ProductComments, opt => opt.MapFrom(src => src.ProductComments));
+            .ForMember(dest => dest.ProductComments, opt => opt.MapFrom(src => src.ProductComments))
+            .ForMember(dest => dest.ProductColors, opt => opt.MapFrom(src => src.ProductColors));
 
             CreateMap<RegisterDto, ApplicationUser>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Account))

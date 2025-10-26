@@ -40,6 +40,7 @@ namespace DTech.Infrastructure.Repositories
             {
                 cart.CartProducts = await context.CartProducts
                     .Include(cp => cp.Product)
+                    .ThenInclude(product => product != null ? product.ProductColors : new List<ProductColor>())
                     .Where(cp => cp.CartId == cart.CartId)
                     .ToListAsync();
             }

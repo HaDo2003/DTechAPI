@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Response;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -56,6 +57,14 @@ namespace DTech.Application.Services
                     Id = cp.Id,
                     ProductId = cp.ProductId,
                     Quantity = cp.Quantity,
+                    Color = cp.ProductColor != null
+                        ? new ProductColorDto
+                        {
+                            ColorId = cp.ProductColor.ColorId,
+                            ColorName = cp.ProductColor.ColorName,
+                            ColorCode = cp.ProductColor.ColorCode
+                        }
+                        : null,
                     Name = cp.Product?.Name,
                     Price = cp.Product?.Price,
                     Discount = cp.Product?.Discount,
@@ -65,6 +74,14 @@ namespace DTech.Application.Services
                 Success = true,
                 Message = "Cart retrieved successfully"
             };
+            Console.WriteLine("[DEBUG] Cart product colors:");
+            foreach (var p in cartDto.CartProducts)
+            {
+                Console.WriteLine(
+                    $" - ProductId: {p.ProductId}, Name: {p.Name}, " +
+                    $"ColorId: {p.Color?.ColorId}, ColorName: {p.Color?.ColorName}, ColorCode: {p.Color?.ColorCode}"
+                );
+            }
 
             return cartDto;
         }

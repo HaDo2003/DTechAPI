@@ -14,6 +14,7 @@ const CartItem: React.FC<CartItemProps> = ({ cartProduct, onUpdateQuantity, onRe
     const formattedFinalPrice = priceFormatter(finalPrice);
     const priceTotal = finalPrice * cartProduct.quantity;
     const formattedPriceTotal = priceFormatter(priceTotal);
+    console.log("Rendering CartItem for color:", cartProduct.color?.colorCode);
 
     return (
         <div
@@ -27,12 +28,25 @@ const CartItem: React.FC<CartItemProps> = ({ cartProduct, onUpdateQuantity, onRe
                     alt={cartProduct.name}
                     className="cart-img-custom me-2"
                 />
-                <div className="cart-product-name">{cartProduct.name}</div>
+                <div className="d-flex flex-column">
+                    <div className="cart-product-name">{cartProduct.name}</div>
+                    {cartProduct.color && (
+                        <div className="d-flex align-items-center mt-1">
+                            <div
+                                className="cart-product-color-circle me-2"
+                                style={{
+                                    backgroundColor: cartProduct.color.colorCode,
+                                }}
+                            ></div>
+                            <small className="text-muted">{cartProduct.color.colorName}</small>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Unit price */}
             <div className="col-2 text-center">
-                <span className="fw-bold small">{formattedFinalPrice}</span>
+                <span className="fw-bold fs-5">{formattedFinalPrice}</span>
             </div>
 
             {/* Quantity controls */}
@@ -63,7 +77,7 @@ const CartItem: React.FC<CartItemProps> = ({ cartProduct, onUpdateQuantity, onRe
 
             {/* Total price */}
             <div className="col-2 text-center">
-                <span className="fw-semibold small cart-total-price">
+                <span className="fw-semibold fs-5 cart-total-price">
                     {formattedPriceTotal}
                 </span>
             </div>

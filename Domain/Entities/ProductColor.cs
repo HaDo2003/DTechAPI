@@ -14,5 +14,7 @@ namespace DTech.Domain.Entities
         public virtual Product? Product { get; set; }
         public virtual ICollection<ProductImage> ProductImages { get; set; } = [];
         public virtual ProductModel? ProductModel { get; set; }
+        public virtual ICollection<CartProduct> CartProducts { get; set; } = [];
+        public virtual ICollection<OrderProduct> OrderProducts { get; set; } = [];
     }
 }
