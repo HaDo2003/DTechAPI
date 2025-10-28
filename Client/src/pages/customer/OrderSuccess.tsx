@@ -3,13 +3,12 @@ import { useLocation, useParams } from "react-router-dom";
 import type { OrderSuccessModel } from "../../types/OrderSuccess";
 import NotFound from "./NotFound";
 
-
 const OrderSuccess: React.FC = () => {
   const location = useLocation();
   const order: OrderSuccessModel = location.state;
   const { orderId } = useParams<{ orderId: string }>();
 
-  if(orderId === undefined){
+  if (orderId === undefined) {
     return <NotFound />
   }
 
@@ -121,8 +120,21 @@ const OrderSuccess: React.FC = () => {
                         className="img-fluid object-fit-cover rounded"
                       />
                     </div>
-                    <div className="flex-grow-1 fw-semibold mb-1">
-                      {product.name}
+                    <div className="d-flex flex-column">
+                      <div className="flex-grow-1 fw-semibold mb-1">
+                        {product.name}
+                      </div>
+                      {product.color && (
+                        <div className="d-flex align-items-center mt-1">
+                          <div
+                            className="cart-product-color-circle me-2"
+                            style={{
+                              backgroundColor: product.color.colorCode,
+                            }}
+                          ></div>
+                          <small className="text-muted">{product.color.colorName}</small>
+                        </div>
+                      )}
                     </div>
                     <div className="text-end fw-semibold">
                       {product?.costAtPurchase?.toLocaleString()}

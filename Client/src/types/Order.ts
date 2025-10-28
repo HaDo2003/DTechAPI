@@ -1,5 +1,6 @@
 import type { MessageResponse } from "./MessageReponse";
 import type { PaymentMethod } from "./PaymentMethod";
+import type { ProductColor } from "./ProductColor";
 
 export interface Order {
     orderId: string;
@@ -73,6 +74,7 @@ export interface OrderItem {
     photo: string;
     quantity: number;
     price: number;
+    color?: ProductColor;
     promotionalGift?: string;
 }
 

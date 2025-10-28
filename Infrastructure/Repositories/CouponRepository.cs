@@ -17,7 +17,7 @@ namespace DTech.Infrastructure.Repositories
 
         public async Task<Coupon?> GetCouponByCode(string code)
         {
-            return await context.Coupons.FirstOrDefaultAsync(c => c.Code == code);
+            return await context.Coupons.AsNoTracking().FirstOrDefaultAsync(c => c.Code == code);
         }
         public async Task<bool> UseCodeAsync(string reductionCode, string customerId)
         {
@@ -58,7 +58,7 @@ namespace DTech.Infrastructure.Repositories
             if (couponId <= 0)
                 return null;
 
-            return await context.Coupons.FindAsync(couponId);
+            return await context.Coupons.AsNoTracking().FirstOrDefaultAsync(c => c.CouponId == couponId);
         }
 
         public async Task<bool> CheckIfCouponExistsAsync(Coupon coupon)

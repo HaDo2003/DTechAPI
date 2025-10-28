@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Response;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Enums;
@@ -52,11 +53,12 @@ namespace DTech.Application.Services
                 CartProducts =
                 [
                     new CartProduct
-            {
-                ProductId = modelReq.ProductId,
-                Quantity = modelReq.Quantity,
-                Product = product
-            }
+                    {
+                        ProductId = modelReq.ProductId,
+                        Quantity = modelReq.Quantity,
+                        Product = product,
+                        ColorId = modelReq.Color?.ColorId
+                    }
                 ]
             };
 
@@ -143,7 +145,11 @@ namespace DTech.Application.Services
                             Name = op.Product.Name,
                             Photo = op.Product.Photo,
                             Quantity = op.Quantity,
-                            CostAtPurchase = op.CostAtPurchase
+                            CostAtPurchase = op.CostAtPurchase,
+                            Price = op.Price,
+                            ProductColor = op.ColorId != null && op.Product.ProductColors != null
+                                ? mapper.Map<ProductColorDto>(op.Product.ProductColors.FirstOrDefault(pc => pc.ColorId == op.ColorId))
+                                : null
                         }).ToList()
                 };
 
@@ -198,6 +204,14 @@ namespace DTech.Application.Services
                 {
                     ProductId = cp.ProductId,
                     Name = cp.Product!.Name,
+                    Color = cp.ProductColor != null
+                        ? new ProductColorDto
+                        {
+                            ColorId = cp.ProductColor.ColorId,
+                            ColorName = cp.ProductColor.ColorName,
+                            ColorCode = cp.ProductColor.ColorCode
+                        }
+                        : null,
                     Photo = cp.Product.Photo,
                     Quantity = cp.Quantity,
                     Price = cp.Product.PriceAfterDiscount  * cp.Quantity,
@@ -274,7 +288,6 @@ namespace DTech.Application.Services
 
             var payment = await CreatePaymentAsync(model);
             if (payment == null) return (false, "Fail to create Payment", null);
-
 
             var order = await CreateOrderAsync(customerId, model, shipping.ShippingId, payment.PaymentId);
             if(order == null) return (false, "Fail to create Order", null);
@@ -373,6 +386,7 @@ namespace DTech.Application.Services
                 Quantity = cartProduct.Quantity,
                 CostAtPurchase = cartProduct.Product!.PriceAfterDiscount * cartProduct.Quantity,
                 PromotionalGift = cartProduct.Product?.PromotionalGift,
+                ColorId = cartProduct.ProductColor?.ColorId
             }).ToList();
             
             return await orderRepo.AddOrderDetailAsync(orderDetails);
@@ -392,7 +406,8 @@ namespace DTech.Application.Services
                     Price = firstItem.Price ?? 0,
                     Quantity = firstItem.Quantity,
                     CostAtPurchase = (firstItem.Price ?? 0) * firstItem.Quantity,
-                    PromotionalGift = firstItem.PromotionalGift
+                    PromotionalGift = firstItem.PromotionalGift,
+                    ColorId = firstItem.Color?.ColorId
                 }
             };
 

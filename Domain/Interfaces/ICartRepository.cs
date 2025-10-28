@@ -7,7 +7,7 @@ namespace DTech.Domain.Interfaces
         Task<int> GetCartByUserIdAsync(string customerId);
         Task<bool> AddToCartAsync(CartProduct product);
         Task<Cart?> GetFullCartByUserIdAsync(string customerId);
-
+        Task<CartProduct?> CheckProductInCartAsync(int cartId, int ProductId, int ProductColorId);
         Task<bool> UpdateCartProductAsync(int cartProductId, string customerId, int change);
         Task<bool> ClearCartAsync(Cart cart);
     }

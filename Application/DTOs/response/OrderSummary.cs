@@ -1,4 +1,6 @@
-﻿namespace DTech.Application.DTOs.response
+﻿using DTech.Application.DTOs.Response;
+
+namespace DTech.Application.DTOs.response
 {
     public class OrderSummary
     {
@@ -15,10 +17,10 @@
         public int? ProductId { get; set; }
         public string? Name { get; set; }
         public string? Photo { get; set; }
-        //public string? Color { get; set; }
         public int Quantity { get; set; }
         public decimal? Price { get; set; }
         public string? PromotionalGift { get; set; }
+        public ProductColorDto? Color { get; set; }
     }
 
     public class OrderSummaryResDto

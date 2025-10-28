@@ -16,6 +16,7 @@ namespace DTech.Infrastructure.Repositories
                 return null;
             }
             var categoryId = await context.Categories
+                .AsNoTracking()
                 .Where(c => c.Name == name)
                 .Select(c => c.CategoryId)
                 .FirstOrDefaultAsync();

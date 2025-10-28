@@ -49,8 +49,21 @@ const OrderSummaryComponent: React.FC<OrderSummaryProps> = ({
                     {item.quantity}
                   </span>
                 </div>
-                <div className="flex-grow-1">
-                  <h6 className="mb-1">{item.name}</h6>
+                <div className="d-flex flex-column">
+                  <div className="flex-grow-1">
+                    <h6 className="mb-1">{item.name}</h6>
+                  </div>
+                  {item.color && (
+                    <div className="d-flex align-items-center mt-1">
+                      <div
+                        className="cart-product-color-circle me-2"
+                        style={{
+                          backgroundColor: item.color.colorCode,
+                        }}
+                      ></div>
+                      <small className="text-muted">{item.color.colorName}</small>
+                    </div>
+                  )}
                 </div>
                 <div className="text-end">
                   <strong>{item?.price?.toLocaleString()}</strong>

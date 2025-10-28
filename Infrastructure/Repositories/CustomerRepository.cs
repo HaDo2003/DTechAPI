@@ -206,6 +206,7 @@ namespace DTech.Infrastructure.Repositories
         public async Task<List<CustomerAddress>> GetAllAddressesByCustomerIdAsync(string customerId)
         {
             return await context.CustomerAddresses
+                .AsNoTracking()
                 .Where(c => c.CustomerId == customerId)
                 .OrderByDescending(c => c.IsDefault)
                 .ToListAsync();
@@ -213,6 +214,7 @@ namespace DTech.Infrastructure.Repositories
         public async Task<CustomerAddress?> GetDefaultAddressByCustomerIdAsync(string customerId)
         {
             return await context.CustomerAddresses
+                .AsNoTracking()
                 .Where(c => c.CustomerId == customerId && c.IsDefault == true)
                 .FirstOrDefaultAsync();
         }

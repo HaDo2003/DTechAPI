@@ -28,14 +28,24 @@ namespace DTech.Application.Services
             if(cartId == 0)
                 return new MessageResponse { Success = false, Message = "Cart not found" };
 
-            var cartProduct = mapper.Map<CartProduct>(model);
-            cartProduct.CartId = cartId;
+            var isProductExistInCart = await cartRepo.CheckProductInCartAsync(cartId, model.ProductId, model.ColorId);
+            if (isProductExistInCart == null)
+            {
+                var cartProduct = mapper.Map<CartProduct>(model);
+                cartProduct.CartId = cartId;
+                var isAdded = await cartRepo.AddToCartAsync(cartProduct);
+                if (!isAdded)
+                    return new MessageResponse { Success = false, Message = "Failed to add to cart" };
 
-            var isAdded = await cartRepo.AddToCartAsync(cartProduct);
-            if (!isAdded)
-                return new MessageResponse { Success = false, Message = "Failed to add to cart" };
-
-            return new MessageResponse { Success = true, Message = "Added to Cart" };
+                return new MessageResponse { Success = true, Message = "Added to Cart" };
+            }
+            else
+            {
+                var isUpdated = await cartRepo.UpdateCartProductAsync(isProductExistInCart.Id, customerId, model.Quantity);
+                if (!isUpdated)
+                    return new MessageResponse { Success = false, Message = "Failed to update cart product quantity" };
+                return new MessageResponse { Success = true, Message = "Updated product quantity in cart" };
+            }
         }
 
         public async Task<CartDto> GetCartAsync(string customerId)

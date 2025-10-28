@@ -13,6 +13,7 @@ namespace DTech.Infrastructure.Repositories
         {
             try
             {
+                context.ChangeTracker.Clear();
                 context.Orders.Add(order);
                 await context.SaveChangesAsync();
                 return order;
@@ -28,6 +29,7 @@ namespace DTech.Infrastructure.Repositories
         {
             try
             {
+                context.ChangeTracker.Clear();
                 context.OrderProducts.AddRange(orderDetails);
                 await context.SaveChangesAsync();
                 return orderDetails;
@@ -43,11 +45,15 @@ namespace DTech.Infrastructure.Repositories
         {
             try
             {
-                var coupon = await context.Coupons.FirstOrDefaultAsync(c => c.Code == reductionCode);
+                var coupon = await context.Coupons
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Code == reductionCode);
                 if (coupon == null)
                 {
                     return false;
                 }
+
+                context.ChangeTracker.Clear();
 
                 OrderCoupon orderCoupon = new()
                 {
@@ -71,12 +77,17 @@ namespace DTech.Infrastructure.Repositories
             try
             {
                 if (orderId == null) return null;
+
+                context.ChangeTracker.Clear();
+
                 return await context.Orders
+                    .AsNoTracking()
                     .Include(o => o.Status)
                     .Include(o => o.Payment)
                     .ThenInclude(p => p!.PaymentMethod)
                     .Include(o => o.OrderProducts)
                     .ThenInclude(op => op!.Product)
+                    .ThenInclude(p => p!.ProductColors)
                     .FirstOrDefaultAsync(o => o.OrderId == orderId);
             }
             catch (Exception ex)
@@ -92,6 +103,7 @@ namespace DTech.Infrastructure.Repositories
             {
                 if (orderId == null) return null;
                 return await context.Orders
+                    .AsNoTracking()
                     .Include(o => o.Status)
                     .Include(o => o.Payment)
                     .ThenInclude(p => p!.PaymentMethod)
@@ -112,7 +124,9 @@ namespace DTech.Infrastructure.Repositories
             if (order == null)
                 return null;
 
-            var status = await context.OrderStatuses.FirstOrDefaultAsync(o => o.StatusId == orderStatusId);
+            var status = await context.OrderStatuses
+                .AsNoTracking()
+                .FirstOrDefaultAsync(o => o.StatusId == orderStatusId);
             if (status == null)
                 return null;
 
@@ -136,7 +150,9 @@ namespace DTech.Infrastructure.Repositories
             if(order == null)
                 return false;
 
-            var status = await context.OrderStatuses.FirstOrDefaultAsync(o => o.Description == statusName);
+            var status = await context.OrderStatuses
+                .AsNoTracking()
+                .FirstOrDefaultAsync(o => o.Description == statusName);
             if (status == null)
                 return false;
 

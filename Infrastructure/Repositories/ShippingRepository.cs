@@ -12,6 +12,7 @@ namespace DTech.Infrastructure.Repositories
         {
             try
             {
+                context.ChangeTracker.Clear();
                 context.Shippings.Add(shipping);
                 await context.SaveChangesAsync();
                 return shipping;

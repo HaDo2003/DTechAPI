@@ -14,7 +14,6 @@ const CartItem: React.FC<CartItemProps> = ({ cartProduct, onUpdateQuantity, onRe
     const formattedFinalPrice = priceFormatter(finalPrice);
     const priceTotal = finalPrice * cartProduct.quantity;
     const formattedPriceTotal = priceFormatter(priceTotal);
-    console.log("Rendering CartItem for color:", cartProduct.color?.colorCode);
 
     return (
         <div

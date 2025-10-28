@@ -32,7 +32,8 @@ const Checkout: React.FC = () => {
             shippingFee: 0,
             discountAmount: 0,
             total: 0,
-        }, customerAddresses: [],
+        },
+        customerAddresses: [],
         paymentMethods: [],
         success: true,
         message: ""

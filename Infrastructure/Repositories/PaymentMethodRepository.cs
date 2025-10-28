@@ -28,7 +28,8 @@ namespace DTech.Infrastructure.Repositories
             if (paymentMethodId <= 0)
                 return null;
 
-            return await context.PaymentMethods.FindAsync(paymentMethodId);
+            return await context.PaymentMethods.AsNoTracking()
+                .FirstOrDefaultAsync(p => p.PaymentMethodId == paymentMethodId);
         }
 
         public async Task<bool> CheckIfPaymentMethodExistsAsync(PaymentMethod paymentMethod)

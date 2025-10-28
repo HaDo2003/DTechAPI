@@ -1,4 +1,5 @@
 import type { PaymentMethod } from "./PaymentMethod";
+import type { ProductColor } from "./ProductColor";
 
 type OrderProduct = {
     id?: number;
@@ -6,6 +7,7 @@ type OrderProduct = {
     photo?: string;
     quantity?: number;
     costAtPurchase?: number;
+    color?: ProductColor;
 };
 
 export interface OrderSuccessModel {

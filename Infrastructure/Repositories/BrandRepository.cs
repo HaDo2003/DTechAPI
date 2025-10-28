@@ -34,7 +34,7 @@ namespace DTech.Infrastructure.Repositories
             if (brandId <= 0)
                 return null;
 
-            return await context.Brands.FindAsync(brandId);
+            return await context.Brands.AsNoTracking().FirstOrDefaultAsync(b => b.BrandId == brandId);
         }
 
         public async Task<bool> CheckIfBrandExistsAsync(Brand brand)

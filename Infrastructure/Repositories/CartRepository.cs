@@ -9,7 +9,7 @@ namespace DTech.Infrastructure.Repositories
     {
         public async Task<int> GetCartByUserIdAsync(string customerId)
         {
-            var cart = await context.Carts.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+            var cart = await context.Carts.AsNoTracking().FirstOrDefaultAsync(c => c.CustomerId == customerId);
             if (cart == null)
             {
                 return 0;
@@ -30,7 +30,7 @@ namespace DTech.Infrastructure.Repositories
 
         public async Task<Cart?> GetFullCartByUserIdAsync(string customerId)
         {
-            var cart = await context.Carts
+            var cart = await context.Carts.AsNoTracking()
                 .FirstOrDefaultAsync(c => c.CustomerId == customerId);
             if (cart == null)
             {
@@ -39,12 +39,24 @@ namespace DTech.Infrastructure.Repositories
             else
             {
                 cart.CartProducts = await context.CartProducts
+                    .AsNoTracking()
                     .Include(cp => cp.Product)
-                    .ThenInclude(product => product != null ? product.ProductColors : new List<ProductColor>())
+                    .Include(cp => cp.ProductColor)
                     .Where(cp => cp.CartId == cart.CartId)
                     .ToListAsync();
             }
             return cart;
+        }
+
+        public async Task<CartProduct?> CheckProductInCartAsync(int cartId, int ProductId, int ProductColorId)
+        {
+            var cp = await context.CartProducts
+                .FirstOrDefaultAsync(cp => cp.CartId == cartId && cp.ProductId == ProductId && cp.ColorId == ProductColorId);
+            if (cp == null)
+            {
+                return null;
+            }
+            return cp;
         }
 
         public async Task<bool> UpdateCartProductAsync(int cartProductId, string customerId, int change)

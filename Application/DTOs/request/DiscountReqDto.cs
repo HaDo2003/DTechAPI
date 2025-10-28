@@ -3,7 +3,7 @@
     public class DiscountReqDto
     {
         public string? Code { get; set; }
-        public bool IsBuyNow { get; set; } = false; // NEW
+        public bool IsBuyNow { get; set; } = false;
 
         // For buy now
         public int? ProductId { get; set; } 

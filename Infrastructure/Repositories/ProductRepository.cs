@@ -355,6 +355,7 @@ namespace DTech.Infrastructure.Repositories
         public async Task<List<ProductModel>> GetModelsAsync(int productId)
         {
             return await context.ProductModels
+                .AsNoTracking()
                 .Where(m => m.ProductColor != null && m.ProductColor.ProductId == productId)
                 .ToListAsync();
         }

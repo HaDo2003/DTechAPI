@@ -29,7 +29,7 @@ namespace DTech.Infrastructure.Repositories
             if (advertisementId <= 0)
                 return null;
 
-            return await context.Advertisements.FindAsync(advertisementId);
+            return await context.Advertisements.AsNoTracking().FirstOrDefaultAsync(a => a.AdvertisementId == advertisementId);
         }
         public async Task<bool> CheckIfAdsExistsAsync(Advertisement advertisement)
         {

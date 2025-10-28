@@ -12,13 +12,14 @@ namespace DTech.Infrastructure.Repositories
         {
             try
             {
+                context.ChangeTracker.Clear();
                 context.Payments.Add(payment);
                 await context.SaveChangesAsync();
                 return payment;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error adding shipping: {ex.Message}");
+                Console.WriteLine($"Error adding payment: {ex.Message}");
                 Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
                 return null;
             }
