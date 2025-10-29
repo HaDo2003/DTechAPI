@@ -3,5 +3,5 @@ export interface ProductModel {
     colorId: number;
     modelName: string;
     modelUrl: string;
-    modelUpload: File;
+    modelUpload?: File;
 }

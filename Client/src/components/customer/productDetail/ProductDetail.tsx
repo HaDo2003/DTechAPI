@@ -1,41 +1,40 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { productService } from "../../services/ProductService";
-import { type Product } from "../../types/Product";
-import { priceFormatter } from "../../utils/priceFormatter";
+import { useNavigate } from "react-router-dom";
+import { productService } from "../../../services/ProductService";
+import { type Product } from "../../../types/Product";
+import { priceFormatter } from "../../../utils/priceFormatter";
 import DOMPurify from "dompurify";
-import NotFound from "./NotFound";
 import InnerImageZoom from 'react-inner-image-zoom';
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 
 // Components
-import ProductGrid from "../../components/customer/ProductGrid";
-import SpecificationsWindow from "../../components/customer/productDetail/SpecificationsWindow";
-import ProductCommentForm from "../../components/customer/productDetail/ProductCommentForm";
-import ProductInfoItem from "../../components/customer/productDetail/ProductInfoItem";
-import AlertForm from "../../components/customer/AlertForm";
+import ProductGrid from "../ProductGrid";
+import SpecificationsWindow from "./SpecificationsWindow";
+import ProductCommentForm from "./ProductCommentForm";
+import ProductInfoItem from "./ProductInfoItem";
+import AlertForm from "../AlertForm";
 
 // Service
-import { cartService } from "../../services/CartService";
+import { cartService } from "../../../services/CartService";
 
-import { useRecentlyViewed } from "../../utils/useRecentlyViewed";
-import type { ProductCommentRequest, ProductCommentResponse } from "../../types/ProductComment";
-import { useAuth } from "../../context/AuthContext";
-import { checkOutService } from "../../services/CheckOutService";
-import { useCart } from "../../context/CartContext";
+import { useRecentlyViewed } from "../../../utils/useRecentlyViewed";
+import type { ProductCommentRequest, ProductCommentResponse } from "../../../types/ProductComment";
+import { useAuth } from "../../../context/AuthContext";
+import { checkOutService } from "../../../services/CheckOutService";
+import { useCart } from "../../../context/CartContext";
 
-import ThreeDModelViewer from "../../components/customer/productDetail/ModelViewer";
-import SkeletonProductDetail from "../../components/customer/skeleton/SkeletonProductDetail";
-import { customerService } from "../../services/CustomerService";
+import ThreeDModelViewer from "./ModelViewer";
+import { customerService } from "../../../services/CustomerService";
 
-const ProductDetail: React.FC = () => {
+interface ProductDetailProps {
+    product?: Product;
+}
+
+const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
     const { user, token } = useAuth();
     const { fetchCart } = useCart();
     const navigate = useNavigate();
-    const { categorySlug, brandSlug, slug } = useParams<{ categorySlug: string; brandSlug: string; slug: string }>();
-    const [product, setProduct] = useState<Product | null>(null);
-    const [loading, setLoading] = useState(true);
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
 
     // State
@@ -53,26 +52,19 @@ const ProductDetail: React.FC = () => {
 
     useEffect(() => {
         document.title = "DTech - Product Detail";
-        const fetchProduct = async () => {
-            setLoading(true);
-            try {
-                const data = await productService.getProductData(categorySlug!, brandSlug!, slug!);
-                setProduct(data);
-                if (data.productImages && data.productImages.length > 0) {
-                    setMainImage(data.productImages[0].image);
-                } else {
-                    setMainImage(data.photo ?? "");
-                }
-                setCommentList(data.productComments ?? []);
-            } catch (error) {
-                console.error("Failed to fetch product data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        if (!product) return;
 
-        fetchProduct();
-    }, [categorySlug, brandSlug, slug]);
+        if (product.productImages && product.productImages.length > 0) {
+            setMainImage(product.productImages[0].image);
+        } else {
+            setMainImage(product.photo ?? "");
+        }
+        setCommentList(product.productComments ?? []);
+    }, [product]);
+
+    if (!product) {
+        return null;
+    }
 
     const fetchWishlist = async () => {
         if (!token || !product) return;
@@ -102,19 +94,8 @@ const ProductDetail: React.FC = () => {
             const matchedIndex = product.productImages.findIndex(img => img.imageId === matchedImage.imageId);
             swiperRef.current?.slideTo(matchedIndex);
         }
-    }, [color]);
+    }, [color, product]);
 
-    if (loading) {
-        return (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
-                return <SkeletonProductDetail />;
-            </div>
-        );
-    }
-
-    if (!product) {
-        return <NotFound />;
-    }
     // Price calculations
     const savePrice = product.price - product.priceAfterDiscount;
     const discountPercent = product.discount?.toFixed(0);
@@ -229,10 +210,8 @@ const ProductDetail: React.FC = () => {
             return;
         }
         try {
-            setLoading(true);
             const res = await checkOutService.buyNow(token, product.productId, quantity);
             if (res.success) {
-                setLoading(false);
                 setQuantity(1);
                 navigate("/check-out", { state: res });
             } else {
@@ -348,20 +327,27 @@ const ProductDetail: React.FC = () => {
                             </div>
                         )}
 
-                        <div className="text-center mt-2">
-                            <button
-                                className="btn-3d-view d-flex align-items-center justify-content-center"
-                                onClick={() => setIs3DViewOpen(true)}
-                            >
-                                <i className="fas fa-cube me-2"></i>
-                                View in 3D
-                            </button>
-                        </div>
+                        {/* 3D View Button */}
+                        {product.productModels && product.productModels.length > 0 && (
+                            <>
+                                <div className="text-center mt-2">
+                                    <button
+                                        className="btn-3d-view d-flex align-items-center justify-content-center"
+                                        onClick={() => setIs3DViewOpen(true)}
+                                    >
+                                        <i className="fas fa-cube me-2"></i>
+                                        View in 3D
+                                    </button>
+                                </div>
 
-                        <ThreeDModelViewer
-                            isOpen={is3DViewOpen}
-                            onClose={() => setIs3DViewOpen(false)}
-                        />
+                                <ThreeDModelViewer
+                                    isOpen={is3DViewOpen}
+                                    onClose={() => setIs3DViewOpen(false)}
+                                    productColor={product.productColors}
+                                    productModel={product.productModels}
+                                />
+                            </>
+                        )}
                     </div>
 
                     {/* RIGHT: Product Details */}

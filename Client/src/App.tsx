@@ -19,7 +19,6 @@ import PrivateRoute from './routes/privateRoute';
 import RouteLink from "./routes/routeLink";
 import Home from './pages/customer/Home';
 import NotFound from './pages/customer/NotFound';
-import ProductDetail from './pages/customer/ProductDetail';
 import CategoryPage from './pages/customer/CategoryPage';
 import ContactPage from './pages/customer/Contact';
 import Login from './pages/customer/Login';
@@ -54,6 +53,7 @@ import PostCategoryDelete from "./pages/admin/post-category/PostCategoryDelete";
 import ProductFormPage from "./pages/admin/product/ProductFormPage";
 import ProductDelete from "./pages/admin/product/ProductDelete";
 import Wishlist from "./pages/customer/Wishlist";
+import ProductPage from "./pages/customer/ProductPage";
 
 function App() {
   return (
@@ -76,7 +76,7 @@ function App() {
           <Route path="access-denied" element={<AccessDenied />} />
           <Route path="not-found" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
-          <Route path=":categorySlug/:brandSlug/:slug" element={<ProductDetail />} />
+          <Route path=":categorySlug/:brandSlug/:slug" element={<ProductPage />} />
           <Route path=":categorySlug" element={<CategoryPage />} />
           <Route path=":categorySlug/:brandSlug" element={<CategoryPage />} />
 

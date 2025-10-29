@@ -3,14 +3,17 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Environment, Html } from '@react-three/drei';
 import Model from '../3d/Model';
 import ColorPickerPanel from '../3d/ColorPickerPanel';
+import type { ProductModel } from '../../../types/ProductModel';
+import type { ProductColor } from '../../../types/ProductColor';
 
 interface ThreeDModelViewerProps {
   isOpen: boolean;
   onClose: () => void;
   modelUrl?: string;
+  productColor?: ProductColor[];
+  productModel?: ProductModel[];
 }
 
-// Loading Fallback Component
 const CanvasLoader = () => {
   return (
     <Html center>
@@ -24,13 +27,20 @@ const CanvasLoader = () => {
   );
 };
 
-// Main 3D Viewer Component
-const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, modelUrl }) => {
+const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({
+  isOpen,
+  onClose,
+  modelUrl,
+  productColor,
+  productModel
+}) => {
   const [autoRotate, setAutoRotate] = useState<boolean>(true);
   const [controlsEnabled, setControlsEnabled] = useState<boolean>(true);
   const [, setIsVisible] = useState(isOpen);
   const [backgroundColor, setBackgroundColor] = useState<string>('#0f3460');
-  const [productColor, setProductColor] = useState<string>('#c0c0c0');
+  const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
+  const [currentModelUrl, setCurrentModelUrl] = useState<string>(modelUrl || 'https://res.cloudinary.com/dwbibirzk/raw/upload/v1760026964/Pre-thesis/Product/3DModel/olanmpyo1owc1hp3gbdx.glb');
+  const [showNoModelNotification, setShowNoModelNotification] = useState<boolean>(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -41,10 +51,44 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
     }
   }, [isOpen]);
 
-  // Preload the model. This helps in subsequent loads.
-  useGLTF.preload(
-    modelUrl || 'https://res.cloudinary.com/dwbibirzk/raw/upload/v1760026964/Pre-thesis/Product/3DModel/olanmpyo1owc1hp3gbdx.glb'
-  );
+  useEffect(() => {
+    if (productColor && productColor.length > 0 && !selectedColorId) {
+      setSelectedColorId(productColor[0].colorId);
+    }
+  }, [productColor]);
+
+  useEffect(() => {
+    if (selectedColorId && productModel && productModel.length > 0) {
+      const model = productModel.find(m => m.colorId === selectedColorId);
+      if (model && model.modelUrl) {
+        setCurrentModelUrl('');
+        setShowNoModelNotification(false);
+        setTimeout(() => {
+          setCurrentModelUrl(model.modelUrl);
+        }, 10);
+      } else {
+        setCurrentModelUrl('');
+        setShowNoModelNotification(true);
+        setTimeout(() => {
+          setShowNoModelNotification(false);
+        }, 4000);
+      }
+    }
+  }, [selectedColorId, productModel]);
+
+  useEffect(() => {
+    if (productModel && productModel.length > 0) {
+      productModel.forEach(model => {
+        if (model.modelUrl) {
+          useGLTF.preload(model.modelUrl);
+        }
+      });
+    }
+  }, [productModel]);
+
+  const handleColorChange = (colorId: number) => {
+    setSelectedColorId(colorId);
+  };
 
   const canvasBackground = `linear-gradient(to bottom, ${backgroundColor} 0%, ${adjustColor(backgroundColor, -20)} 50%, ${adjustColor(backgroundColor, -40)} 100%)`;
 
@@ -86,25 +130,43 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
 
             {/* Lights */}
             <ambientLight
-              intensity={0.25}
+              intensity={0.15}
             />
 
             <directionalLight
               position={[3, 5, 2]}
-              intensity={0.8}
+              intensity={0.5}
               castShadow
             />
 
             {/* 3D Model with Suspense */}
             <Suspense fallback={<CanvasLoader />}>
-              <Model
-                isOpen={isOpen}
-                key={modelUrl}
-                modelUrl={modelUrl}
-                autoRotate={autoRotate}
-                productColor={productColor}
-              />
-              <Environment preset="studio" environmentIntensity={0.5} resolution={256} />
+              {currentModelUrl ? (
+                <Model
+                  isOpen={isOpen}
+                  key={currentModelUrl}
+                  modelUrl={currentModelUrl}
+                  autoRotate={autoRotate}
+                />
+              ) : showNoModelNotification && (
+                <Html
+                  center
+                  transform={false}
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}
+                >
+                  <div
+                    className="text-center bg-dark bg-opacity-75 p-4 rounded-3 border border-warning"
+                    style={{ pointerEvents: 'none', userSelect: 'none' }}
+                  >
+                    <i className="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                    <h5 className="text-white mb-2">3D Model Not Available</h5>
+                    <p className="text-light mb-0">
+                      This color doesn't have a 3D model yet.
+                    </p>
+                  </div>
+                </Html>
+              )}
+              <Environment preset="studio" environmentIntensity={0.3} resolution={256} />
             </Suspense>
 
             {/* Ground plane with shadow */}
@@ -134,9 +196,11 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({ isOpen, onClose, 
 
           <ColorPickerPanel
             backgroundColor={backgroundColor}
-            productColor={productColor}
+            productColors={productColor || []}
+            selectedColorId={selectedColorId}
             onBackgroundColorChange={setBackgroundColor}
-            onProductColorChange={setProductColor}
+            onColorSelect={handleColorChange}
+            productModels={productModel?.map(m => ({ colorId: m.colorId, modelUrl: m.modelUrl })) || []}
           />
 
           {/* Floating Controls Panel */}

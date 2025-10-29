@@ -9,10 +9,10 @@ import AlertForm from "../AlertForm";
 type OrderDetailProps = {
     orderId: string;
     onClose?: () => void;
-    onRefresh?: () => Promise<void>;
+    // onRefresh?: () => Promise<void>;
 };
 
-const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose, onRefresh }) => {
+const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose }) => {
     const { token } = useAuth();
     const [order, setOrder] = useState<OrderDetailResponse | null>(null);
     const [loading, setLoading] = useState<boolean>(true);

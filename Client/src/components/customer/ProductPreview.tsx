@@ -61,7 +61,8 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
         try {
             const res = await cartService.addToCart(token, {
                 productId: product.productId,
-                quantity: quantity
+                quantity: quantity,
+                colorId: 0,
             });
             if (res.success) {
                 setAlert({ message: res.message || "Added to cart!", type: "success" });

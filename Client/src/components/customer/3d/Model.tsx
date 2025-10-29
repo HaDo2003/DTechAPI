@@ -7,11 +7,10 @@ interface ModelProps {
   isOpen: boolean;
   modelUrl?: string;
   autoRotate: boolean;
-  productColor: string;
 }
 
 // 3D Model Component
-const Model: React.FC<ModelProps> = ({ isOpen, modelUrl, autoRotate, productColor }) => {
+const Model: React.FC<ModelProps> = ({ isOpen, modelUrl, autoRotate }) => {
   const groupRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF(
     modelUrl || 'https://res.cloudinary.com/dwbibirzk/raw/upload/v1760026964/Pre-thesis/Product/3DModel/olanmpyo1owc1hp3gbdx.glb', true
@@ -19,8 +18,15 @@ const Model: React.FC<ModelProps> = ({ isOpen, modelUrl, autoRotate, productColo
   const { gl } = useThree();
 
   useLayoutEffect(() => {
-    if (!scene) return;
-    scene.traverse((child) => {
+    if (!scene || !groupRef.current) return;
+
+    while (groupRef.current.children.length > 0) {
+      groupRef.current.remove(groupRef.current.children[0]);
+    }
+
+    const clonedScene = scene.clone(true);
+
+    clonedScene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.castShadow = true;
         child.receiveShadow = true;
@@ -39,32 +45,36 @@ const Model: React.FC<ModelProps> = ({ isOpen, modelUrl, autoRotate, productColo
       }
     });
 
-    const box = new THREE.Box3().setFromObject(scene);
+    const box = new THREE.Box3().setFromObject(clonedScene);
     const size = box.getSize(new THREE.Vector3());
     const scaleFactor = 5 / Math.max(size.x, size.y, size.z);
-    scene.scale.setScalar(scaleFactor);
+    clonedScene.scale.setScalar(scaleFactor * 1.0);
 
-    box.setFromObject(scene);
+    box.setFromObject(clonedScene);
     const scaledCenter = box.getCenter(new THREE.Vector3());
     const scaledSize = box.getSize(new THREE.Vector3());
 
-    scene.position.set(-scaledCenter.x, -scaledCenter.y + scaledSize.y / 3, -scaledCenter.z);
+    clonedScene.position.set(-scaledCenter.x, -scaledCenter.y + scaledSize.y / 3, -scaledCenter.z);
 
-    console.groupEnd();
+    groupRef.current.add(clonedScene);
 
     return () => {
-      scene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh) {
-          if (obj.geometry) obj.geometry.dispose();
-          if (obj.material) {
-            if (Array.isArray(obj.material)) obj.material.forEach((m: any) => m.dispose());
-            else obj.material.dispose();
+      if (groupRef.current) {
+        while (groupRef.current.children.length > 0) {
+          const child = groupRef.current.children[0];
+          groupRef.current.remove(child);
+          if (child instanceof THREE.Mesh) {
+            if (child.geometry) child.geometry.dispose();
+            if (child.material) {
+              if (Array.isArray(child.material)) child.material.forEach((m: any) => m.dispose());
+              else child.material.dispose();
+            }
           }
         }
-      });
+      }
       gl.renderLists.dispose();
     };
-  }, [scene, gl]);
+  }, [scene, gl, modelUrl]);
 
   useFrame(() => {
     if (!autoRotate || !isOpen) return;
@@ -73,20 +83,7 @@ const Model: React.FC<ModelProps> = ({ isOpen, modelUrl, autoRotate, productColo
     }
   });
 
-  // useEffect(() => {
-  //   scene.traverse((child: any) => {
-  //     if (child.isMesh && child.material) {
-  //       child.material = child.material.clone();
-  //       child.material.color.set(productColor);
-  //     }
-  //   });
-  // }, [productColor, scene]);
-
-  return (
-    <group ref={groupRef}>
-      <primitive object={scene} scale={1.5} />
-    </group>
-  );
+  return <group ref={groupRef} />;
 };
 
 export default Model;

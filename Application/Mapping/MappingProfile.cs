@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System.Linq;
 using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
 using DTech.Application.DTOs.Response;
@@ -17,12 +18,20 @@ namespace DTech.Application.Mapping
             CreateMap<ProductComment, ProductCommentDto>();
             CreateMap<Product, RelatedProductDto>();
             CreateMap<ProductColor, ProductColorDto>();
+            CreateMap<ProductModel, ProductModelDto>();
 
             CreateMap<Product, ProductDto>()
             .ForMember(dest => dest.Specifications, opt => opt.MapFrom(src => src.Specifications))
             .ForMember(dest => dest.ProductImages, opt => opt.MapFrom(src => src.ProductImages))
             .ForMember(dest => dest.ProductComments, opt => opt.MapFrom(src => src.ProductComments))
-            .ForMember(dest => dest.ProductColors, opt => opt.MapFrom(src => src.ProductColors));
+            .ForMember(dest => dest.ProductColors, opt => opt.MapFrom(src => src.ProductColors))
+            .ForMember(dest => dest.ProductModels, opt => opt.MapFrom(src =>
+                src.ProductColors != null && src.ProductColors.Any()
+                ? src.ProductColors
+                    .Where(pc => pc.ProductModel != null)
+                    .Select(pc => pc.ProductModel!)
+                    .ToList()
+                : new List<ProductModel>()));
 
             CreateMap<RegisterDto, ApplicationUser>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Account))
@@ -37,7 +46,7 @@ namespace DTech.Application.Mapping
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.IsDefault, opt => opt.MapFrom(_ => true))
                 .ForMember(dest => dest.ProvinceId, opt => opt.Ignore())
-                .ForMember(dest => dest.WardId, opt => opt.Ignore())     
+                .ForMember(dest => dest.WardId, opt => opt.Ignore())
                 .ForMember(dest => dest.CustomerId, opt => opt.Ignore());
 
             CreateMap<RegisterDto, Cart>()
@@ -53,7 +62,7 @@ namespace DTech.Application.Mapping
             CreateMap<UpdateProfileDto, ApplicationUser>()
                 .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(_ => DateTime.UtcNow))
                 .ForMember(dest => dest.UpdatedBy, opt => opt.MapFrom(src => src.FullName));
-            
+
             CreateMap<AddAddressDto, CustomerAddress>();
             CreateMap<EditAddressDto, CustomerAddress>();
             CreateMap<ProductCommentRequestDto, ProductComment>()

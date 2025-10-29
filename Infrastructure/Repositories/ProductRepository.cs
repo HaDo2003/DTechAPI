@@ -97,6 +97,7 @@ namespace DTech.Infrastructure.Repositories
             if (product != null)
             {
                 product.ProductColors = await context.ProductColors
+                    .Include(pc => pc.ProductModel)
                     .Where(c => c.ProductId == product.ProductId)
                     .ToListAsync();
 
