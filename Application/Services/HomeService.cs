@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Response;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -87,6 +88,14 @@ namespace DTech.Application.Services
                     Slug = p.Brand.Slug ?? "",
                     Logo = p.Brand.Logo ?? "",
                 } : null,
+                ProductColors = p != null && p.ProductColors != null && p.ProductColors.Count != 0
+                    ? [.. p.ProductColors.Select(color => new ProductColorDto
+                    {
+                        ColorId = color.ColorId,
+                        ColorName = color.ColorName,
+                        ColorCode = color.ColorCode
+                    })]
+                    : [],
             }).ToList();
 
             return Task.FromResult(productDtos);

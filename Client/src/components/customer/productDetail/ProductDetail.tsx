@@ -140,7 +140,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
             return;
         }
 
-        if (color === null) {
+        if (color === 0) {
             setAlert({ message: "Please choose color of product", type: "error" });
             return;
         }
@@ -209,8 +209,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
             }, 5000);
             return;
         }
+
+        if (color === 0) {
+            setAlert({ message: "Please choose color of product", type: "error" });
+            return;
+        }
+
         try {
-            const res = await checkOutService.buyNow(token, product.productId, quantity);
+            const res = await checkOutService.buyNow(token, product.productId, quantity, color);
             if (res.success) {
                 setQuantity(1);
                 navigate("/check-out", { state: res });
@@ -272,16 +278,18 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
                                 <span className="badge bg-danger rounded-pill fs-5 px-3 py-2">-{discountPercent}%</span>
                             </div>
                         )}
-                        <div className="border rounded shadow-sm p-2 mb-2 bg-white d-flex justify-content-center align-items-center main-div-img-size">
-                            <InnerImageZoom
-                                src={mainImage}
-                                zoomSrc={mainImage}
-                                zoomType="hover"
-                                zoomScale={1.8}
-                                className="main-img rounded"
-                                hideHint={true}
-                                hasSpacer={true}
-                            />
+                        <div className="border rounded shadow-sm p-2 mb-2 bg-white d-flex justify-content-center align-items-center main-div-img-size" style={{ overflow: 'hidden' }}>
+                            <div className="d-flex justify-content-center align-items-center w-75 h-75">
+                                <InnerImageZoom
+                                    src={mainImage}
+                                    zoomSrc={mainImage}
+                                    zoomType="hover"
+                                    zoomScale={1.8}
+                                    className="main-img rounded"
+                                    hideHint={true}
+                                    hasSpacer={true}
+                                />
+                            </div>
                         </div>
 
                         {product.productImages && product.productImages.length > 0 && (

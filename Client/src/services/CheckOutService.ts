@@ -52,9 +52,9 @@ export const checkOutService = {
         }
     },
 
-    async buyNow(token: string, productId: number, quantity: number): Promise<CheckOut> {
+    async buyNow(token: string, productId: number, quantity: number, colorId: number): Promise<CheckOut> {
         try {
-            const res = await axios.post<CheckOut>("/api/checkOut/buy-now", { productId, quantity }, {
+            const res = await axios.post<CheckOut>("/api/checkOut/buy-now", { productId, quantity, colorId }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             return { ...res.data, success: true };

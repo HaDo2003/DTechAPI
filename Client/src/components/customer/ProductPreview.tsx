@@ -10,6 +10,7 @@ import Loading from "../shared/Loading";
 import { cartService } from "../../services/CartService";
 import { checkOutService } from "../../services/CheckOutService";
 import { useCart } from "../../context/CartContext";
+import { customerService } from "../../services/CustomerService";
 
 interface ProductPreviewProps {
     isOpen: boolean;
@@ -26,6 +27,12 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
     const formattedOriginalPrice = priceFormatter(product.price);
     const formattedSavePrice = priceFormatter(savePrice);
     const [mainImage, setMainImage] = useState<string>("");
+    const [color, setColor] = useState<number>(
+        product.productColors && product.productColors.length > 0
+            ? product.productColors[0].colorId
+            : 0
+    );
+    const [isWishlisted, setIsWishlisted] = useState(false);
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -46,6 +53,62 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
         loadProduct();
     }, [product]);
 
+    useEffect(() => {
+        fetchWishlist();
+    }, [token, product]);
+
+    const fetchWishlist = async () => {
+        if (!token || !product) return;
+        try {
+            const res = await customerService.getWishlists<{ productId: number }>(token);
+            if (res.success && res.data) {
+                const isInWishlist = res.data.some(w => w.productId === product.productId);
+                setIsWishlisted(isInWishlist);
+            } else {
+                setIsWishlisted(false);
+            }
+        } catch {
+            setIsWishlisted(false);
+        }
+    };
+
+    const toggleWishlist = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (token === null) {
+            setAlert({ message: "Please login to add to cart", type: "error" });
+            setTimeout(() => {
+                navigate("/login");
+            }, 3000);
+            return;
+        }
+
+        if (isWishlisted) {
+            try {
+                const res = await customerService.removeWishlist(token, product.productId);
+                if (res.success) {
+                    setIsWishlisted(false);
+                    setAlert({ message: res.message || "Removed wishlist!", type: "success" });
+                } else {
+                    setAlert({ message: res.message || "Removed wishlist failed!", type: "error" });
+                }
+            } catch (err) {
+                setAlert({ message: "Removed wishlist failed, please try again.", type: "error" });
+            }
+        } else {
+            try {
+                const res = await customerService.addWishlist(token, product.productId);
+                if (res.success) {
+                    setIsWishlisted(true);
+                    setAlert({ message: res.message || "Added to wishlist!", type: "success" });
+                } else {
+                    setAlert({ message: res.message || "Add to wishlist failed!", type: "error" });
+                }
+            } catch (err) {
+                setAlert({ message: "Add to wishlist failed, please try again.", type: "error" });
+            }
+        }
+    };
+
     const handleQuantityIncrease = () => setQuantity(prev => prev + 1);
     const handleQuantityDecrease = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
     const handleAddToCart = async (e: React.FormEvent) => {
@@ -58,11 +121,16 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
             return;
         }
 
+        if (color === 0) {
+            setAlert({ message: "Please choose color of product", type: "error" });
+            return;
+        }
+
         try {
             const res = await cartService.addToCart(token, {
                 productId: product.productId,
                 quantity: quantity,
-                colorId: 0,
+                colorId: color,
             });
             if (res.success) {
                 setAlert({ message: res.message || "Added to cart!", type: "success" });
@@ -85,9 +153,15 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
             }, 5000);
             return;
         }
+
+        if (color === 0) {
+            setAlert({ message: "Please choose color of product", type: "error" });
+            return;
+        }
+
         try {
             setLoading(true);
-            const res = await checkOutService.buyNow(token, product.productId, quantity);
+            const res = await checkOutService.buyNow(token, product.productId, quantity, color);
             if (res.success) {
                 setLoading(false);
                 setQuantity(1);
@@ -123,7 +197,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
                             {/* LEFT: Product Image */}
                             <div className="col-12 col-lg-5 d-flex flex-column justify-content-center position-relative">
                                 {product.discount > 0 && (
-                                    <div className="position-absolute end-0 top-0 mx-3 my-1">
+                                    <div className="position-absolute end-0 top-0 mx-3 my-1 z-1000">
                                         <span className="badge bg-danger rounded-pill py-1">
                                             -{discountPercent}%
                                         </span>
@@ -203,6 +277,30 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
                                 </div>
 
                                 <div className="product-purchase-area">
+                                    {product.productColors && product.productColors.length > 0 && (
+                                        <div className="color-section my-3">
+                                            <label className="fw-semibold d-block mb-2 text-secondary">Choose Color:</label>
+                                            <div className="d-flex flex-wrap gap-3">
+                                                {product.productColors.map((colorOption) => (
+                                                    <button
+                                                        key={colorOption.colorId}
+                                                        type="button"
+                                                        className={`btn-color shadow-md ${color === colorOption.colorId ? "selected" : ""}`}
+                                                        onClick={() => setColor(colorOption.colorId)}
+                                                        style={{
+                                                            backgroundColor: colorOption.colorCode,
+                                                            borderColor: color === colorOption.colorId ? colorOption.colorCode : "#dee2e6",
+                                                        }}
+                                                        title={colorOption.colorName}
+                                                    >
+                                                        {color === colorOption.colorId && (
+                                                            <i className="fa-solid fa-check text-white checkmark"></i>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="quantity-section">
                                         <label htmlFor="quantity" className="quantity-label">Quantity:</label>
                                         <div className="quantity-control">
@@ -222,9 +320,12 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
                                             <i className="fas fa-shopping-cart"></i> Add to Cart
                                         </button>
 
-                                        <button type="button" className="btn-wishlist" onClick={() =>
-                                            setAlert({ message: "Added to wishlist!", type: "success" })
-                                        }>
+                                        <button
+                                            type="button"
+                                            className={`btn-wishlist
+                                                ${isWishlisted ? "btn-wishlist-red" : "btn-wishlist-white"}`}
+                                            onClick={(e) => toggleWishlist(e)}
+                                        >
                                             <i className="fas fa-heart"></i>
                                         </button>
                                     </div>

@@ -110,7 +110,7 @@ const OrderSuccess: React.FC = () => {
                       style={{ width: "150px", height: "100px" }}
                     >
                       <div className="position-absolute end-0 top-0">
-                        <span className="badge bg-primary rounded-pill quantity-display">
+                        <span className="bg-primary quantity-display badge-size">
                           {product.quantity}
                         </span>
                       </div>
@@ -137,7 +137,7 @@ const OrderSuccess: React.FC = () => {
                       )}
                     </div>
                     <div className="text-end fw-semibold">
-                      {product?.costAtPurchase?.toLocaleString()}
+                      ${product?.costAtPurchase?.toLocaleString()}
                     </div>
                   </div>
                 ))}
@@ -146,24 +146,24 @@ const OrderSuccess: React.FC = () => {
                 <div className="mt-3">
                   <div className="d-flex justify-content-between mb-2">
                     <span>Subtotal</span>
-                    <span>{order?.totalCost?.toLocaleString()}</span>
+                    <span>${order?.totalCost?.toLocaleString()}</span>
                   </div>
                   <div className="d-flex justify-content-between mb-2">
                     <span>Shipping Fee</span>
-                    <span>{order?.shippingCost?.toLocaleString()}</span>
+                    <span>${order?.shippingCost?.toLocaleString()}</span>
                   </div>
                   {order?.costDiscount && order.costDiscount > 0 && (
                     <div className="d-flex justify-content-between mb-2">
                       <span>Discount</span>
                       <span className="text-danger">
-                        - {order.costDiscount.toLocaleString()}
+                        - ${order.costDiscount.toLocaleString()}
                       </span>
                     </div>
                   )}
                   <hr />
                   <div className="d-flex justify-content-between fw-bold text-primary fs-5">
                     <span>Total</span>
-                    <span>{order?.finalCost?.toLocaleString()}</span>
+                    <span>${order?.finalCost?.toLocaleString()}</span>
                   </div>
                 </div>
               </div>

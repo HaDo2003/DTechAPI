@@ -16,6 +16,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
+                .Include(a => a.ProductColors)
                 .Where(a => a.Category!.Name != "Laptop" && a.Category!.Name != "Smart Phone" && a.Category!.Name != "Tablet" && a.Status == StatusEnums.Available)
                 .ToListAsync();
 
@@ -48,6 +49,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
+                .Include(a => a.ProductColors)
                 .Where(a => a.Discount != null && a.Discount > 0 && a.Status == StatusEnums.Available)
                 .OrderByDescending(a => a.Discount)
                 .ToListAsync();
@@ -76,6 +78,7 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
+                .Include(a => a.ProductColors)
                 .Where(p => p.CategoryId != null && id.Contains(p.CategoryId.Value) && p.Status == StatusEnums.Available)
                 .OrderByDescending(a => a.ProductId)
                 .ToListAsync();

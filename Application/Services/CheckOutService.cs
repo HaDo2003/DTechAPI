@@ -46,6 +46,8 @@ namespace DTech.Application.Services
             if (product == null)
                 return new CheckOutDto { Success = false, Message = "Product not found" };
 
+            var selectedColor = product.ProductColors?.FirstOrDefault(pc => pc.ColorId == modelReq.ColorId);
+
             // Create a temporary cart
             var tempCart = new Cart
             {
@@ -57,7 +59,8 @@ namespace DTech.Application.Services
                         ProductId = modelReq.ProductId,
                         Quantity = modelReq.Quantity,
                         Product = product,
-                        ColorId = modelReq.Color?.ColorId
+                        ColorId = modelReq.ColorId,
+                        ProductColor = selectedColor
                     }
                 ]
             };
@@ -293,14 +296,14 @@ namespace DTech.Application.Services
             if(order == null) return (false, "Fail to create Order", null);
 
             // For CART
-            if (cart != null) 
+            if (cart != null)
             {
                 var orderProducts = await CreateOrderDetailAsync(order, cart);
                 if (orderProducts == null) return (false, "Fail to create order detail", null);
 
                 var isClear = await cartRepo.ClearCartAsync(cart);
                 if (!isClear) return (false, "Fail to clear cart", null);
-            } 
+            }
             // For BUY NOW
             else
             {
@@ -388,7 +391,7 @@ namespace DTech.Application.Services
                 PromotionalGift = cartProduct.Product?.PromotionalGift,
                 ColorId = cartProduct.ProductColor?.ColorId
             }).ToList();
-            
+
             return await orderRepo.AddOrderDetailAsync(orderDetails);
         }
 
@@ -436,38 +439,40 @@ namespace DTech.Application.Services
                                     <table style='width: 100%; border-collapse: collapse; margin-top: 15px;'>
                                         <thead>
                                             <tr style='background-color: #f0f0f0;'>
-                                                <th style='padding: 10px; text-align: left; border-bottom: 1px solid #ddd;'>Product</th>
-                                                <th style='padding: 10px; text-align: center; border-bottom: 1px solid #ddd;'>Quantity</th>
-                                                <th style='padding: 10px; text-align: right; border-bottom: 1px solid #ddd;'>Price</th>
+                                                <th style='padding: 8px; text-align: left; border-bottom: 1px solid #ddd;'>Product</th>
+                                                <th style='padding: 8px; text-align: left; border-bottom: 1px solid #ddd;'>Color</th>
+                                                <th style='padding: 8px; text-align: center; border-bottom: 1px solid #ddd;'>Quantity</th>
+                                                <th style='padding: 8px; text-align: right; border-bottom: 1px solid #ddd;'>Price</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {string.Join("", order.OrderProducts.Select(product => $@"
                                                 <tr>
-                                                    <td style='padding: 10px; border-bottom: 1px solid #eee;'>{product.Product?.Name}</td>
-                                                    <td style='padding: 10px; text-align: center; border-bottom: 1px solid #eee;'>{product.Quantity}</td>
-                                                    <td style='padding: 10px; text-align: right; border-bottom: 1px solid #eee;'>{product.CostAtPurchase:N0} ₫</td>
+                                                    <td style='padding: 8px; border-bottom: 1px solid #eee;'>{product.Product?.Name}</td>
+                                                    <td style='padding: 8px; border-bottom: 1px solid #eee;'>{product.Product?.ProductColors.FirstOrDefault()?.ColorName}</td>
+                                                    <td style='padding: 8px; text-align: center; border-bottom: 1px solid #eee;'>{product.Quantity}</td>
+                                                    <td style='padding: 8px; text-align: right; border-bottom: 1px solid #eee;'>{product.CostAtPurchase:N0} ₫</td>
                                                 </tr>
                                             "))}
                                         </tbody>
                                         <tfoot>
                                             <tr>
                                                 <td colspan='2' style='padding: 10px; text-align: right;'>Subtotal:</td>
-                                                <td style='padding: 10px; text-align: right;'>{order.TotalCost:N0} ₫</td>
+                                                <td style='padding: 10px; text-align: right;'>${order.TotalCost:N0}</td>
                                             </tr>
                                             <tr>
                                                 <td colspan='2' style='padding: 10px; text-align: right;'>Shipping:</td>
-                                                <td style='padding: 10px; text-align: right;'>{order.ShippingCost:N0} ₫</td>
+                                                <td style='padding: 10px; text-align: right;'>${order.ShippingCost:N0}</td>
                                             </tr>
                                             {(order.CostDiscount > 0 ? $@"
                                                 <tr>
                                                     <td colspan='2' style='padding: 10px; text-align: right;'>Discount:</td>
-                                                    <td style='padding: 10px; text-align: right; color: red;'>- {order.CostDiscount:N0} ₫</td>
+                                                    <td style='padding: 10px; text-align: right; color: red;'>- ${order.CostDiscount:N0} ₫</td>
                                                 </tr>
                                             " : "")}
                                             <tr style='font-weight: bold;'>
                                                 <td colspan='2' style='padding: 10px; text-align: right;'>Total:</td>
-                                                <td style='padding: 10px; text-align: right; color: #28a745;'>{order.FinalCost:N0} ₫</td>
+                                                <td style='padding: 10px; text-align: right; color: #28a745;'>${order.FinalCost:N0} ₫</td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -481,7 +486,7 @@ namespace DTech.Application.Services
 
                                     <p>If you have any questions or concerns, feel free to contact our support team.</p>
 
-                                    <p>You can view your bill here: 
+                                    <p>You can view your bill here:
                                         <a href='#' style='color: #4CAF50; text-decoration: none;'>
                                             View Bill
                                         </a>

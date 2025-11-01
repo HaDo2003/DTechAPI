@@ -37,6 +37,17 @@ body {
 }
 
 /*=========================================================
+Z Index Custom
+===========================================================*/
+.z-1000 {
+    z-index: 1060;
+}
+
+.z-9999 {
+    z-index: 9999;
+}
+
+/*=========================================================
 Loading
 ===========================================================*/
 .content-loader {
@@ -887,9 +898,9 @@ Product Preview Modal
     transform: translate(-50%, -50%);
     background: white;
     width: 80%;
-    height: 80%;
+    height: 70%;
     max-width: 110vh;
-    max-height: 60vh;
+    max-height: auto;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
@@ -1296,7 +1307,6 @@ Product Detail
 }
 
 .btn-wishlist::after {
-    content: "Add to wishlist";
     position: absolute;
     bottom: 120%;
     left: 50%;
@@ -1315,6 +1325,14 @@ Product Detail
 
 .btn-wishlist:hover::after {
     opacity: 1;
+}
+
+.btn-wishlist-white::after {
+    content: "Add to wishlist";
+}
+
+.btn-wishlist-red::after {
+    content: "Remove from wishlist";
 }
 
 .buy-now-section {
@@ -1920,7 +1938,19 @@ Order Success
 }
 
 .quantity-display {
-    font-size: 13px;
+    font-size: 9px;
+}
+
+.badge-size{
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
 }
 
 /*=========================================================

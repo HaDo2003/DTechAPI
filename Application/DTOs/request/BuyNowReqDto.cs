@@ -6,6 +6,6 @@ namespace DTech.Application.DTOs.request
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
-        public ProductColorDto? Color { get; set; }
+        public int ColorId { get; set; }
     }
 }

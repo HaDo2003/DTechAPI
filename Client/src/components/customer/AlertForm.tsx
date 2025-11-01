@@ -34,7 +34,7 @@ const AlertForm: React.FC<AlertFormProps> = ({
 
     return (
         <div
-            className={`${alertClass} position-fixed end-0 m-3 shadow alert-custom`}
+            className={`${alertClass} position-fixed end-0 m-3 shadow alert-custom z-9999`}
             role="alert"
         >
             {message}
