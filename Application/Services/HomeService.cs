@@ -30,8 +30,8 @@ namespace DTech.Application.Services
                 Image = ad.Image ?? "",
                 Order = ad.Order,
             }).ToList();
-            var hotProductDtos = await MapProductsToDto(hotProducts);
-            var accessoriesProductDtos = await MapProductsToDto(accessories);
+            var hotProductDtos = await MapProductsToDto([.. hotProducts]);
+            var accessoriesProductDtos = await MapProductsToDto([.. accessories]);
             var laptopProductDtos = await MapProductsToDto(laptopProducts);
             var smartphoneProductDtos = await MapProductsToDto(smartphoneProducts);
             var tabletProductDtos = await MapProductsToDto(tabletProducts);
@@ -53,7 +53,8 @@ namespace DTech.Application.Services
             if (categoryId == null)
                 return [];
 
-            return await productRepo.GetProductsByCategoryIdAsync([categoryId.Value]);
+            var productsQuery = await productRepo.GetProductsByCategoryIdAsync([categoryId.Value]);
+            return [.. productsQuery];
         }
 
         private static Task<List<ProductDto>> MapProductsToDto(List<Product> products)

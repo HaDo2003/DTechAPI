@@ -5,20 +5,20 @@ namespace DTech.Domain.Interfaces
     public interface IProductRepository
     {
         // Repo for products
-        Task<List<Product>> GetDiscountedProductsAsync();
-        Task<List<Product>> GetDiscountedProductsAsync(int brandId);
-        Task<List<Product>> GetAccessoriesAsync();
-        Task<List<Product>> GetAccessoriesAsync(int brandId);
-        Task<List<Product>> GetProductsByCategoryIdAsync(List<int> categoryIds);
-        IQueryable<Product> GetAllProductsQuery();
+        Task<IQueryable<Product>> GetDiscountedProductsAsync();
+        Task<IQueryable<Product>> GetDiscountedProductsAsync(int brandId);
+        Task<IQueryable<Product>> GetAccessoriesAsync();
+        Task<IQueryable<Product>> GetAccessoriesAsync(int brandId);
+        Task<IQueryable<Product>> GetProductsByCategoryIdAsync(List<int> categoryIds);
+        Task<IQueryable<Product>> GetByCategoryAndBrandAsync(int? categoryId, int? brandId);
+        Task<IQueryable<Product>> GetAllProductsQuery();
         Task<Product?> GetBySlugAsync(string? slug, int? categoryId, int? brandId);
         Task<bool> IncrementProductViewsAsync(int? productId);
         Task<List<Product>> GetRelatedProductsAsync(int? brandId, int? productId);
-        Task<List<Product>> GetByCategoryAndBrandAsync(int? categoryId, int? brandId);
         Task<List<Product>> GetProductsByIdListAsync(List<int> ids);
         Task<bool> CheckProductByIdAsync(int productId);
         Task<Product?> GetProductByIdAsync(int? productId);
-        Task<List<Product>> GetProductByQuery(string query);
+        Task<IQueryable<Product>> GetProductByQuery(string query);
 
         // Repo for Product Images
         Task<List<ProductImage>> GetImageAsync(int productId);

@@ -9,14 +9,12 @@ namespace DTech.Application.Interfaces
     public interface IProductService
     {
         Task<ProductDto?> ProductDetailAsync(string categorySlug, string brandSlug, string slug);
-
-        Task<List<ProductDto>?> GetProductsByCategoryAsync(string? categorySlug, string? sortOrder);
-
-        Task<List<ProductDto>?> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, string? sortOrder);
+        Task<PaginatedProductResDto?> GetProductsByCategoryAsync(string? categorySlug, int page, int pageSize, string? sortOrder);
+        Task<PaginatedProductResDto?> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, int page, int pageSize, string? sortOrder);
         Task<PaginatedProductResDto?> GetAllProductsAsync(int page, int pageSize, string? sortOrder);
         Task<List<ProductDto>> GetRecentlyViewedProductsAsync(string? ids);
         Task<ProductCommentDto> PostCommentAsync(ProductCommentRequestDto model);
-        Task<List<ProductDto>> SearchProductsAsync(string query, string sortOrder, string? customerId);
+        Task<PaginatedProductResDto?> SearchProductsAsync(string query, int page, int pageSize, string sortOrder, string? customerId);
 
         // For Admin
         Task<IndexResDto<List<ProductIndexDto>>> GetProductsAsync();

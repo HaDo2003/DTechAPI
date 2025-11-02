@@ -25,7 +25,16 @@ const Slider: React.FC<SliderProps> = ({ advertisements }) => {
       <div className="carousel-inner">
         {advertisements.map((slider, i) => (
           <div key={slider.advertisementId} className={`carousel-item ${i === 0 ? "active" : ""} c-item`}>
-            <img src={slider.image} className="d-block w-100" alt={slider.name} />
+            <img
+              src={slider.image}
+              className="d-block w-100"
+              alt={slider.name}
+              loading="eager"
+              style={{
+                objectFit: 'cover',
+                imageRendering: '-webkit-optimize-contrast'
+              }}
+            />
           </div>
         ))}
       </div>

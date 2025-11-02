@@ -12,16 +12,16 @@ export interface CategoryPageProps {
   totalItems?: number;
 }
 
-export const getCategoryProducts = async (slug: string, sortOrder?: string): Promise<CategoryPageProps> => {
+export const getCategoryProducts = async (slug: string, page: number, pageSize: number, sortOrder?: string): Promise<CategoryPageProps> => {
   const res = await axios.get<CategoryPageProps>(`/api/product/${slug}`, {
-    params: { sortOrder }
+    params: { page, pageSize, sortOrder }
   });
   return res.data;
 };
 
-export const getCategoryBrandProducts = async (categorySlug: string, brandSlug: string, sortOrder?: string): Promise<CategoryPageProps> => {
+export const getCategoryBrandProducts = async (categorySlug: string, brandSlug: string, page: number, pageSize: number, sortOrder?: string): Promise<CategoryPageProps> => {
   const res = await axios.get<CategoryPageProps>(`/api/product/${categorySlug}/${brandSlug}`, {
-    params: { sortOrder }
+    params: { page, pageSize, sortOrder }
   });
   return res.data;
 };

@@ -24,15 +24,20 @@ namespace DTech.API.Controllers
         }
 
         [HttpGet("{categorySlug}")]
-        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategory(string categorySlug,[FromQuery] string? sortOrder)
+        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategory(
+            string categorySlug, 
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 15, 
+            [FromQuery] string? sortOrder = null
+        )
         {
-            var products = await productService.GetProductsByCategoryAsync(categorySlug, sortOrder);
-            if (products == null || products.Count == 0)
+            var products = await productService.GetProductsByCategoryAsync(categorySlug, page, pageSize, sortOrder);
+            if (products == null || products.Products.Count == 0)
             {
                 return NotFound();
             }
 
-            var brands = products
+            var brands = products.Products
                 .Where(p => p.Brand != null)
                 .Select(p => p.Brand)
                 .DistinctBy(b => b!.BrandId)
@@ -44,7 +49,7 @@ namespace DTech.API.Controllers
             var result = new CategoryPageDto
             {
                 Title = formattedTitle,
-                Products = products,
+                Products = products.Products,
                 Brands = brands,
                 InitialSort = sortOrder ?? "default",
                 CategorySlug = categorySlug
@@ -53,10 +58,15 @@ namespace DTech.API.Controllers
         }
 
         [HttpGet("{categorySlug}/{brandSlug}")]
-        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategoryAndBrand(string categorySlug, string brandSlug, [FromQuery] string? sortOrder)
-        {
-            var products = await productService.GetProductsByCategoryAndBrandAsync(categorySlug, brandSlug, sortOrder);
-            if (products == null || products.Count == 0)
+        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategoryAndBrand(
+            string categorySlug, 
+            string brandSlug, 
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 15, 
+            [FromQuery] string? sortOrder = null
+        ){
+            var products = await productService.GetProductsByCategoryAndBrandAsync(categorySlug, brandSlug, page, pageSize, sortOrder);
+            if (products == null || products.Products.Count == 0)
             {
                 return NotFound();
             }
@@ -66,7 +76,7 @@ namespace DTech.API.Controllers
             var result = new CategoryPageDto
             {
                 Title = formattedTitle,
-                Products = products,
+                Products = products.Products,
                 Brands = null,
                 InitialSort = sortOrder ?? "default",
                 CategorySlug = categorySlug,
@@ -110,13 +120,18 @@ namespace DTech.API.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] string query, [FromQuery] string sortOrder = "newest")
+        public async Task<IActionResult> Search(
+            [FromQuery] string query,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 15,
+            [FromQuery] string sortOrder = "newest"
+        )
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(query))
                 return BadRequest(new { message = "Query cannot be empty." });
 
-            var products = await productService.SearchProductsAsync(query, sortOrder, userId);
+            var products = await productService.SearchProductsAsync(query, page, pageSize, sortOrder, userId);
 
             return Ok(new { products, initialSort = sortOrder, success = true });
         }

@@ -3,31 +3,29 @@ using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DTech.Infrastructure.Repositories
 {
     public class ProductRepository(DTechDbContext context) : IProductRepository
     {
         // Repo for products
-        public async Task<List<Product>> GetAccessoriesAsync()
+        public Task<IQueryable<Product>> GetAccessoriesAsync()
         {
-            var products = await context.Products
+            return Task.FromResult<IQueryable<Product>>(context.Products
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
                 .Include(a => a.ProductColors)
-                .Where(a => a.Category!.Name != "Laptop" && a.Category!.Name != "Smart Phone" && a.Category!.Name != "Tablet" && a.Status == StatusEnums.Available)
-                .ToListAsync();
-
-            // Shuffle the list randomly
-            var random = new Random();
-            return [.. products.OrderBy(p => random.Next())];
+                .Where(a => a.Category!.Name != "Laptop"
+                    && a.Category!.Name != "Smart Phone"
+                    && a.Category!.Name != "Tablet"
+                    && a.Status == StatusEnums.Available)
+                .OrderByDescending(a => a.ProductId));
         }
 
-        public async Task<List<Product>> GetAccessoriesAsync(int brandId)
+        public Task<IQueryable<Product>> GetAccessoriesAsync(int brandId)
         {
-            var products = await context.Products
+            return Task.FromResult(context.Products
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
@@ -35,55 +33,70 @@ namespace DTech.Infrastructure.Repositories
                     && a.Category!.Name != "Smart Phone"
                     && a.Category!.Name != "Tablet"
                     && a.BrandId == brandId
-                    && a.Status == StatusEnums.Available)
-                .ToListAsync();
-
-            // Shuffle the list randomly
-            var random = new Random();
-            return [.. products.OrderBy(p => random.Next())];
+                    && a.Status == StatusEnums.Available));
         }
 
-        public async Task<List<Product>> GetDiscountedProductsAsync()
+        public Task<IQueryable<Product>> GetDiscountedProductsAsync()
         {
-            var products = await context.Products
+            return Task.FromResult<IQueryable<Product>>(context.Products
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
                 .Include(a => a.ProductColors)
                 .Where(a => a.Discount != null && a.Discount > 0 && a.Status == StatusEnums.Available)
-                .OrderByDescending(a => a.Discount)
-                .ToListAsync();
-            return products;
+                .OrderByDescending(a => a.Discount));
         }
 
-        public async Task<List<Product>> GetDiscountedProductsAsync(int brandId)
+        public Task<IQueryable<Product>> GetDiscountedProductsAsync(int brandId)
         {
-            var products = await context.Products
+            return Task.FromResult<IQueryable<Product>>(context.Products
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
+                .Include(a => a.ProductColors)
                 .Where(a => a.Discount != null && a.Discount > 0 && a.BrandId == brandId && a.Status == StatusEnums.Available)
-                .OrderByDescending(a => a.Discount)
-                .ToListAsync();
-            return products;
+                .OrderByDescending(a => a.Discount));
         }
 
-        public async Task<List<Product>> GetProductsByCategoryIdAsync(List<int> id)
+        public Task<IQueryable<Product>> GetProductsByCategoryIdAsync(List<int> id)
         {
             if (id == null)
             {
-                return [];
+                return Task.FromResult(Enumerable.Empty<Product>().AsQueryable());
             }
-            var products = await context.Products
+            return Task.FromResult<IQueryable<Product>>(context.Products
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
                 .Include(a => a.ProductColors)
                 .Where(p => p.CategoryId != null && id.Contains(p.CategoryId.Value) && p.Status == StatusEnums.Available)
-                .OrderByDescending(a => a.ProductId)
-                .ToListAsync();
-            return products;
+                .OrderByDescending(a => a.ProductId));
         }
+
+        public Task<IQueryable<Product>> GetByCategoryAndBrandAsync(int? categoryId, int? brandId)
+        {
+            if (categoryId == null || brandId == null)
+            {
+                return Task.FromResult(Enumerable.Empty<Product>().AsQueryable());
+            }
+            return Task.FromResult<IQueryable<Product>>(context.Products
+                .AsNoTracking()
+                .Include(a => a.Brand)
+                .Include(a => a.Category)
+                .Include(a => a.ProductColors)
+                .Where(a => a.CategoryId == categoryId && a.BrandId == brandId && a.Status == StatusEnums.Available)
+                .OrderByDescending(a => a.ProductId));
+        }
+
+        public Task<IQueryable<Product>> GetAllProductsQuery()
+        {
+            return Task.FromResult(context.Products
+                .AsNoTracking()
+                .Include(p => p.Brand)
+                .Include(p => p.Category)
+                .Where(p => p.Status == StatusEnums.Available));
+        }
+
         public async Task<Product?> GetBySlugAsync(string? slug, int? categoryId, int? brandId)
         {
             if (slug == null || categoryId == null || brandId == null)
@@ -117,15 +130,6 @@ namespace DTech.Infrastructure.Repositories
                     .ToListAsync();
             }
             return product;
-        }
-
-        public IQueryable<Product> GetAllProductsQuery()
-        {
-            return context.Products
-                .AsNoTracking()
-                .Include(p => p.Brand)
-                .Include(p => p.Category)
-                .Where(p => p.Status == StatusEnums.Available);
         }
 
         public async Task<bool> IncrementProductViewsAsync(int? productId)
@@ -166,21 +170,7 @@ namespace DTech.Infrastructure.Repositories
             return products;
         }
 
-        public async Task<List<Product>> GetByCategoryAndBrandAsync(int? categoryId, int? brandId)
-        {
-            if (categoryId == null || brandId == null)
-            {
-                return [];
-            }
-            var products = await context.Products
-                .AsNoTracking()
-                .Include(a => a.Brand)
-                .Include(a => a.Category)
-                .Where(a => a.CategoryId == categoryId && a.BrandId == brandId && a.Status == StatusEnums.Available)
-                .OrderByDescending(a => a.ProductId)
-                .ToListAsync();
-            return products;
-        }
+        
 
         public async Task<List<Product>> GetProductsByIdListAsync(List<int> ids)
         {
@@ -216,11 +206,11 @@ namespace DTech.Infrastructure.Repositories
 
             return product;
         }
-        public async Task<List<Product>> GetProductByQuery(string query)
+        public Task<IQueryable<Product>> GetProductByQuery(string query)
         {
             query = query.Trim().ToLower();
 
-            var products = await context.Products
+            return Task.FromResult<IQueryable<Product>>(context.Products
                 .AsNoTracking()
                 .Include(a => a.Brand)
                 .Include(a => a.Category)
@@ -234,10 +224,7 @@ namespace DTech.Infrastructure.Repositories
                         EF.Functions.Like(s.Detail!.ToLower(), $"%{query}%")
                     )
                 ))
-                .OrderByDescending(a => a.ProductId)
-                .ToListAsync();
-
-            return products;
+                .OrderByDescending(a => a.ProductId));
         }
 
         // Repo for Product Images
@@ -469,7 +456,43 @@ namespace DTech.Infrastructure.Repositories
             if (product == null)
                 return (false, "Product not found");
 
+            // Delete all related ProductImages
+            var productImages = await context.ProductImages
+                .Where(img => img.ProductId == productId)
+                .ToListAsync();
+            if (productImages.Count > 0)
+                context.ProductImages.RemoveRange(productImages);
+
+            // Delete all related Specifications
+            var specifications = await context.Specifications
+                .Where(spec => spec.ProductId == productId)
+                .ToListAsync();
+            if (specifications.Count > 0)
+                context.Specifications.RemoveRange(specifications);
+
+            // Delete all related ProductModels (through ProductColors)
+            var productColors = await context.ProductColors
+                .Include(pc => pc.ProductModel)
+                .Where(pc => pc.ProductId == productId)
+                .ToListAsync();
+
+            if (productColors.Count > 0)
+            {
+                // Delete ProductModels first
+                var productModels = productColors
+                    .Where(pc => pc.ProductModel != null)
+                    .Select(pc => pc.ProductModel!)
+                    .ToList();
+                if (productModels.Count > 0)
+                    context.ProductModels.RemoveRange(productModels);
+
+                // Delete ProductColors
+                context.ProductColors.RemoveRange(productColors);
+            }
+
+            // Finally, delete the product
             context.Products.Remove(product);
+
             var result = await context.SaveChangesAsync();
             if (result > 0)
                 return (true, "Product deleted successfully");

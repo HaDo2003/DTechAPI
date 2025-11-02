@@ -8,6 +8,7 @@ import NotFound from "./NotFound";
 import SkeletonCategoryGrid from "../../components/customer/skeleton/SkeletonCategoryGrid";
 import { useAuth } from "../../context/AuthContext";
 import { customerService } from "../../services/CustomerService";
+import { filterOptions } from "../../utils/filterConfig";
 
 const CategoryPage: React.FC = () => {
     const { token } = useAuth();
@@ -19,6 +20,7 @@ const CategoryPage: React.FC = () => {
     const [title, setTitle] = useState<string>("");
     const [sortOrder, setSortOrder] = useState<string>("newest");
     const [loading, setLoading] = useState<boolean>(true);
+    const [showFilterPanel, setShowFilterPanel] = useState<boolean>(false);
 
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize] = useState<number>(15);
@@ -68,8 +70,8 @@ const CategoryPage: React.FC = () => {
                     data = await getAllProducts(currentPage, pageSize, sortOrder);
                 } else {
                     data = brandSlug
-                        ? await getCategoryBrandProducts(categorySlug, brandSlug, sortOrder)
-                        : await getCategoryProducts(categorySlug, sortOrder);
+                        ? await getCategoryBrandProducts(categorySlug, brandSlug, currentPage, pageSize, sortOrder)
+                        : await getCategoryProducts(categorySlug, currentPage, pageSize, sortOrder);
                 }
 
 
@@ -95,6 +97,17 @@ const CategoryPage: React.FC = () => {
     useEffect(() => {
         fetchWishlist();
     }, [token]);
+
+    useEffect(() => {
+        if (showFilterPanel) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "unset";
+        }
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [showFilterPanel]);
 
     if (!loading && products.length === 0) {
         return <NotFound />;
@@ -127,30 +140,44 @@ const CategoryPage: React.FC = () => {
                         <h2>{title}</h2>
                     </div>
 
-                    {brands.length > 0 && (
-                        <div className="container my-4">
-                            <div className="category-nav">
-                                <div className="row text-center">
+                    <div className="container my-4">
+                        <div className="d-flex flex-wrap align-items-start gap-2 justify-content-start">
+                            {/* Filter Button */}
+                            <button
+                                type="button"
+                                onClick={() => setShowFilterPanel(true)}
+                                className="btn border border-primary text-primary d-flex align-items-center gap-2 px-3 py-2 rounded-3"
+                                style={{ fontWeight: 500 }}
+                            >
+                                <i className="bi bi-funnel"></i>
+                                Filter
+                            </button>
+                            {/* Brand Buttons */}
+                            {brands.length > 0 && (
+                                <>
                                     {brands.map((brand) => (
-                                        <div className="col" key={brand.slug}>
-                                            <Link
-                                                to={`/${categorySlug}/${brand.slug}`}
-                                                className="category-item"
-                                            >
-                                                <div className="icon-container">
-                                                    <img
-                                                        src={brand.logo}
-                                                        className="card-img-top p-1 w-100 mx-auto d-block"
-                                                        alt={brand.name}
-                                                    />
-                                                </div>
-                                            </Link>
-                                        </div>
+                                        <Link
+                                            key={brand.slug}
+                                            to={`/${categorySlug}/${brand.slug}`}
+                                            className="d-flex align-items-center border bg-white rounded-3 px-3 py-2 text-decoration-none"
+                                            style={{
+                                                transition: "0.2s",
+                                                borderColor: "#e0e0e0",
+                                                fontWeight: 500,
+                                            }}
+                                        >
+                                            <img
+                                                src={brand.logo}
+                                                alt={brand.name}
+                                                style={{ height: "20px", marginRight: "8px" }}
+                                            />
+                                            <span style={{ color: "#555" }}>{brand.name}</span>
+                                        </Link>
                                     ))}
-                                </div>
-                            </div>
+                                </>
+                            )}
                         </div>
-                    )}
+                    </div>
 
                     <div className="d-flex flex-wrap gap-2 px-3 mb-4">
                         <h4>Sort By: </h4>
@@ -183,7 +210,7 @@ const CategoryPage: React.FC = () => {
                             ))}
                         </div>
                     </div>
-                    {categorySlug === "all-products" && totalPages > 1 && (
+                    {totalPages > 1 && (
                         <div className="d-flex justify-content-center align-items-center flex-wrap gap-2 my-5">
                             <button
                                 className="btn btn-outline-secondary px-3 py-2"
@@ -212,6 +239,99 @@ const CategoryPage: React.FC = () => {
                             </button>
                         </div>
                     )}
+                </div>
+            )}
+
+            {showFilterPanel && (
+                <div
+                    className="filter-overlay position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-end z-2000"
+                    onClick={() => setShowFilterPanel(false)}
+                    style={{ overflowY: "hidden" }}
+                >
+                    <div className="filter-panel bg-white p-4 shadow-lg h-100" style={{ width: "320px", overflowY: "auto" }}>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h5>Filters</h5>
+                            <button
+                                type="button"
+                                className="btn-close"
+                                aria-label="Close"
+                                onClick={() => setShowFilterPanel(false)}
+                            ></button>
+                        </div>
+
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                // TODO: Apply filters here
+                                setShowFilterPanel(false);
+                            }}
+                        >
+                            {/* Common filter options */}
+                            <div className="mb-3">
+                                <label className="form-label fw-bold">Price Range</label>
+                                <div className="d-flex gap-2">
+                                    <input type="number" className="form-control" placeholder="Min" />
+                                    <input type="number" className="form-control" placeholder="Max" />
+                                </div>
+                            </div>
+
+                            {/* Category-Specific Filters */}
+                            {filterOptions[categorySlug ?? ""] ? (
+                                filterOptions[categorySlug ?? ""].map((filterGroup) => (
+                                    <div key={filterGroup.label} className="mb-3">
+                                        <label className="form-label fw-bold">{filterGroup.label}</label>
+                                        {filterGroup.options.map((opt) => (
+                                            <div key={opt} className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id={`${filterGroup.label}-${opt}`}
+                                                />
+                                                <label
+                                                    className="form-check-label"
+                                                    htmlFor={`${filterGroup.label}-${opt}`}
+                                                >
+                                                    {opt}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))
+                            ) : (
+                                <p></p>
+                            )}
+
+                            <div className="mb-3">
+                                <label className="form-label fw-bold">Rating</label>
+                                {[5, 4, 3, 2, 1].map((rating) => (
+                                    <div key={rating} className="form-check">
+                                        <input className="form-check-input" type="radio" name="rating" id={`rating-${rating}`} />
+                                        <label className="form-check-label" htmlFor={`rating-${rating}`}>
+                                            {rating} stars & up
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label fw-bold">Availability</label>
+                                <div className="form-check">
+                                    <input className="form-check-input" type="checkbox" id="inStock" />
+                                    <label className="form-check-label" htmlFor="inStock">In Stock</label>
+                                </div>
+                            </div>
+
+                            <div className="d-flex align-item-center justify-content-center mt-3 gap-3">
+                                <button type="submit" className="btn btn-primary w-75">
+                                    Apply Filters
+                                </button>
+                                <button type="submit" className="btn btn-warning w-75">
+                                    Clear Filters
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
                 </div>
             )}
         </>

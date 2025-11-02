@@ -440,7 +440,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
                             <div className="quantity-section">
                                 <label htmlFor="quantity" className="quantity-label">Quantity:</label>
                                 <div className="quantity-control">
-                                    <button type="button" className="btn-quantity-adjust" onClick={handleQuantityDecrease}>−</button>
+                                    <button type="button" className="btn-quantity-adjust" onClick={handleQuantityDecrease} disabled={statusText === "Out of Stock"}>−</button>
                                     <input
                                         type="text"
                                         className="quantity-input"
@@ -449,11 +449,22 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
                                         value={quantity}
                                         readOnly
                                     />
-                                    <button type="button" className="btn-quantity-adjust" onClick={handleQuantityIncrease}>+</button>
+                                    <button type="button" className="btn-quantity-adjust" onClick={handleQuantityIncrease} disabled={statusText === "Out of Stock"}>+</button>
                                 </div>
-
-                                <button type="button" className="btn-add-to-cart" onClick={handleAddToCart}>
-                                    <i className="fas fa-shopping-cart"></i> Add to Cart
+                                <button
+                                    type="button"
+                                    className="btn-add-to-cart"
+                                    onClick={handleAddToCart}
+                                    disabled={statusText === "Out of Stock"}
+                                    title={statusText === "Out of Stock" ? "This product is currently out of stock" : "Add to cart"}
+                                    style={{
+                                        pointerEvents: statusText === "Out of Stock" ? "none" : "auto",
+                                        opacity: statusText === "Out of Stock" ? 0.6 : 1,
+                                        cursor: statusText === "Out of Stock" ? "not-allowed" : "pointer"
+                                    }}
+                                >
+                                    <i className="fas fa-shopping-cart"></i>
+                                    {statusText === "Out of Stock" ? " Out of Stock" : " Add to Cart"}
                                 </button>
 
                                 <button
@@ -467,12 +478,27 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
                             </div>
 
                             <div className="buy-now-section">
-                                <button type="button" className="btn-buy-now" onClick={handleBuyNow}>
-                                    BUY NOW
-                                    <br />
-                                    <span className="delivery-note">
-                                        Fast Delivery
-                                    </span>
+                                <button
+                                    type="button"
+                                    className="btn-buy-now"
+                                    onClick={handleBuyNow}
+                                    disabled={statusText === "Out of Stock"}
+                                    title={statusText === "Out of Stock" ? "This product is currently out of stock" : "Buy now with fast delivery"}
+                                    style={{
+                                        pointerEvents: statusText === "Out of Stock" ? "none" : "auto",
+                                        opacity: statusText === "Out of Stock" ? 0.6 : 1,
+                                        cursor: statusText === "Out of Stock" ? "not-allowed" : "pointer"
+                                    }}
+                                >
+                                    {statusText === "Out of Stock" ? "Out of Stock" : (
+                                        <>
+                                            BUY NOW
+                                            <br />
+                                            <span className="delivery-note">
+                                                {statusText === "Out of Stock" ? "Out of Stock" : "Fast Delivery"}
+                                            </span>
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>

@@ -6,9 +6,7 @@ using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
-using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace DTech.Application.Services
@@ -55,11 +53,14 @@ namespace DTech.Application.Services
         }
 
         //Get products by category slug and sort order
-        public async Task<List<ProductDto>?> GetProductsByCategoryAsync(string? categorySlug, string? sortOrder)
+        public async Task<PaginatedProductResDto?> GetProductsByCategoryAsync(string? categorySlug, int page, int pageSize, string? sortOrder)
         {
             try
             {
-                List<Product> products;
+                if (page <= 0) page = 1;
+                if (pageSize <= 0) pageSize = 15;
+                IQueryable<Product> products;
+
                 switch (categorySlug)
                 {
                     case "hot-sales":
@@ -70,10 +71,10 @@ namespace DTech.Application.Services
                         break;
                     default:
                         if (string.IsNullOrWhiteSpace(categorySlug))
-                            return [];
+                            return null;
 
                         var category = await categoryRepo.GetCategoryBySlugAsync(categorySlug);
-                        if (category == null) return [];
+                        if (category == null) return null;
 
                         var categoryIds = new List<int> { category.CategoryId };
                         if (category.InverseParent != null && category.InverseParent.Count > 0)
@@ -83,10 +84,24 @@ namespace DTech.Application.Services
                         break;
                 }
 
-                products = SortOrders(sortOrder, products);
+                products = QuerySortOrders(sortOrder, products);
 
-                var productDto = _mapper.Map<List<ProductDto>>(products);
-                return productDto;
+                int totalItems = await products.CountAsync();
+                int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var productLists = await products
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var productDto = _mapper.Map<List<ProductDto>>(productLists);
+                return new PaginatedProductResDto
+                {
+                    Products = productDto,
+                    TotalPages = totalPages,
+                    TotalItems = totalItems,
+                    Title = "All Products"
+                };
             }
             catch (Exception ex)
             {
@@ -96,13 +111,15 @@ namespace DTech.Application.Services
         }
 
         //Get products by category slug, brand slug and sort order
-        public async Task<List<ProductDto>?> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, string? sortOrder)
+        public async Task<PaginatedProductResDto?> GetProductsByCategoryAndBrandAsync(string? categorySlug, string? brandSlug, int page, int pageSize, string? sortOrder)
         {
             try
             {
-                var products = new List<Product>();
+                if (page <= 0) page = 1;
+                if (pageSize <= 0) pageSize = 15;
+                IQueryable<Product> products;
                 Category? category = new();
-                Brand? brand = await brandRepo.GetBrandBySlugAsync(brandSlug) 
+                Brand? brand = await brandRepo.GetBrandBySlugAsync(brandSlug)
                     ?? throw new Exception($"Brand with slug '{brandSlug}' not found."); ;
 
                 switch (categorySlug)
@@ -130,10 +147,24 @@ namespace DTech.Application.Services
                         break;
                 }
 
-                products = SortOrders(sortOrder, products);
+                products = QuerySortOrders(sortOrder, products);
 
-                var productDto = _mapper.Map<List<ProductDto>>(products);
-                return productDto;
+                int totalItems = await products.CountAsync();
+                int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var productLists = await products
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                var productDto = _mapper.Map<List<ProductDto>>(productLists);
+                return new PaginatedProductResDto
+                {
+                    Products = productDto,
+                    TotalPages = totalPages,
+                    TotalItems = totalItems,
+                    Title = "All Products"
+                };
             }
             catch (Exception ex)
             {
@@ -148,9 +179,9 @@ namespace DTech.Application.Services
             try
             {
                 if (page <= 0) page = 1;
-                if (pageSize <= 0) pageSize = 12;
+                if (pageSize <= 0) pageSize = 15;
 
-                var query = productRepo.GetAllProductsQuery();
+                var query = await productRepo.GetAllProductsQuery();
 
                 query = QuerySortOrders(sortOrder, query);
 
@@ -163,7 +194,6 @@ namespace DTech.Application.Services
                     .ToListAsync();
 
                 var productDtos = _mapper.Map<List<ProductDto>>(products);
-
 
                 var brands = productDtos
                     .Where(p => p.Brand != null)
@@ -220,20 +250,6 @@ namespace DTech.Application.Services
             }
         }
 
-        private static List<Product> SortOrders(string? sortOrder, List<Product> products)
-        {
-            return sortOrder switch
-            {
-                "newest" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderBy(p => p.ProductId)],
-                "discount" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderByDescending(p => p.Discount)],
-                "name_asc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderBy(p => p.Name)],
-                "name_desc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderByDescending(p => p.Name)],
-                "price_asc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderBy(p => p.Price)],
-                "price_desc" => [.. products.Where(a => a.Status == StatusEnums.Available).OrderByDescending(p => p.Price)],
-                _ => products
-            };
-        }
-
         private static IQueryable<Product> QuerySortOrders(string? sortOrder, IQueryable<Product> query)
         {
             return sortOrder switch
@@ -263,9 +279,12 @@ namespace DTech.Application.Services
             };
         }
 
-        public async Task<List<ProductDto>> SearchProductsAsync(string query, string sortOrder, string? customerId)
+        public async Task<PaginatedProductResDto?> SearchProductsAsync(string query, int page, int pageSize, string sortOrder, string? customerId)
         {
-            if(customerId != null)
+            if (page <= 0) page = 1;
+            if (pageSize <= 0) pageSize = 15;
+
+            if (customerId != null)
             {
                 var customer = await customerRepo.CheckCustomerAsync(customerId);
                 if (!customer)
@@ -275,13 +294,27 @@ namespace DTech.Application.Services
             }
 
             if (string.IsNullOrWhiteSpace(query))
-                return [];
+                return null;
 
             var products = await productRepo.GetProductByQuery(query);
-            products = SortOrders(sortOrder, [.. products]);
+            products = QuerySortOrders(sortOrder, products);
 
-            var productDto = _mapper.Map<List<ProductDto>>(products);
-            return productDto;
+            int totalItems = await products.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var productLists = await products
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var productDto = _mapper.Map<List<ProductDto>>(productLists);
+            return new PaginatedProductResDto
+            {
+                Products = productDto,
+                TotalPages = totalPages,
+                TotalItems = totalItems,
+                Title = "All Products"
+            };
         }
 
         // For admin

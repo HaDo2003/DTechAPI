@@ -29,8 +29,7 @@ namespace DTech.Infrastructure.Services
             var uploadParams = new ImageUploadParams()
             {
                 File = new FileDescription(file.FileName, stream),
-                Folder = folderName,
-                Transformation = new Transformation().Crop("limit").Width(500).Height(500)
+                Folder = folderName
             };
 
             var uploadResult = await _cloudinary.UploadAsync(uploadParams);

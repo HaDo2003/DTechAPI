@@ -57,6 +57,13 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
         fetchWishlist();
     }, [token, product]);
 
+    let statusText;
+    if (product.statusProduct) {
+        statusText = "In Stock";
+    } else {
+        statusText = "Out of Stock";
+    }
+
     const fetchWishlist = async () => {
         if (!token || !product) return;
         try {
@@ -316,8 +323,20 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
                                             <button type="button" className="btn-quantity-adjust" onClick={handleQuantityIncrease}>+</button>
                                         </div>
 
-                                        <button type="button" className="btn-add-to-cart" onClick={handleAddToCart}>
-                                            <i className="fas fa-shopping-cart"></i> Add to Cart
+                                        <button
+                                            type="button"
+                                            className="btn-add-to-cart"
+                                            onClick={handleAddToCart}
+                                            disabled={statusText === "Out of Stock"}
+                                            title={statusText === "Out of Stock" ? "This product is currently out of stock" : "Add to cart"}
+                                            style={{
+                                                pointerEvents: statusText === "Out of Stock" ? "none" : "auto",
+                                                opacity: statusText === "Out of Stock" ? 0.6 : 1,
+                                                cursor: statusText === "Out of Stock" ? "not-allowed" : "pointer"
+                                            }}
+                                        >
+                                            <i className="fas fa-shopping-cart"></i>
+                                            {statusText === "Out of Stock" ? " Out of Stock" : " Add to Cart"}
                                         </button>
 
                                         <button
@@ -331,12 +350,27 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
                                     </div>
 
                                     <div className="buy-now-section">
-                                        <button type="button" className="btn-buy-now" onClick={handleBuyNow}>
-                                            BUY NOW
-                                            <br />
-                                            <span className="delivery-note">
-                                                Fast Delivery
-                                            </span>
+                                        <button
+                                            type="button"
+                                            className="btn-buy-now"
+                                            onClick={handleBuyNow}
+                                            disabled={statusText === "Out of Stock"}
+                                            title={statusText === "Out of Stock" ? "This product is currently out of stock" : "Buy now with fast delivery"}
+                                            style={{
+                                                pointerEvents: statusText === "Out of Stock" ? "none" : "auto",
+                                                opacity: statusText === "Out of Stock" ? 0.6 : 1,
+                                                cursor: statusText === "Out of Stock" ? "not-allowed" : "pointer"
+                                            }}
+                                        >
+                                            {statusText === "Out of Stock" ? "Out of Stock" : (
+                                                <>
+                                                    BUY NOW
+                                                    <br />
+                                                    <span className="delivery-note">
+                                                        {statusText === "Out of Stock" ? "Out of Stock" : "Fast Delivery"}
+                                                    </span>
+                                                </>
+                                            )}
                                         </button>
                                     </div>
                                 </div>
