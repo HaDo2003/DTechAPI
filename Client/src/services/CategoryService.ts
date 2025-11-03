@@ -32,3 +32,21 @@ export const getAllProducts = async (page: number, pageSize: number, sortOrder?:
   });
   return res.data;
 };
+
+export const getFilteredProducts = async (
+  categorySlug: string,
+  filters: any,
+  brandSlug?: string
+) => {
+  const url = brandSlug
+    ? `/api/product/${categorySlug}/filter?brandSlug=${brandSlug}`
+    : `/api/product/${categorySlug}/filter`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(filters),
+  });
+
+  return await res.json();
+};

@@ -1,6 +1,9 @@
 ﻿using DTech.Application.DTOs.request;
+using DTech.Application.DTOs.Request;
 using DTech.Application.DTOs.response;
+using DTech.Application.DTOs.Response;
 using DTech.Application.Interfaces;
+using DTech.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -24,10 +27,10 @@ namespace DTech.API.Controllers
         }
 
         [HttpGet("{categorySlug}")]
-        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategory(
-            string categorySlug, 
-            [FromQuery] int page = 1, 
-            [FromQuery] int pageSize = 15, 
+        public async Task<IActionResult> GetProductsByCategory(
+            string categorySlug,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 15,
             [FromQuery] string? sortOrder = null
         )
         {
@@ -46,23 +49,25 @@ namespace DTech.API.Controllers
             var formattedTitle = System.Globalization.CultureInfo.CurrentCulture.TextInfo
                 .ToTitleCase(categorySlug.Replace("-", " "));
 
-            var result = new CategoryPageDto
+            var result = new PaginatedProductResDto
             {
                 Title = formattedTitle,
                 Products = products.Products,
                 Brands = brands,
                 InitialSort = sortOrder ?? "default",
-                CategorySlug = categorySlug
+                CategorySlug = categorySlug,
+                TotalPages = products.TotalPages,
+                TotalItems = products.TotalItems
             };
             return Ok(result);
         }
 
         [HttpGet("{categorySlug}/{brandSlug}")]
-        public async Task<ActionResult<CategoryPageDto>> GetProductsByCategoryAndBrand(
-            string categorySlug, 
-            string brandSlug, 
-            [FromQuery] int page = 1, 
-            [FromQuery] int pageSize = 15, 
+        public async Task<IActionResult> GetProductsByCategoryAndBrand(
+            string categorySlug,
+            string brandSlug,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 15,
             [FromQuery] string? sortOrder = null
         ){
             var products = await productService.GetProductsByCategoryAndBrandAsync(categorySlug, brandSlug, page, pageSize, sortOrder);
@@ -73,13 +78,15 @@ namespace DTech.API.Controllers
 
             var formattedTitle = System.Globalization.CultureInfo.CurrentCulture.TextInfo
                 .ToTitleCase(categorySlug.Replace("-", " "));
-            var result = new CategoryPageDto
+            var result = new PaginatedProductResDto
             {
                 Title = formattedTitle,
                 Products = products.Products,
                 Brands = null,
                 InitialSort = sortOrder ?? "default",
                 CategorySlug = categorySlug,
+                TotalPages = products.TotalPages,
+                TotalItems = products.TotalItems
             };
             return Ok(result);
         }
@@ -134,6 +141,36 @@ namespace DTech.API.Controllers
             var products = await productService.SearchProductsAsync(query, page, pageSize, sortOrder, userId);
 
             return Ok(new { products, initialSort = sortOrder, success = true });
+        }
+
+        [HttpPost("{categorySlug}/filter")]
+        public async Task<IActionResult> GetFilteredProducts(
+            string categorySlug,
+            [FromBody] FilterReqDto filterRequest,
+            [FromQuery] string? brandSlug = null
+        )
+        {
+            var result = await productService.GetFilteredProductsAsync(categorySlug, filterRequest, brandSlug);
+            if (result == null || result.Products.Count == 0)
+            {
+                return NotFound();
+            }
+
+            var formattedTitle = System.Globalization.CultureInfo.CurrentCulture.TextInfo
+                .ToTitleCase(categorySlug.Replace("-", " "));
+
+            var response = new PaginatedProductResDto
+            {
+                Title = formattedTitle,
+                Products = result.Products,
+                Brands = result.Brands,
+                InitialSort = filterRequest.SortOrder,
+                CategorySlug = categorySlug,
+                TotalPages = result.TotalPages,
+                TotalItems = result.TotalItems
+            };
+
+            return Ok(response);
         }
     }
 }

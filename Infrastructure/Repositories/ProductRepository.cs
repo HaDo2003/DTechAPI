@@ -94,6 +94,9 @@ namespace DTech.Infrastructure.Repositories
                 .AsNoTracking()
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
+                .Include(p => p.ProductColors)
+                .Include(p => p.Specifications)
+                .Include(p => p.ProductComments)
                 .Where(p => p.Status == StatusEnums.Available));
         }
 

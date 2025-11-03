@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using DTech.Application.DTOs.request;
+using DTech.Application.DTOs.Request;
 using DTech.Application.DTOs.response;
 using DTech.Application.DTOs.Response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Product;
+using DTech.Application.Helper;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -132,7 +134,7 @@ namespace DTech.Application.Services
                         break;
                     default:
                         category = await categoryRepo.GetCategoryBySlugAsync(categorySlug)
-                                   ?? throw new Exception($"Category with slug '{categorySlug}' not found.");;
+                                   ?? throw new Exception($"Category with slug '{categorySlug}' not found."); ;
 
                         // Get category IDs: main + all its children
                         var categoryIds = new List<int> { category.CategoryId };
@@ -317,6 +319,86 @@ namespace DTech.Application.Services
             };
         }
 
+        public async Task<PaginatedProductResDto?> GetFilteredProductsAsync(string categorySlug, FilterReqDto filterRequest, string? brandSlug)
+        {
+            try
+            {
+                Console.WriteLine($"[DEBUG SERVICE] Starting filter - Category: {categorySlug}, Brand: {brandSlug}");
+                Console.WriteLine($"[DEBUG SERVICE] Page: {filterRequest.Page}, PageSize: {filterRequest.PageSize}");
+
+                if (filterRequest.Page <= 0) filterRequest.Page = 1;
+                if (filterRequest.PageSize <= 0) filterRequest.PageSize = 15;
+
+                IQueryable<Product> query = await productRepo.GetAllProductsQuery();
+                Console.WriteLine($"[DEBUG SERVICE] Initial query count: {await query.CountAsync()}");
+
+                query = query.ApplyCategoryAndBrandFilter(categorySlug, brandSlug);
+                Console.WriteLine($"[DEBUG SERVICE] After category/brand filter: {await query.CountAsync()}");
+
+                query = query.ApplyCommonFilters(filterRequest);
+                Console.WriteLine($"[DEBUG SERVICE] After common filters: {await query.CountAsync()}");
+
+                if (filterRequest.OperatingSystem?.Count > 0)
+                {
+                    Console.WriteLine($"[DEBUG SERVICE] Filtering by Operating System: {string.Join(", ", filterRequest.OperatingSystem)}");
+
+                    // Debug: Show actual OS values in database
+                    var osSpecs = await query
+                        .SelectMany(p => p.Specifications)
+                        .Where(s => s.SpecName == "Operating System")
+                        .Select(s => s.Detail)
+                        .Distinct()
+                        .ToListAsync();
+                    Console.WriteLine($"[DEBUG SERVICE] Available Operating Systems in DB: {string.Join(", ", osSpecs)}");
+                }
+                query = query.ApplyCategorySpecificFilters(categorySlug, filterRequest);
+                Console.WriteLine($"[DEBUG SERVICE] After category specific filters: {await query.CountAsync()}");
+
+                query = QuerySortOrders(filterRequest.SortOrder, query);
+
+                var totalItems = await query.CountAsync();
+                Console.WriteLine($"[DEBUG SERVICE] Total items after filters: {totalItems}");
+                var totalPages = (int)Math.Ceiling(totalItems / (double)filterRequest.PageSize);
+
+                var products = await query
+                    .Skip((filterRequest.Page - 1) * filterRequest.PageSize)
+                    .Take(filterRequest.PageSize)
+                    .ToListAsync();
+
+                Console.WriteLine($"[DEBUG SERVICE] Products retrieved: {products.Count}");
+
+                var productDtos = _mapper.Map<List<ProductDto>>(products);
+                Console.WriteLine($"[DEBUG SERVICE] ProductDtos mapped: {productDtos.Count}");
+
+                List<BrandDto?>? brandDtos = null;
+                if (brandSlug == null)
+                {
+                    brandDtos = [.. productDtos
+                    .Where(p => p.Brand != null)
+                    .Select(p => p.Brand!)
+                    .DistinctBy(b => b.BrandId)];
+                }
+
+                var result = new PaginatedProductResDto
+                {
+                    Products = productDtos,
+                    Brands = brandDtos,
+                    TotalPages = totalPages,
+                    TotalItems = totalItems,
+                    Title = "All Products"
+                };
+
+                Console.WriteLine($"[DEBUG SERVICE] Returning result with {result.Products.Count} products");
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DEBUG SERVICE ERROR] {ex.Message}");
+                Console.WriteLine($"[DEBUG SERVICE ERROR] Stack: {ex.StackTrace}");
+                return null;
+            }
+        }
         // For admin
         public async Task<IndexResDto<List<ProductIndexDto>>> GetProductsAsync()
         {
@@ -361,8 +443,9 @@ namespace DTech.Application.Services
 
             var dto = new ProductResDto
             {
-                ProductInfor = product != null 
-                ? new ProductDetailDto {
+                ProductInfor = product != null
+                ? new ProductDetailDto
+                {
                     Id = product.ProductId,
                     Name = product.Name,
                     Slug = product.Slug,
@@ -471,7 +554,7 @@ namespace DTech.Application.Services
 
         public async Task<IndexResDto<object?>> CreateProductAsync(ProductDetailDto? model, string? currentUserId)
         {
-            if(model == null)
+            if (model == null)
             {
                 return new IndexResDto<object?>
                 {
@@ -785,7 +868,8 @@ namespace DTech.Application.Services
                 }
 
                 var result = await productRepo.SaveSpecificationsAsync();
-                if (!result) {
+                if (!result)
+                {
                     return new IndexResDto<object?>
                     {
                         Success = true,
@@ -799,7 +883,8 @@ namespace DTech.Application.Services
                     Message = "Specifications updated successfully.",
                     Data = null
                 };
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return new IndexResDto<object?>
                 {

@@ -1,4 +1,5 @@
 ﻿using DTech.Application.DTOs.request;
+using DTech.Application.DTOs.Request;
 using DTech.Application.DTOs.response;
 using DTech.Application.DTOs.Response;
 using DTech.Application.DTOs.Response.Admin;
@@ -15,6 +16,7 @@ namespace DTech.Application.Interfaces
         Task<List<ProductDto>> GetRecentlyViewedProductsAsync(string? ids);
         Task<ProductCommentDto> PostCommentAsync(ProductCommentRequestDto model);
         Task<PaginatedProductResDto?> SearchProductsAsync(string query, int page, int pageSize, string sortOrder, string? customerId);
+        Task<PaginatedProductResDto?> GetFilteredProductsAsync(string categorySlug, FilterReqDto filterRequest, string? brandSlug);
 
         // For Admin
         Task<IndexResDto<List<ProductIndexDto>>> GetProductsAsync();

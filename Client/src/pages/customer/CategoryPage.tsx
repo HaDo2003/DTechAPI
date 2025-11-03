@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import ProductCard from "../../components/customer/ProductCard";
 import { type Product } from "../../types/Product";
 import { type Brand } from "../../types/Brand";
-import { getCategoryProducts, getCategoryBrandProducts, getAllProducts } from "../../services/CategoryService";
+import { getCategoryProducts, getCategoryBrandProducts, getAllProducts, getFilteredProducts } from "../../services/CategoryService";
 import NotFound from "./NotFound";
 import SkeletonCategoryGrid from "../../components/customer/skeleton/SkeletonCategoryGrid";
 import { useAuth } from "../../context/AuthContext";
@@ -34,6 +34,14 @@ const CategoryPage: React.FC = () => {
         { label: "Price ↑", value: "price_asc" },
         { label: "Price ↓", value: "price_desc" },
     ];
+
+    const [filters, setFilters] = useState({
+        minPrice: 0,
+        maxPrice: 100000,
+        inStock: false,
+        rating: null as number | null,
+        selectedOptions: {} as Record<string, string[]>,
+    });
 
     const fetchWishlist = async () => {
         if (!token) return;
@@ -128,6 +136,98 @@ const CategoryPage: React.FC = () => {
         if (page < 1 || page > totalPages) return;
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type, checked } = e.target;
+        setFilters((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value,
+        }));
+    };
+
+    const handleOptionChange = (groupLabel: string, option: string, checked: boolean) => {
+        setFilters((prev) => {
+            const prevOptions = prev.selectedOptions[groupLabel] || [];
+            return {
+                ...prev,
+                selectedOptions: {
+                    ...prev.selectedOptions,
+                    [groupLabel]: checked
+                        ? [...prevOptions, option]
+                        : prevOptions.filter((opt) => opt !== option),
+                },
+            };
+        });
+    };
+
+    const handleRatingChange = (value: number) => {
+        setFilters((prev) => ({ ...prev, rating: value }));
+    };
+
+    const handleApplyFilters = async () => {
+        if (!categorySlug) return;
+
+        const requestBody: any = {
+            minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
+            maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+            inStock: filters.inStock || undefined,
+            rating: filters.rating || undefined,
+            page: 1,
+            pageSize: pageSize,
+            sortOrder: sortOrder,
+        };
+
+        for (const [key, values] of Object.entries(filters.selectedOptions)) {
+            requestBody[key.toLowerCase().replace(/\s+/g, "")] = values;
+        }
+
+        try {
+            setLoading(true);
+            const data = await getFilteredProducts(categorySlug, requestBody, brandSlug);
+
+            if (data && data.products) {
+                setProducts(data.products);
+                setTotalPages(data.totalPages ?? 1);
+                setCurrentPage(1);
+            } else {
+                setProducts([]);
+            }
+        } catch (error) {
+            console.error("Error fetching filtered products:", error);
+        } finally {
+            setLoading(false);
+            setShowFilterPanel(false);
+        }
+    };
+
+    const handleClearFilters = async () => {
+        setFilters({
+            minPrice: 0,
+            maxPrice: 100000,
+            inStock: false,
+            rating: null,
+            selectedOptions: {},
+        });
+
+        // Reload default data
+        if (categorySlug) {
+            setLoading(true);
+            try {
+                const data = brandSlug
+                    ? await getCategoryBrandProducts(categorySlug, brandSlug, currentPage, pageSize, sortOrder)
+                    : await getCategoryProducts(categorySlug, currentPage, pageSize, sortOrder);
+
+                setProducts(data.products);
+                setTotalPages(data.totalPages ?? 1);
+            } catch (error) {
+                console.error("Error clearing filters:", error);
+                setProducts([]);
+            } finally {
+                setLoading(false);
+                setShowFilterPanel(false);
+            }
+        }
     };
 
     return (
@@ -248,7 +348,11 @@ const CategoryPage: React.FC = () => {
                     onClick={() => setShowFilterPanel(false)}
                     style={{ overflowY: "hidden" }}
                 >
-                    <div className="filter-panel bg-white p-4 shadow-lg h-100" style={{ width: "320px", overflowY: "auto" }}>
+                    <div
+                        className="filter-panel bg-white p-4 shadow-lg h-100"
+                        style={{ width: "320px", overflowY: "auto" }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <h5>Filters</h5>
                             <button
@@ -262,7 +366,7 @@ const CategoryPage: React.FC = () => {
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                // TODO: Apply filters here
+                                handleApplyFilters();
                                 setShowFilterPanel(false);
                             }}
                         >
@@ -270,13 +374,27 @@ const CategoryPage: React.FC = () => {
                             <div className="mb-3">
                                 <label className="form-label fw-bold">Price Range</label>
                                 <div className="d-flex gap-2">
-                                    <input type="number" className="form-control" placeholder="Min" />
-                                    <input type="number" className="form-control" placeholder="Max" />
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        placeholder="Min"
+                                        name="minPrice"
+                                        value={filters.minPrice}
+                                        onChange={handleInputChange}
+                                    />
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        placeholder="Max"
+                                        name="maxPrice"
+                                        value={filters.maxPrice}
+                                        onChange={handleInputChange}
+                                    />
                                 </div>
                             </div>
 
                             {/* Category-Specific Filters */}
-                            {filterOptions[categorySlug ?? ""] ? (
+                            {filterOptions[categorySlug ?? ""] &&
                                 filterOptions[categorySlug ?? ""].map((filterGroup) => (
                                     <div key={filterGroup.label} className="mb-3">
                                         <label className="form-label fw-bold">{filterGroup.label}</label>
@@ -286,26 +404,32 @@ const CategoryPage: React.FC = () => {
                                                     className="form-check-input"
                                                     type="checkbox"
                                                     id={`${filterGroup.label}-${opt}`}
+                                                    checked={filters.selectedOptions[filterGroup.label]?.includes(opt) || false}
+                                                    onChange={(e) =>
+                                                        handleOptionChange(filterGroup.label, opt, e.target.checked)
+                                                    }
                                                 />
-                                                <label
-                                                    className="form-check-label"
-                                                    htmlFor={`${filterGroup.label}-${opt}`}
-                                                >
+                                                <label className="form-check-label" htmlFor={`${filterGroup.label}-${opt}`}>
                                                     {opt}
                                                 </label>
                                             </div>
                                         ))}
                                     </div>
-                                ))
-                            ) : (
-                                <p></p>
-                            )}
+                                ))}
 
+                            {/* Rating Filter */}
                             <div className="mb-3">
                                 <label className="form-label fw-bold">Rating</label>
                                 {[5, 4, 3, 2, 1].map((rating) => (
                                     <div key={rating} className="form-check">
-                                        <input className="form-check-input" type="radio" name="rating" id={`rating-${rating}`} />
+                                        <input
+                                            className="form-check-input"
+                                            type="radio"
+                                            name="rating"
+                                            id={`rating-${rating}`}
+                                            checked={filters.rating === rating}
+                                            onChange={() => handleRatingChange(rating)}
+                                        />
                                         <label className="form-check-label" htmlFor={`rating-${rating}`}>
                                             {rating} stars & up
                                         </label>
@@ -313,10 +437,18 @@ const CategoryPage: React.FC = () => {
                                 ))}
                             </div>
 
+                            {/* Availability */}
                             <div className="mb-3">
                                 <label className="form-label fw-bold">Availability</label>
                                 <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" id="inStock" />
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="inStock"
+                                        name="inStock"
+                                        checked={filters.inStock}
+                                        onChange={handleInputChange}
+                                    />
                                     <label className="form-check-label" htmlFor="inStock">In Stock</label>
                                 </div>
                             </div>
@@ -325,11 +457,14 @@ const CategoryPage: React.FC = () => {
                                 <button type="submit" className="btn btn-primary w-75">
                                     Apply Filters
                                 </button>
-                                <button type="submit" className="btn btn-warning w-75">
+                                <button
+                                    type="button"
+                                    className="btn btn-warning w-75"
+                                    onClick={handleClearFilters}
+                                >
                                     Clear Filters
                                 </button>
                             </div>
-
                         </form>
                     </div>
                 </div>
