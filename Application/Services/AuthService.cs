@@ -184,7 +184,6 @@ namespace DTech.Application.Services
 
             var userId = debugResponse.GetProperty("data").GetProperty("user_id").GetString();
 
-            
             var profileUrl = $"https://graph.facebook.com/{userId}?fields=id,name,email,picture&access_token={accessToken}";
             var profileResponse = await httpClient.GetFromJsonAsync<JsonElement>(profileUrl);
 

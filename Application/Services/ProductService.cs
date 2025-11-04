@@ -338,19 +338,6 @@ namespace DTech.Application.Services
                 query = query.ApplyCommonFilters(filterRequest);
                 Console.WriteLine($"[DEBUG SERVICE] After common filters: {await query.CountAsync()}");
 
-                if (filterRequest.OperatingSystem?.Count > 0)
-                {
-                    Console.WriteLine($"[DEBUG SERVICE] Filtering by Operating System: {string.Join(", ", filterRequest.OperatingSystem)}");
-
-                    // Debug: Show actual OS values in database
-                    var osSpecs = await query
-                        .SelectMany(p => p.Specifications)
-                        .Where(s => s.SpecName == "Operating System")
-                        .Select(s => s.Detail)
-                        .Distinct()
-                        .ToListAsync();
-                    Console.WriteLine($"[DEBUG SERVICE] Available Operating Systems in DB: {string.Join(", ", osSpecs)}");
-                }
                 query = query.ApplyCategorySpecificFilters(categorySlug, filterRequest);
                 Console.WriteLine($"[DEBUG SERVICE] After category specific filters: {await query.CountAsync()}");
 

@@ -47,7 +47,6 @@ namespace DTech.Application.Services
                 return new MessageResponse { Success = true, Message = "Updated product quantity in cart" };
             }
         }
-
         public async Task<CartDto> GetCartAsync(string customerId)
         {
             var customer = await customerRepo.CheckCustomerAsync(customerId);
@@ -84,14 +83,6 @@ namespace DTech.Application.Services
                 Success = true,
                 Message = "Cart retrieved successfully"
             };
-            Console.WriteLine("[DEBUG] Cart product colors:");
-            foreach (var p in cartDto.CartProducts)
-            {
-                Console.WriteLine(
-                    $" - ProductId: {p.ProductId}, Name: {p.Name}, " +
-                    $"ColorId: {p.Color?.ColorId}, ColorName: {p.Color?.ColorName}, ColorCode: {p.Color?.ColorCode}"
-                );
-            }
 
             return cartDto;
         }
