@@ -350,8 +350,7 @@ namespace DTech.UnitTest.Services
 
             var cartProducts = new List<CartProduct>
             {
-                new CartProduct
-                {
+                new() {
                     Id = 1,
                     CartId = cartId,
                     ProductId = 1,

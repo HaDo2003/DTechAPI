@@ -220,7 +220,7 @@ namespace DTech.UnitTest.Services
         public async Task ForgotPasswordAsync_NullEmail_ReturnsErrorMessage()
         {
             // Arrange
-            var model = new ForgotPasswordDto { Email = null };
+            var model = new ForgotPasswordDto { Email = null};
             // Act
             var result = await _authService.ForgotPasswordAsync(model);
             // Assert

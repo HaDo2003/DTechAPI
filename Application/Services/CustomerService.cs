@@ -71,7 +71,7 @@ namespace DTech.Application.Services
             var isUpdated = await customerRepo.UpdateCustomerAsync(newProfile);
             if (!isUpdated)
                 return new MessageResponse { Success = false, Message = "Failed to update profile" };
-            
+
             return new MessageResponse { Success = true, Message = "Profile updated successfully" };
         }
 
@@ -100,9 +100,9 @@ namespace DTech.Application.Services
             if (addressId == null)
                 return new AddressResponse { Success = false, Message = "Failed to add new address" };
 
-            return new AddressResponse 
-            { 
-                Success = true, 
+            return new AddressResponse
+            {
+                Success = true,
                 Message = "Add new address successfully",
                 AddressId = addressId
             };
@@ -172,11 +172,11 @@ namespace DTech.Application.Services
             if (!isUpdated)
                 return new AddressResponse { Success = false, Message = "Failed to change default address" };
 
-            return new AddressResponse 
-            { 
-                Success = true, 
-                Message = "Edit address successfully", 
-                AddressId = addressId 
+            return new AddressResponse
+            {
+                Success = true,
+                Message = "Edit address successfully",
+                AddressId = addressId
             };
         }
 
@@ -190,8 +190,8 @@ namespace DTech.Application.Services
             if (order == null)
                 return new OrderDetailResDto { Success = false, Message = "Order not found" };
 
-            OrderDetailResDto model = new() 
-            { 
+            OrderDetailResDto model = new()
+            {
                 OrderId = order.OrderId,
                 OrderDate = order.OrderDate,
                 Name = order.Name,
@@ -206,7 +206,7 @@ namespace DTech.Application.Services
                 Payment = order.Payment == null
                     ? null
                     : new PaymentDto
-                    { 
+                    {
                         Status = order.Payment.Status,
                         PaymentMethodName = order.Payment.PaymentMethod!.Description ?? string.Empty,
                     },
@@ -232,7 +232,7 @@ namespace DTech.Application.Services
 
             int orderStatusId = 7;
             var orderUpdated = await orderRepo.UpdateStatusAsync(orderId, customerId, orderStatusId);
-            if(orderUpdated == null) 
+            if(orderUpdated == null)
                 return new OrderDetailResDto { Success = false, Message = "Fail to cancel order" };
 
             OrderDetailResDto model = new()
@@ -286,9 +286,9 @@ namespace DTech.Application.Services
         {
             var customer = await customerRepo.CheckCustomerAsync(customerId);
             if (!customer)
-                return new IndexResDto<List<WishlistDto>> { 
-                    Success = false, 
-                    Message = "Customer not found" 
+                return new IndexResDto<List<WishlistDto>> {
+                    Success = false,
+                    Message = "Customer not found"
                 };
 
             var wls = await customerRepo.GetAllWishlistByCustomerIdAync(customerId);

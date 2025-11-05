@@ -252,20 +252,6 @@ namespace DTech.Application.Services
             }
         }
 
-        private static IQueryable<Product> QuerySortOrders(string? sortOrder, IQueryable<Product> query)
-        {
-            return sortOrder switch
-            {
-                "newest" => query.OrderByDescending(p => p.ProductId),
-                "discount" => query.OrderByDescending(p => p.Discount),
-                "name_asc" => query.OrderBy(p => p.Name),
-                "name_desc" => query.OrderByDescending(p => p.Name),
-                "price_asc" => query.OrderBy(p => p.Price),
-                "price_desc" => query.OrderByDescending(p => p.Price),
-                _ => query
-            };
-        }
-
         public async Task<ProductCommentDto> PostCommentAsync(ProductCommentRequestDto model)
         {
             var productComment = _mapper.Map<ProductComment>(model);
@@ -385,6 +371,19 @@ namespace DTech.Application.Services
                 Console.WriteLine($"[DEBUG SERVICE ERROR] Stack: {ex.StackTrace}");
                 return null;
             }
+        }
+        private static IQueryable<Product> QuerySortOrders(string? sortOrder, IQueryable<Product> query)
+        {
+            return sortOrder switch
+            {
+                "newest" => query.OrderByDescending(p => p.ProductId),
+                "discount" => query.OrderByDescending(p => p.Discount),
+                "name_asc" => query.OrderBy(p => p.Name),
+                "name_desc" => query.OrderByDescending(p => p.Name),
+                "price_asc" => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                _ => query
+            };
         }
         // For admin
         public async Task<IndexResDto<List<ProductIndexDto>>> GetProductsAsync()
