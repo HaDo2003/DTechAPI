@@ -9,18 +9,15 @@ namespace DTech.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PostId { get; set; }
-
         [Display(Name = "Post Category")]
-        public int? CateId { get; set; }
-
+        public int? PostCategoryId { get; set; }
         [Required(ErrorMessage = "Please enter title")]
         [Display(Name = "Title")]
         public string? Name { get; set; }
-
         public string? Slug { get; set; }
-
+        public bool IsMain { get; set; } = false;
+        public bool IsFeatured { get; set; } = false;
         public string? Image { get; set; }
-
         public string? Description { get; set; }
 
         [Display(Name = "Post Date")]
@@ -30,7 +27,7 @@ namespace DTech.Domain.Entities
         public string? PostBy { get; set; }
         public StatusEnums Status { get; set; } = StatusEnums.Available;
         [Display(Name = "Post Category")]
-        public virtual PostCategory? Cate { get; set; }
+        public virtual PostCategory? PostCategory { get; set; }
 
         public virtual ICollection<PostComment> PostComments { get; set; } = new List<PostComment>();
     }

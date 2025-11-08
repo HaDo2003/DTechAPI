@@ -90,7 +90,10 @@ const Sidebar: React.FC<AdminSidebarProps> = ({
                       return allowed.some((r) => (user?.roles ?? "").toLowerCase() === r);
                     })
                     .map((item) => {
-                      const isActive = location.pathname.startsWith(item.to);
+                      // Exact match or match with trailing slash to prevent partial matches
+                      const isActive =
+                        location.pathname === item.to ||
+                        location.pathname.startsWith(item.to + "/");
                       return (
                         <InformationItem
                           key={item.key}

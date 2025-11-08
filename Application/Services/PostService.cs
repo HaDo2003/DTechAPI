@@ -36,7 +36,7 @@ namespace DTech.Application.Services
                 Name = p.Name,
                 PostDate = p.PostDate,
                 PostBy = p.PostBy,
-                PostCategory = p.Cate?.Name,
+                PostCategory = p.PostCategory?.Name,
             }).ToList();
             foreach(var o in postDtos)
             {
@@ -69,8 +69,8 @@ namespace DTech.Application.Services
                 Image = post.Image,
                 PostBy = post.PostBy,
                 PostDate = post.PostDate,
-                PostCategoryId = post.Cate != null ? post.Cate.CategoryId : 0,
-                PostCategory = post.Cate != null ? post.Cate.Name : "N/A"
+                PostCategoryId = post.PostCategory != null ? post.PostCategory.CategoryId : 0,
+                PostCategory = post.PostCategory != null ? post.PostCategory.Name : "N/A"
             };
 
             return new IndexResDto<PostDetailDto>
@@ -92,7 +92,7 @@ namespace DTech.Application.Services
                     PostDate = DateTime.UtcNow,
                     PostBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                     Description = sanitizer.Sanitize(model.Description ?? string.Empty),
-                    CateId = model.PostCategoryId
+                    PostCategoryId = model.PostCategoryId
                 };
                 post.Slug = post.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
 
@@ -170,7 +170,7 @@ namespace DTech.Application.Services
                     PostDate = DateTime.UtcNow,
                     PostBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                     Image = model.Image,
-                    CateId = model.PostCategoryId
+                    PostCategoryId = model.PostCategoryId
                 };
 
                 string newSlug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-") ?? string.Empty;

@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { CheckOut, CouponResponse, } from "../types/Order";
 import type { OrderSuccessModel } from "../types/OrderSuccess";
+import { handleAxiosError } from "../utils/handleAxiosError";
 
 export const checkOutService = {
     async fetchCheckOut(token: string): Promise<CheckOut> {
@@ -10,20 +11,7 @@ export const checkOutService = {
             });
             return { ...res.data, success: true };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to fetch customer profile. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to fetch checkout information. Please try again.") as CheckOut;
         }
     },
 
@@ -35,20 +23,7 @@ export const checkOutService = {
             });
             return { ...res.data };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to fetch customer profile. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to apply coupon. Please try again.");
         }
     },
 
@@ -59,20 +34,7 @@ export const checkOutService = {
             });
             return { ...res.data, success: true };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to fetch customer profile. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to process buy now. Please try again.") as CheckOut;
         }
     },
 
@@ -84,20 +46,7 @@ export const checkOutService = {
             });
             return { ...res.data, success: true };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to place order. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to place order. Please try again.");
         }
     }
 }

@@ -204,7 +204,7 @@ const PostFormPage: React.FC = () => {
                                         <select
                                             id="status-select"
                                             name="status"
-                                            value={form.status ?? ""}
+                                            value={form.status ?? "Available"}
                                             onChange={handleChange}
                                             className="form-control"
                                             title="Status"

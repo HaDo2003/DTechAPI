@@ -8,11 +8,43 @@ namespace DTech.Infrastructure.Repositories
 {
     public class PostRepository(DTechDbContext context) : IPostRepository
     {
+        // For Customer
+        public async Task<List<Post>?> GetPostsAsync(string type)
+        {
+            IQueryable<Post> query = context.Posts
+                .AsNoTracking()
+                .Include(p => p.PostCategory)
+                .Where(p => p.Status == StatusEnums.Available);
+            query = type switch
+            {
+                "New" => query.OrderByDescending(p => p.PostDate).Take(5),
+                "Feature" => query.Where(p => p.IsFeatured == true).OrderByDescending(p => p.PostDate).Take(3),
+                "Main" => query.Where(p => p.IsMain == true).OrderByDescending(p => p.PostDate).Take(1),
+                _ => query.OrderByDescending(p => p.PostDate).Take(6),
+            };
+            return await query.ToListAsync();
+        }
+        public Task<IQueryable<Post>?> GetPostsByCategorySlugAsync(string categorySlug)
+        {
+            if (string.IsNullOrWhiteSpace(categorySlug))
+                return Task.FromResult<IQueryable<Post>?>(null);
+
+            IQueryable<Post> query = context.Posts
+                .AsNoTracking()
+                .Include(p => p.PostCategory)
+                .Where(p => p.PostCategory != null &&
+                            p.PostCategory.Slug == categorySlug &&
+                            p.Status == StatusEnums.Available)
+                .OrderByDescending(p => p.PostDate);
+
+            return Task.FromResult<IQueryable<Post>?>(query);
+        }
+        //For Admin
         public async Task<List<Post>?> GetAllPostsAsync()
         {
             return await context.Posts
                 .AsNoTracking()
-                .Include(p => p.Cate)
+                .Include(p => p.PostCategory)
                 .OrderBy(p => p.PostId)
                 .ToListAsync();
         }
@@ -24,7 +56,7 @@ namespace DTech.Infrastructure.Repositories
 
             return await context.Posts
                 .AsNoTracking()
-                .Include(p => p.Cate)
+                .Include(p => p.PostCategory)
                 .FirstOrDefaultAsync(p => p.PostId == postId);
         }
 
@@ -72,7 +104,7 @@ namespace DTech.Infrastructure.Repositories
             existingPost.Image = post.Image;
             existingPost.PostDate = DateTime.UtcNow;
             existingPost.PostBy = post.PostBy;
-            existingPost.CateId = post.CateId;
+            existingPost.PostCategoryId = post.PostCategoryId;
 
             context.Posts.Update(existingPost);
             var result = await context.SaveChangesAsync();

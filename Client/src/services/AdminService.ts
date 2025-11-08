@@ -1,28 +1,16 @@
 import axios from "axios";
 import type { Admin, ServiceResponse } from "../types/Admin";
+import { handleAxiosError } from "../utils/handleAxiosError";
 
 export const adminService = {
-    async getAdmin(token: string): Promise<Admin> {
+    async getAdmin(token: string): Promise<ServiceResponse<Admin>> {
         try {
             const response = await axios.get<Admin>("/api/dashboard/get-admin", {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            return { ...response.data };
+            return { success: true, data: response.data };
         } catch (err: any) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to get admin. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to get admin. Please try again.");
         }
     },
 
@@ -175,7 +163,7 @@ export const adminService = {
         try {
             const response = await axios.put<ServiceResponse<T>>(
                 `${endpoint}/${id}`,
-                {statusName: newStatus },
+                { statusName: newStatus },
                 {
                     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
                 }
@@ -185,19 +173,4 @@ export const adminService = {
             return handleAxiosError(err, `Failed to update ${newStatus}. Please try again.`);
         }
     },
-}
-
-function handleAxiosError(err: any, defaultMessage: string): ServiceResponse<any> {
-    if (axios.isAxiosError(err)) {
-        let message = defaultMessage;
-        if (typeof err.response?.data === "string") {
-            message = err.response.data;
-        } else if (typeof err.response?.data?.message === "string") {
-            message = err.response.data.message;
-        } else if (err.response?.data) {
-            message = JSON.stringify(err.response.data);
-        }
-        return { success: false, message };
-    }
-    return { success: false, message: "Unexpected error occurred" };
 }

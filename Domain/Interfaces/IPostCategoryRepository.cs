@@ -4,6 +4,8 @@ namespace DTech.Domain.Interfaces
 {
     public interface IPostCategoryRepository
     {
+        // For Customer
+        Task<PostCategory?> GetPostCategoryBySlugAsync(string categorySlug);
         Task<List<PostCategory>?> GetAllPostCategoriesAsync();
         Task<List<PostCategory>?> GetAvailablePostCategoriesAsync();
         Task<PostCategory?> GetPostCategoryByIdAsync(int postCategoryId);

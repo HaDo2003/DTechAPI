@@ -4,6 +4,10 @@ namespace DTech.Domain.Interfaces
 {
     public interface IPostRepository
     {
+        // For Customer
+        Task<List<Post>?> GetPostsAsync(string type);
+        Task<IQueryable<Post>?> GetPostsByCategorySlugAsync(string categorySlug);
+        //For Admin
         Task<List<Post>?> GetAllPostsAsync();
         Task<Post?> GetPostByIdAsync(int postId);
         Task<bool> CheckIfPostExistsAsync(Post post);

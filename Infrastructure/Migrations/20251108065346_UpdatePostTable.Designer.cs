@@ -3,6 +3,7 @@ using System;
 using DTech.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DTech.Infrastructure.Migrations
 {
     [DbContext(typeof(DTechDbContext))]
-    partial class DTechDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251108065346_UpdatePostTable")]
+    partial class UpdatePostTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -779,6 +782,9 @@ namespace DTech.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PostId"));
 
+                    b.Property<int?>("CateId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -798,9 +804,6 @@ namespace DTech.Infrastructure.Migrations
                     b.Property<string>("PostBy")
                         .HasColumnType("text");
 
-                    b.Property<int?>("PostCategoryId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("PostDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -812,7 +815,7 @@ namespace DTech.Infrastructure.Migrations
 
                     b.HasKey("PostId");
 
-                    b.HasIndex("PostCategoryId");
+                    b.HasIndex("CateId");
 
                     b.ToTable("Posts");
                 });
@@ -1646,11 +1649,11 @@ namespace DTech.Infrastructure.Migrations
 
             modelBuilder.Entity("DTech.Domain.Entities.Post", b =>
                 {
-                    b.HasOne("DTech.Domain.Entities.PostCategory", "PostCategory")
+                    b.HasOne("DTech.Domain.Entities.PostCategory", "Cate")
                         .WithMany("Posts")
-                        .HasForeignKey("PostCategoryId");
+                        .HasForeignKey("CateId");
 
-                    b.Navigation("PostCategory");
+                    b.Navigation("Cate");
                 });
 
             modelBuilder.Entity("DTech.Domain.Entities.PostComment", b =>

@@ -20,7 +20,7 @@ const PostCategoryFormPage: React.FC = () => {
         id: 0,
         name: "",
         slug: "",
-        status: ""
+        status: "Available"
     });
 
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);

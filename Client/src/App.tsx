@@ -54,6 +54,8 @@ import ProductFormPage from "./pages/admin/product/ProductFormPage";
 import ProductDelete from "./pages/admin/product/ProductDelete";
 import Wishlist from "./pages/customer/Wishlist";
 import ProductPage from "./pages/customer/ProductPage";
+import NewsInitial from "./pages/customer/NewsInitial";
+import NewsCategoryDetail from "./pages/customer/NewsCategoryDetail";
 
 function App() {
   return (
@@ -79,6 +81,9 @@ function App() {
           <Route path=":categorySlug/:brandSlug/:slug" element={<ProductPage />} />
           <Route path=":categorySlug" element={<CategoryPage />} />
           <Route path=":categorySlug/:brandSlug" element={<CategoryPage />} />
+          <Route path="news" element={<NewsInitial />} />
+          <Route path="news/:categorySlug" element={<NewsCategoryDetail />} />
+          {/* <Route path="news/:categorySlug/:postSlug" element={<NewsPage />} /> */}
 
           {/* Protected routes */}
           <Route element={<PrivateRoute />}>

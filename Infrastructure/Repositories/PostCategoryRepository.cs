@@ -8,6 +8,15 @@ namespace DTech.Infrastructure.Repositories
 {
     public class PostCategoryRepository(DTechDbContext context) : IPostCategoryRepository
     {
+        public async Task<PostCategory?> GetPostCategoryBySlugAsync(string categorySlug)
+        {
+            if (string.IsNullOrWhiteSpace(categorySlug))
+                return null;
+
+            return await context.PostCategories
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Slug == categorySlug);
+        }
         public async Task<List<PostCategory>?> GetAllPostCategoriesAsync()
         {
             return await context.PostCategories

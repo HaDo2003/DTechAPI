@@ -173,8 +173,6 @@ namespace DTech.Infrastructure.Repositories
             return products;
         }
 
-        
-
         public async Task<List<Product>> GetProductsByIdListAsync(List<int> ids)
         {
             if (ids == null || ids.Count == 0)

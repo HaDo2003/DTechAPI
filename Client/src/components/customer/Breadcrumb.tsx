@@ -47,7 +47,7 @@ const Breadcrumb: React.FC = () => {
       <nav aria-label="breadcrumb">
         <ol className="breadcrumb pt-1 custom-breadcrumb">
           {!isHome && (
-            <li className="breadcrumb-item ps-2">
+            <li className="breadcrumb-item">
               <Link to="/" className="breadcrumb-link">Home</Link>
             </li>
           )}

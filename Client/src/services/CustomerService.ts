@@ -5,6 +5,7 @@ import { type CustomerAddress, type CustomerAddressResponse } from "../types/Cus
 import type { Contact } from "../types/Contact";
 import type { OrderDetailResponse } from "../types/Order";
 import type { ServiceResponse } from "../types/Admin";
+import { handleAxiosError } from "../utils/handleAxiosError";
 
 export const customerService = {
     async getCustomerProfile(token: string): Promise<Customer> {
@@ -14,20 +15,7 @@ export const customerService = {
             });
             return { ...response.data, success: true };
         } catch (err: any) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to fetch customer profile. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to fetch customer profile. Please try again.");
         }
     },
 
@@ -52,20 +40,8 @@ export const customerService = {
             });
             return { success: true, message: response.data.message || "Profile updated successfully" };
         } catch (err: any) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to update customer profile. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            const error = handleAxiosError(err, "Failed to update customer profile. Please try again.");
+            return { success: error.success, message: error.message || "Failed to update customer profile. Please try again." };
         }
     },
 
@@ -78,20 +54,8 @@ export const customerService = {
             });
             return { success: true, message: response.data.message || "Change Password successfully" };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to change password. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            const error = handleAxiosError(err, "Failed to change password. Please try again.");
+            return { success: error.success, message: error.message || "Failed to change password. Please try again." };
         }
     },
 
@@ -109,20 +73,7 @@ export const customerService = {
                 addressId: response.data.addressId,
             };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to add new address. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to add new address. Please try again.");
         }
     },
 
@@ -135,20 +86,7 @@ export const customerService = {
             });
             return { success: true, message: response.data.message || "Edit address successfully" };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to edit address. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to edit address. Please try again.");
         }
     },
 
@@ -167,20 +105,7 @@ export const customerService = {
             );
             return { success: true, message: response.data.message || "Add new address successfully" };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to add new address. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to delete address. Please try again.");
         }
     },
 
@@ -189,20 +114,8 @@ export const customerService = {
             const response = await axios.post<MessageResponse>("/api/contact/send-contact", data);
             return { success: true, message: response.data.message || "Send Contact successfully" };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to send contact. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            const error = handleAxiosError(err, "Failed to send contact. Please try again.");
+            return { success: error.success, message: error.message || "Failed to send contact. Please try again." };
         }
     },
 
@@ -215,24 +128,11 @@ export const customerService = {
             });
             return {
                 success: true,
-                message: response.data.message || "Change default successfully" ,
+                message: response.data.message || "Change default successfully",
                 addressId: response.data.addressId
             };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to change default address. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to change default address. Please try again.");
         }
     },
 
@@ -242,21 +142,9 @@ export const customerService = {
                 headers: { Authorization: `Bearer ${token}` },
             });
             return { ...response.data, success: true, message: "Fetch order detail successfully" };
-        } catch (err: any) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to fetch order detail. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+        } catch (err) {
+            const error = handleAxiosError(err, "Failed to fetch order detail. Please try again.");
+            return { ...error, message: error.message || "Failed to fetch order detail. Please try again." } as OrderDetailResponse;
         }
     },
 
@@ -266,21 +154,9 @@ export const customerService = {
                 headers: { Authorization: `Bearer ${token}` },
             });
             return { ...response.data, success: true, message: "Cancel order successfully" };
-        } catch (err: any) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to cancel order. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+        } catch (err) {
+            const error = handleAxiosError(err, "Failed to cancel order. Please try again.");
+            return { ...error, message: error.message || "Failed to cancel order. Please try again." } as OrderDetailResponse;
         }
     },
 
@@ -296,20 +172,7 @@ export const customerService = {
                 data: response.data
             };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to get wishlists. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            return handleAxiosError(err, "Failed to get wishlists. Please try again.");
         }
     },
 
@@ -325,20 +188,8 @@ export const customerService = {
                 message: response.data.message || "Add wishlist successfully",
             };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to add new wishlist. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            const error = handleAxiosError(err, "Failed to add new wishlist. Please try again.");
+            return { success: error.success, message: error.message || "Failed to add new wishlist. Please try again." };
         }
     },
 
@@ -353,21 +204,9 @@ export const customerService = {
                 success: true,
                 message: response.data.message || "Remove wishlist successfully",
             };
-        }catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Failed to add new wishlist. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+        } catch (err) {
+            const error = handleAxiosError(err, "Failed to remove wishlist. Please try again.");
+            return { success: error.success, message: error.message || "Failed to remove wishlist. Please try again." };
         }
     },
 }

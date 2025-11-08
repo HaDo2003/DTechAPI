@@ -32,8 +32,8 @@ const AdminLayout: React.FC = () => {
                     return;
                 }
                 const data = await adminService.getAdmin(token);
-                if (data.success) {
-                    setUser(data);
+                if (data.success && data.data) {
+                    setUser(data.data);
                     setAlert(null);
                 } else {
                     setAlert({ message: data.message || "Failed to load admin data.", type: "error" });

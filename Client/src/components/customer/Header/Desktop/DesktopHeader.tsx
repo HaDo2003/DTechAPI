@@ -226,6 +226,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                     icon="fa-newspaper"
                                     labelFull="News"
                                     labelShort="News"
+                                    onClick={() => handleNavigation('/news')}
                                 />
 
                                 {/* User Account */}

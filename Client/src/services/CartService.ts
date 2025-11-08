@@ -2,6 +2,7 @@ import axios from "axios";
 import type { MessageResponse } from "../types/MessageReponse";
 import type { CartProduct } from "../types/CartProduct";
 import type { Cart } from "../types/Cart";
+import { handleAxiosError } from "../utils/handleAxiosError";
 
 export const cartService = {
     async addToCart(token: string, data: CartProduct): Promise<MessageResponse> {
@@ -13,20 +14,8 @@ export const cartService = {
             })
             return { success: true, message: res.data.message || "Add to cart successfully" };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Add to cart failed. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            const errorResponse = handleAxiosError(err, "Add to cart failed. Please try again.");
+            return { success: errorResponse.success, message: errorResponse.message || "Add to cart failed. Please try again." };
         }
     },
 
@@ -39,48 +28,24 @@ export const cartService = {
             })
             return { ...res.data, success: true, message: res.data.message };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Get cart failed. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            const errorResponse = handleAxiosError(err, "Get cart failed. Please try again.");
+            return { ...errorResponse, message: errorResponse.message || "Get cart failed. Please try again." };
         }
     },
 
     async updateProductQuantity(token: string, id: number, change: number): Promise<Cart> {
         try {
             const res = await axios.put<Cart>(`/api/cart/update-quantity/${id}`,
-            { change },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+                { change },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
             return { ...res.data, success: true, message: res.data.message };
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                let message: string = "Update quantity failed. Please try again.";
-                if (typeof err.response?.data === "string") {
-                    message = err.response.data;
-                }
-                else if (typeof err.response?.data?.message === "string") {
-                    message = err.response.data.message;
-                }
-                else {
-                    message = JSON.stringify(err.response?.data);
-                }
-                return { success: false, message };
-            }
-            return { success: false, message: "Unexpected error occurred" };
+            const errorResponse = handleAxiosError(err, "Update quantity failed. Please try again.");
+            return { ...errorResponse, message: errorResponse.message || "Update quantity failed. Please try again." };
         }
     }
 }

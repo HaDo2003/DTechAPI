@@ -1,6 +1,7 @@
 import axios from "axios";
 import { type Product } from "../types/Product";
 import { type ProductCommentRequest, type ProductCommentResponse } from "../types/ProductComment";
+import { handleAxiosError } from "../utils/handleAxiosError";
 
 export const productService = {
   async getProductData(categorySlug: string, brandSlug: string, slug: string): Promise<Product> {
@@ -18,20 +19,9 @@ export const productService = {
       };
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        let message: string = "Failed to post comment. Please try again.";
-        if (typeof err.response?.data === "string") {
-          message = err.response.data;
-        }
-        else if (typeof err.response?.data?.message === "string") {
-          message = err.response.data.message;
-        }
-        else {
-          message = JSON.stringify(err.response?.data);
-        }
-        return { success: false, message };
+        return handleAxiosError(err, "Failed to post comment. Please try again.");
       }
       return { success: false, message: "Unexpected error occurred" };
     }
   }
-
-}
+};
