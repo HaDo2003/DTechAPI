@@ -110,6 +110,39 @@ namespace DTech.Application.Services
                 return null;
             }
         }
+        public async Task<PostDto?> GetPostBySlugAsync(string slug)
+        {
+            try
+            {
+                var post = await postRepo.GetPostBySlugAsync(slug);
+                if (post == null)
+                {
+                    return null;
+                }
+
+                var postDto = new PostDto()
+                {
+                    PostId = post.PostId,
+                    Name = post.Name,
+                    Slug = post.Slug,
+                    Description = post.Description,
+                    IsFeatured = post.IsFeatured,
+                    IsMain = post.IsMain,
+                    PostCategoryId = post.PostCategoryId,
+                    PostCategory = post.PostCategory?.Name,
+                    PostCategorySlug = post.PostCategory?.Slug,
+                    Image = post.Image,
+                    PostDate = post.PostDate,
+                    PostBy = post.PostBy
+                };
+                return postDto;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetPostByIdAsync: {ex.Message}");
+                return null;
+            }
+        }
 
         private static List<PostDto> MapPosts(List<Post> posts)
         {

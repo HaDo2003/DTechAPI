@@ -4,7 +4,7 @@ import { postService } from "../services/PostService";
 import { useEffect } from "react";
 import SkeletonNewsPage from "../components/customer/skeleton/SkeletonNewsPage";
 import { timeFormatter } from "../utils/timeFormatter";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface NewsLayoutProps {
     children: React.ReactNode;
@@ -15,6 +15,7 @@ const NewsLayout: React.FC<NewsLayoutProps> = ({
     children,
     isContentLoading,
 }) => {
+    const location = useLocation();
     const [categories, setCategories] = useState<PostCategory[]>([]);
     const [featuredNews, setFeaturedNews] = useState<Post[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -41,42 +42,61 @@ const NewsLayout: React.FC<NewsLayoutProps> = ({
             {loading || isContentLoading ? (
                 <SkeletonNewsPage />
             ) : (
-                <div style={{ backgroundColor: '#f8f9fa' }}>
-                    {/* Main Content */}
-                    <div className="container py-2">
-                        {/* Category Navigation */}
-                        <div className="mb-4">
-                            <nav className="d-flex gap-4 overflow-auto border-bottom pb-3" style={{ fontSize: '15px' }}>
-                                {categories.map(category => (
+                <div>
+                    {/* Category Navigation */}
+                    <div className="mb-4">
+                        <nav className="d-flex gap-4 overflow-auto border-bottom pb-3" style={{ fontSize: '15px' }}>
+                            <Link
+                                to="/news"
+                                className={`text-decoration-none fw-medium text-nowrap ${location.pathname === '/news'
+                                    ? 'text-primary border-bottom border-primary border-2'
+                                    : 'text-dark'
+                                    }`}
+                                style={{ paddingBottom: '0.75rem' }}
+                            >
+                                ALL NEWS
+                            </Link>
+                            {categories.map(category => {
+                                const isActive = location.pathname === `/news/${category.slug}`;
+                                return (
                                     <Link
                                         key={category.categoryId}
                                         to={`/news/${category.slug}`}
-                                        className="text-decoration-none text-dark fw-medium text-nowrap"
+                                        className={`text-decoration-none fw-medium text-nowrap ${isActive
+                                            ? 'text-primary border-bottom border-primary border-2'
+                                            : 'text-dark'
+                                            }`}
+                                        style={{ paddingBottom: '0.75rem' }}
                                     >
                                         {category.name.toUpperCase()}
                                     </Link>
-                                ))}
-                            </nav>
+                                );
+                            })}
+                        </nav>
+                    </div>
+
+                    <div className="row g-5">
+                        {/* Left Column */}
+                        <div className="col-lg-8">
+                            {children}
                         </div>
 
-                        <div className="row g-5">
-                            {/* Left Column */}
-                            <div className="col-lg-8">
-                                {children}
-                            </div>
-
-                            {/* Right Sidebar */}
-                            <div className="col-lg-4">
-                                {/* Featured News */}
-                                <div className="card border-0 shadow-sm">
-                                    <div className="card-header bg-dark text-white fw-bold py-3">
-                                        FEATURED NEWS
-                                    </div>
-                                    <div className="card-body p-0">
-                                        {featuredNews.map((news, index) => (
-                                            <div
-                                                key={news.postId}
-                                                className={`p-3 ${index !== featuredNews.length - 1 ? 'border-bottom' : ''}`}
+                        {/* Right Sidebar */}
+                        <div className="col-lg-4">
+                            {/* Featured News */}
+                            <div className="card border-0 shadow-sm">
+                                <div className="card-header bg-dark text-white fw-bold py-3">
+                                    FEATURED NEWS
+                                </div>
+                                <div className="card-body p-0">
+                                    {featuredNews.map((news, index) => (
+                                        <div
+                                            key={news.postId}
+                                            className={`p-3 ${index !== featuredNews.length - 1 ? 'border-bottom' : ''}`}
+                                        >
+                                            <Link
+                                                to={`/news/${news.postCategorySlug}/${news.slug}`}
+                                                className="text-decoration-none"
                                             >
                                                 <div className="row g-2 align-items-center">
                                                     <div className="col-4">
@@ -94,13 +114,13 @@ const NewsLayout: React.FC<NewsLayoutProps> = ({
                                                         <small className="text-muted" style={{ fontSize: '11px' }}>{timeFormatter(news.postDate || "")}</small>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                            </Link>
+                                        </div>
+                                    ))}
                             </div>
                         </div>
                     </div>
+                </div>
                 </div >
             )}
         </>

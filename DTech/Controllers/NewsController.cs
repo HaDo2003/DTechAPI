@@ -49,5 +49,16 @@ namespace DTech.API.Controllers
                 totalItems = result.TotalItems
             });
         }
+
+        [HttpGet("get-post-by-slug/{slug}")]
+        public async Task<IActionResult> GetPostBySlug(string slug)
+        {
+            var post = await newsService.GetPostBySlugAsync(slug);
+            if (post == null)
+            {
+                return NotFound();
+            }
+            return Ok(post);
+        }
     } 
 }

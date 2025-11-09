@@ -1,6 +1,7 @@
 ﻿using DTech.Application.DTOs.response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Advertisement;
+using DTech.Application.Helper;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -82,7 +83,7 @@ namespace DTech.Application.Services
                     CreatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                 };
 
-                adv.Slug = adv.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
+                adv.Slug = CreateSlug.GenerateSlug(adv.Name ?? string.Empty);
 
                 var existingAdv = await advRepo.CheckIfAdsExistsAsync(adv);
                 if (existingAdv)
@@ -166,7 +167,7 @@ namespace DTech.Application.Services
                     Image = model.Image,
                 };
 
-                string newSlug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-") ?? string.Empty;
+                string newSlug = CreateSlug.GenerateSlug(model.Name ?? string.Empty);
                 adv.Slug = newSlug;
 
                 var existingAdv = await advRepo.CheckIfAdsExistsAsync(adv);

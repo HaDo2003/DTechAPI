@@ -46,5 +46,15 @@ export const postService = {
                 totalItems: 0
             };
         }
+    },
+
+    async getPostData(postSlug: string) {
+        try {
+            const response = await axios.get(`/api/news/get-post-by-slug/${postSlug}`);
+            return response.data;
+        } catch (error) {
+            handleAxiosError(error, "Failed to fetch post detail. Please try again.");
+            return null;
+        }
     }
 };

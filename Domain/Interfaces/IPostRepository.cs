@@ -7,6 +7,7 @@ namespace DTech.Domain.Interfaces
         // For Customer
         Task<List<Post>?> GetPostsAsync(string type);
         Task<IQueryable<Post>?> GetPostsByCategorySlugAsync(string categorySlug);
+        Task<Post?> GetPostBySlugAsync(string slug);
         //For Admin
         Task<List<Post>?> GetAllPostsAsync();
         Task<Post?> GetPostByIdAsync(int postId);

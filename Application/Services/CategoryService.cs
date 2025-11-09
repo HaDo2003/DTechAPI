@@ -1,5 +1,6 @@
 ﻿using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Category;
+using DTech.Application.Helper;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -85,7 +86,7 @@ namespace DTech.Application.Services
                     CreatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                 };
 
-                cat.Slug = cat.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
+                cat.Slug = CreateSlug.GenerateSlug(cat.Name ?? string.Empty);
 
                 var existingCat = await categoryRepo.CheckIfCategoryExistsAsync(cat);
                 if (existingCat)
@@ -141,7 +142,7 @@ namespace DTech.Application.Services
                     UpdateDate = DateTime.UtcNow,
                     UpdatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                 };
-                cat.Slug = cat.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
+                cat.Slug = CreateSlug.GenerateSlug(model.Name ?? string.Empty);
 
                 var existingCat = await categoryRepo.CheckIfCategoryExistsAsync(cat);
                 if (existingCat)

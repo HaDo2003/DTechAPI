@@ -1,6 +1,7 @@
 ﻿using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Category;
 using DTech.Application.DTOs.Response.Admin.Post;
+using DTech.Application.Helper;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -94,7 +95,7 @@ namespace DTech.Application.Services
                     Description = sanitizer.Sanitize(model.Description ?? string.Empty),
                     PostCategoryId = model.PostCategoryId
                 };
-                post.Slug = post.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
+                post.Slug = CreateSlug.GenerateSlug(post.Name ?? string.Empty);
 
                 var exists = await postRepo.CheckIfPostExistsAsync(post);
                 if (exists)
@@ -173,7 +174,7 @@ namespace DTech.Application.Services
                     PostCategoryId = model.PostCategoryId
                 };
 
-                string newSlug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-") ?? string.Empty;
+                string newSlug = CreateSlug.GenerateSlug(model.Name ?? string.Empty);
                 post.Slug = newSlug;
 
                 var exists = await postRepo.CheckIfPostExistsAsync(post);

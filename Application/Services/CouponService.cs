@@ -1,5 +1,6 @@
 ﻿using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Coupon;
+using DTech.Application.Helper;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -97,7 +98,7 @@ namespace DTech.Application.Services
                     CreatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                 };
 
-                coupon.Slug = coupon.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
+                coupon.Slug = CreateSlug.GenerateSlug(coupon.Name ?? string.Empty);
 
                 var existingCoupon = await couponRepo.CheckIfCouponExistsAsync(coupon);
                 if (existingCoupon)
@@ -160,7 +161,7 @@ namespace DTech.Application.Services
                     UpdatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                 };
 
-                string newSlug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-") ?? string.Empty;
+                string newSlug = CreateSlug.GenerateSlug(model.Name ?? string.Empty);
                 coupon.Slug = newSlug;
 
                 var existingCoupon = await couponRepo.CheckIfCouponExistsAsync(coupon);

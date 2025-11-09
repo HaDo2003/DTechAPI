@@ -39,6 +39,15 @@ namespace DTech.Infrastructure.Repositories
 
             return Task.FromResult<IQueryable<Post>?>(query);
         }
+        public async Task<Post?> GetPostBySlugAsync(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+                return null;
+            return await context.Posts
+                .AsNoTracking()
+                .Include(p => p.PostCategory)
+                .FirstOrDefaultAsync(p => p.Slug == slug && p.Status == StatusEnums.Available);
+        }
         //For Admin
         public async Task<List<Post>?> GetAllPostsAsync()
         {

@@ -1,5 +1,6 @@
 ﻿using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Brand;
+using DTech.Application.Helper;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
 using DTech.Domain.Interfaces;
@@ -83,7 +84,7 @@ namespace DTech.Application.Services
                     CreatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                 };
 
-                brand.Slug = brand.Name?.ToLower().Replace(" ", "-").Replace("/", "-");
+                brand.Slug = CreateSlug.GenerateSlug(brand.Name ?? string.Empty);
 
                 var existingBrand = await brandRepo.CheckIfBrandExistsAsync(brand);
                 if (existingBrand)
@@ -160,7 +161,7 @@ namespace DTech.Application.Services
                     UpdatedBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                 };
 
-                string newSlug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-") ?? string.Empty;
+                string newSlug = CreateSlug.GenerateSlug(model.Name ?? string.Empty);
                 brand.Slug = newSlug;
 
                 var existingBrand = await brandRepo.CheckIfBrandExistsAsync(brand);
