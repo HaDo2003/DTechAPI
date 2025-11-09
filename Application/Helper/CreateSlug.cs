@@ -1,11 +1,14 @@
-﻿namespace DTech.Application.Helper
+﻿using System.Text.RegularExpressions;
+
+namespace DTech.Application.Helper
 {
     public class CreateSlug
     {
+        private static readonly Regex SlugPattern = new(@"[\s/,.:;]+", RegexOptions.Compiled);
+
         public static string GenerateSlug(string phrase)
         {
-            string str = phrase.ToLower().Replace(" ", "-").Replace("/", "-").Replace(", ", "-").Replace(". ", "-");
-            return str;
+            return SlugPattern.Replace(phrase.ToLower(), "-");
         }
     }
 }
