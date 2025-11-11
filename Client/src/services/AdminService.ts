@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { Admin, ServiceResponse } from "../types/Admin";
 import { handleAxiosError } from "../utils/handleAxiosError";
+import type { Dashboard } from "../types/Dashboard";
 
 export const adminService = {
     async getAdmin(token: string): Promise<ServiceResponse<Admin>> {
@@ -171,6 +172,17 @@ export const adminService = {
             return response.data;
         } catch (err: any) {
             return handleAxiosError(err, `Failed to update ${newStatus}. Please try again.`);
+        }
+    },
+
+    async fecthDashboardData(token?: string): Promise<ServiceResponse<Dashboard>> {
+        try {
+            const response = await axios.get<ServiceResponse<Dashboard>>("/api/dashboard/fetch-dashboard", {
+                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            });
+            return response.data;
+        } catch (err: any) {
+            return handleAxiosError(err, "Failed to fetch dashboard data. Please try again.");
         }
     },
 }

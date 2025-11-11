@@ -9,6 +9,7 @@ namespace DTech.Domain.Interfaces
         Task<bool> CheckAccountAsync(string? account);
         Task<List<ApplicationUser>?> GetAllCustomersAsync();
         Task<ApplicationUser?> GetOnlyCustomerByIdAsync(string? userId);
+        Task<List<ApplicationUser>?> GetRecentCustomersAsync(int number);
         //Check when create new account
         Task<bool> CheckEmailAsync(string? email);
         Task<bool> CheckPhoneAsync(string? phone);

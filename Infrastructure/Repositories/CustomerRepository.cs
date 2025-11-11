@@ -123,6 +123,17 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.Users.AnyAsync(c => c.Id == customerId);
         }
+        public async Task<List<ApplicationUser>?> GetRecentCustomersAsync(int number)
+        {
+            var customers = await userManager.GetUsersInRoleAsync("Customer");
+            if (customers == null || customers.Count == 0)
+                return null;
+            var recentCustomers = customers
+                .OrderByDescending(c => c.CreateDate)
+                .Take(number)
+                .ToList();
+            return recentCustomers;
+        }
         //For CustomerAddress table
         public async Task<bool> CreateCustomerAddressAsync(CustomerAddress customerAddress)
         {

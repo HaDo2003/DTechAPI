@@ -1,18 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
-interface Product {
-  productId: number;
-  name: string;
-  photo: string;
-  price: number;
-  category: {
-    name: string;
-  };
-}
+import type { ProductMonitor } from "../../../types/Product";
+import { priceFormatter } from "../../../utils/priceFormatter";
 
 interface RecentlyAddedProductsProps {
-  products: Product[];
+  products: ProductMonitor[];
 }
 
 const ProductList: React.FC<RecentlyAddedProductsProps> = ({ products }) => {
@@ -40,24 +32,24 @@ const ProductList: React.FC<RecentlyAddedProductsProps> = ({ products }) => {
               <div className="col-2">
                 <img
                   src={product.photo}
-                  alt={product.name}
+                  alt={product.productName}
                   className="img-size-50"
                 />
               </div>
               <div className="col-10">
                 <Link
-                  to={`/admin/products/edit/${product.productId}`}
+                  to={`/admin/product/edit/${product.productId}`}
                   className="fw-bold"
                 >
-                  {product.category?.name}
+                  {product.category}
                   <span className="badge text-bg-info float-end">
-                    ${product.price.toLocaleString()}
+                    {priceFormatter(product.price || 0)}
                   </span>
                 </Link>
                 <div className="text-truncate">
-                  {product.name.length > 30
-                    ? product.name.substring(0, 30) + "..."
-                    : product.name}
+                  {product.productName && product.productName.length > 30
+                    ? product.productName.substring(0, 30) + "..."
+                    : product.productName}
                 </div>
               </div>
             </div>
@@ -67,7 +59,7 @@ const ProductList: React.FC<RecentlyAddedProductsProps> = ({ products }) => {
 
       {/* Card Footer */}
       <div className="card-footer text-center">
-        <Link to="/admin/products" className="uppercase">
+        <Link to="/admin/product" className="btn btn-sm btn-secondary float-end">
           View All Products
         </Link>
       </div>

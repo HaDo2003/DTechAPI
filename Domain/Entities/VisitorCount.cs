@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DTech.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DTech.Domain.Entities
@@ -8,7 +9,9 @@ namespace DTech.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public DateOnly Date { get; set; }
         public int Count { get; set; }
+        public DateOnly Date { get; set; }
+        public int Week { get; set; }
+        public DayOfWeekEnums Day { get; set; }
     }
 }

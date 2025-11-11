@@ -5,6 +5,7 @@ namespace DTech.Domain.Interfaces
 {
     public interface IAdminRepository
     {
+        // For Admin Management
         Task<ApplicationUser?> GetAdminByIdAsync(string userId);
         Task<List<ApplicationUser>?> GetAllAdminsAsync();
         Task<(string RoleId, string RoleName)> GetUserRoleAsync(ApplicationUser user);

@@ -83,6 +83,10 @@ namespace DTech.Infrastructure.Data
                 .HasIndex(u => new { u.UserId, u.ParticipationDate })
                 .IsUnique();
 
+            modelBuilder.Entity<VisitorCount>()
+                .HasIndex(v => v.Date)
+                .IsUnique();
+
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var property in entityType.GetProperties())

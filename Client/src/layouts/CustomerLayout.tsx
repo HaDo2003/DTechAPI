@@ -1,12 +1,13 @@
 import '../styles/site.css'
 import '../styles/responsive.css'
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import DesktopHeader from "../components/customer/header/desktop/DesktopHeader";
 import MobileHeader from "../components/customer/header/mobile/MobileHeader";
 import Footer from "../components/customer/footer/Footer";
 import Breadcrumb from "../components/customer/Breadcrumb";
 import ChatBox, { type ChatMessage } from "../components/customer/ChatBox";
+import { visitorDataService } from '../services/VisitorDataService';
 // import { AuthDebugger } from "../context/AuthContext";
 
 const CustomerLayout: React.FC = () => {
@@ -19,6 +20,17 @@ const CustomerLayout: React.FC = () => {
       timestamp: new Date().toISOString(),
     },
   ];
+
+  useEffect(() => {
+    const hasVisited = sessionStorage.getItem("hasVisited");
+    if (!hasVisited) {
+      const recordVisit = async () => {
+        await visitorDataService.updateVisitorCount();
+        sessionStorage.setItem("hasVisited", "true");
+      };
+      recordVisit();
+    }
+  }, []);
 
   return (
     <div className="customer-layout">

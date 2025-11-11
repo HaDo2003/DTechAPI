@@ -161,5 +161,16 @@ namespace DTech.Infrastructure.Repositories
             await context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<Order>?> GetLatestOrdersAsync(int number)
+        {
+            return await context.Orders
+                .AsNoTracking()
+                .Include(o => o.Status)
+                .Include(o => o.OrderProducts)
+                .OrderByDescending(o => o.OrderDate)
+                .Take(number)
+                .ToListAsync();
+        }
     }
 }

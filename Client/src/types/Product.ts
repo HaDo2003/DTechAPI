@@ -71,3 +71,11 @@ export interface ProductFormProp {
     productImages?: ProductImage[];
     productModels?: ProductModel[];
 }
+
+export interface ProductMonitor {
+    productId?: number;
+    productName?: string;
+    photo?: string;
+    price?: number;
+    category?: string;
+}

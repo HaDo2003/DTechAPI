@@ -1,12 +1,14 @@
 ﻿using DTech.Application.DTOs.response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Admin;
+using DTech.Application.DTOs.Response.Admin.Dashboard;
 
 namespace DTech.Application.Interfaces
 {
     public interface IAdminService
     {
         Task<AdminResDto> GetAdmin(string userId);
+        Task<IndexResDto<DashboardResDto>> FetchDashboardData();
         Task<IndexResDto<List<AdminIndexDto>>> GetAdmins();
         Task<IndexResDto<AdminDetailDto>> GetAdminDetailAsync(string userId);
         Task<IndexResDto<object?>> CreateAdminAsync(AdminDetailDto model, string? currentUserId);

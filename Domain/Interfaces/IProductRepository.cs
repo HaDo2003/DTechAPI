@@ -19,6 +19,7 @@ namespace DTech.Domain.Interfaces
         Task<bool> CheckProductByIdAsync(int productId);
         Task<Product?> GetProductByIdAsync(int? productId);
         Task<IQueryable<Product>> GetProductByQuery(string query);
+        Task<List<Product>> GetRecentProductsAsync(int number);
 
         // Repo for Product Images
         Task<List<ProductImage>> GetImageAsync(int productId);

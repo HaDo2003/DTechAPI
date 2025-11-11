@@ -1,15 +1,23 @@
-﻿using DTech.Application.DTOs.response;
+﻿using AngleSharp.Io;
+using DTech.Application.DTOs.response;
 using DTech.Application.DTOs.Response.Admin;
 using DTech.Application.DTOs.Response.Admin.Admin;
+using DTech.Application.DTOs.Response.Admin.Dashboard;
 using DTech.Application.Interfaces;
 using DTech.Domain.Entities;
+using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace DTech.Application.Services
 {
     public class AdminService(
         IAdminRepository adminRepo,
+        IProductRepository productRepo,
+        IOrderRepository orderRepo,
+        ICustomerRepository customerRepo,
+        IVisitorDataRepository visitorDataRepo,
         ICloudinaryService cloudinaryService
     ) : IAdminService
     {
@@ -26,6 +34,79 @@ namespace DTech.Application.Services
                 Avatar = user.Image,
                 UserName = user.FullName,
                 CreateDate = user.CreateDate
+            };
+        }
+
+        public async Task<IndexResDto<DashboardResDto>> FetchDashboardData()
+        {
+            var latestOrders = await orderRepo.GetLatestOrdersAsync(5);
+            var usersList = await customerRepo.GetRecentCustomersAsync(5);
+            var productsList = await productRepo.GetRecentProductsAsync(5);
+            var visitorCount = await visitorDataRepo.GetVisitorCountAsync();
+
+            List<OrderMonitoring>? orderMonitoringList = null;
+            List<UserMonitoring>? userMonitoringList = null;
+            List<ProductMonitoring>? productMonitoringList = null;
+            List<VisitorCountMonitoring>? visitorCountList = null;
+
+            if (latestOrders != null)
+            {
+                orderMonitoringList = [.. latestOrders.Select(order => new OrderMonitoring
+                {
+                    OrderId = order.OrderId,
+                    CustomerName = order.Name,
+                    Status = order.Status?.Description,
+                    Quantity = order.OrderProducts?.Sum(op => op.Quantity) ?? 0
+                })];
+            }
+            
+
+            if (usersList != null)
+            {
+                userMonitoringList = [.. usersList.Select(user => new UserMonitoring
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName,
+                    Image = user.Image,
+                    CreatedAt = user.CreateDate
+                })];
+            }
+            
+
+            if (productsList != null)
+            {
+                productMonitoringList = [.. productsList.Select(product => new ProductMonitoring
+                {
+                    ProductId = product.ProductId,
+                    ProductName = product.Name,
+                    Photo = product.Photo,
+                    Price = product.PriceAfterDiscount,
+                    Category = product.Category?.Name
+                })];
+            }
+
+            if (visitorCount != null)
+            {
+                visitorCountList = [.. visitorCount.Select(vc => new VisitorCountMonitoring
+                {
+                    Week = vc.Week,
+                    Date = vc.Date,
+                    Day = vc.Day,
+                    Count = vc.Count
+                })];
+            }
+
+
+            return new IndexResDto<DashboardResDto>
+            {
+                Success = true,
+                Data = new DashboardResDto
+                {
+                    LatestOrders = orderMonitoringList,
+                    UsersList = userMonitoringList,
+                    ProductsList = productMonitoringList,
+                    VisitorCounts = visitorCountList
+                }
             };
         }
 

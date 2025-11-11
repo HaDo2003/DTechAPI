@@ -12,5 +12,6 @@ namespace DTech.Domain.Interfaces
         Task<Order?> UpdateStatusAsync(string orderId, string customerId, int orderStatusId);
         Task<List<Order>?> GetAllOrdersAsync();
         Task<bool> UpdateOrderStatusAsync(Order? order, string statusName);
+        Task<List<Order>?> GetLatestOrdersAsync(int number);
     }
 }

@@ -1,47 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
-// Types
-interface Status {
-  statusId: number;
-  description: string;
-}
-
-interface Customer {
-  fullName: string;
-}
-
-interface OrderProduct {
-  quantity: number;
-}
-
-interface Order {
-  orderId: number;
-  customer?: Customer;
-  status?: Status;
-  orderProducts: OrderProduct[];
-}
+import type { OrderMonitor } from "../../../types/Order";
 
 interface LatestOrdersProps {
-  orders: Order[];
+  orders: OrderMonitor[];
 }
 
 const LatestOrder: React.FC<LatestOrdersProps> = ({ orders }) => {
   // Map statusId → badge style
-  const getStatusBadge = (statusId: number, description: string) => {
-    switch (statusId) {
-      case 1:
+  const getStatusBadge = (description: string) => {
+    switch (description) {
+      case "Order Placed":
         return <span className="badge text-bg-info">{description}</span>;
-      case 2:
-      case 3:
-      case 4:
+      case "Order Processing":
+      case "Shipped":
+      case "Out for Delivery":
         return <span className="badge text-bg-primary">{description}</span>;
-      case 5:
-      case 6:
+      case "Delivered":
+      case "Order Completed":
         return <span className="badge text-bg-success">{description}</span>;
-      case 7:
+      case "Order Canceled":
         return <span className="badge text-bg-warning">{description}</span>;
-      case 8:
+      case "Order Returned":
         return <span className="badge text-bg-danger">{description}</span>;
       default:
         return <span className="badge text-bg-secondary">{description}</span>;
@@ -80,23 +60,20 @@ const LatestOrder: React.FC<LatestOrdersProps> = ({ orders }) => {
                 <tr key={order.orderId}>
                   <td>
                     <Link
-                      to={`/orders/${order.orderId}`}
+                      to={`/admin/order/detail/${order.orderId}`}
                       className="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
                     >
                       {order.orderId}
                     </Link>
                   </td>
-                  <td>{order.customer?.fullName ?? "N/A"}</td>
+                  <td>{order.customerName ?? "N/A"}</td>
                   <td>
                     {order.status
-                      ? getStatusBadge(order.status.statusId, order.status.description)
+                      ? getStatusBadge(order.status)
                       : "N/A"}
                   </td>
                   <td>
-                    {order.orderProducts.reduce(
-                      (sum, op) => sum + op.quantity,
-                      0
-                    )}
+                    {order.quantity}
                   </td>
                 </tr>
               ))}
@@ -107,7 +84,7 @@ const LatestOrder: React.FC<LatestOrdersProps> = ({ orders }) => {
 
       {/* Card Footer */}
       <div className="card-footer clearfix">
-        <Link to="/orders" className="btn btn-sm btn-secondary float-end">
+        <Link to="/admin/order" className="btn btn-sm btn-secondary float-end">
           View All Orders
         </Link>
       </div>

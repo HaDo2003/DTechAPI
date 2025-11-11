@@ -227,6 +227,16 @@ namespace DTech.Infrastructure.Repositories
                 ))
                 .OrderByDescending(a => a.ProductId));
         }
+        public async Task<List<Product>> GetRecentProductsAsync(int number)
+        {
+            return await context.Products
+                .AsNoTracking()
+                .Include(a => a.Category)
+                .Where(a => a.Status == StatusEnums.Available)
+                .OrderByDescending(a => a.ProductId)
+                .Take(number)
+                .ToListAsync();
+        }
 
         // Repo for Product Images
         public async Task<List<ProductImage>> GetImageAsync(int productId)

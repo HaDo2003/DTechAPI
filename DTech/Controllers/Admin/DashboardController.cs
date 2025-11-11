@@ -29,5 +29,19 @@ namespace DTech.API.Controllers.Admin
 
             return Ok(response);
         }
+
+        [HttpGet("fetch-dashboard")]
+        public async Task<IActionResult> FetchDashboardAsync()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+            var response = await adminService.FetchDashboardData();
+            if (response == null)
+                return NotFound(new { Message = "Fail to fecth dashboard" });
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+            return Ok(response);
+        }
     }
 }

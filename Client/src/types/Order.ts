@@ -114,3 +114,10 @@ interface Payment {
     status?: number;
     paymentMethodName?: string;
 }
+
+export interface OrderMonitor {
+    orderId?: string;
+    customerName?: string;
+    status?: string;
+    quantity?: number;
+}

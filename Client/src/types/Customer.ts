@@ -48,3 +48,10 @@ export interface CustomerForm {
   updateDate?: string;
   updatedBy?: string;
 }
+
+export interface CustomerMonitor {
+  userId?: string;
+  userName?: string;
+  image?: string;
+  createdAt?: string;
+}

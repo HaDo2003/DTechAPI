@@ -1,75 +1,136 @@
 import React, { lazy } from "react";
+import type { VisitorCountMonitor } from "../../../types/Dashboard";
+import { Link } from "react-router-dom";
 
 const Chart = lazy(() => import("react-apexcharts"));
 
-const OnlineStoreVisitors: React.FC = () => {
-    const options: ApexCharts.ApexOptions = {
+interface OnlineStoreVisitorsProps {
+    visitorCounts: VisitorCountMonitor[];
+}
+
+const OnlineStoreVisitors: React.FC<OnlineStoreVisitorsProps> = ({ visitorCounts }) => {
+    const groupedByWeek = visitorCounts.reduce((acc, item) => {
+        if (item.week !== undefined) {
+            if (!acc[item.week]) {
+                acc[item.week] = [];
+            }
+            acc[item.week].push(item);
+        }
+        return acc;
+    }, {} as Record<number, VisitorCountMonitor[]>);
+
+    const weeks = Object.keys(groupedByWeek).map(Number).sort((a, b) => a - b);
+
+    const colors = ["#0d6efd", "#20c997", "#ffc107", "#dc3545"];
+
+    const series = weeks.map((week, _) => {
+        const weekData = groupedByWeek[week];
+        const dayMap: Record<string, number> = {};
+
+        weekData.forEach(item => {
+            if (item.day) {
+                const dayShort = item.day.substring(0, 3);
+                dayMap[dayShort] = item.count ?? 0;
+            }
+        });
+
+        const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const data = daysOfWeek.map(day => dayMap[day] || 0);
+
+        return {
+            name: `Week ${week}`,
+            data: data,
+        };
+    });
+
+    const totalVisitors = visitorCounts.reduce((sum, item) => sum + (item.count ?? 0), 0);
+    const currentWeek = weeks[weeks.length - 1];
+    const previousWeek = weeks[weeks.length - 2];
+
+    const currentWeekTotal = groupedByWeek[currentWeek]?.reduce((sum, item) => sum + (item.count ?? 0), 0) || 0;
+    const previousWeekTotal = groupedByWeek[previousWeek]?.reduce((sum, item) => sum + (item.count ?? 0), 0) || 0;
+
+    const percentageChange = previousWeekTotal > 0
+        ? (((currentWeekTotal - previousWeekTotal) / previousWeekTotal) * 100).toFixed(1)
+        : 0;
+
+    const isPositive = Number(percentageChange) >= 0;
+
+    const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    const options: any = {
         chart: {
-            height: 200,
             type: "line",
+            fontFamily: "inherit",
+            sparkline: { enabled: false },
             toolbar: { show: false },
         },
-        colors: ["#0d6efd", "#adb5bd"],
-        stroke: { curve: "smooth" },
-        grid: {
-            borderColor: "#e7e7e7",
-            row: {
-                colors: ["#f3f3f3", "transparent"],
-                opacity: 0.5,
+        colors: colors,
+        stroke: {
+            width: 5,
+            curve: "smooth",
+        },
+        fill: {
+            type: "gradient",
+            gradient: {
+                shade: "light",
+                gradientToColors: colors,
+                shadeIntensity: 1,
+                type: "horizontal",
+                opacityFrom: 1,
+                opacityTo: 1,
+                stops: [0, 100, 100, 100],
             },
         },
+        grid: {
+            strokeDashArray: 4,
+            borderColor: ["#f3f3f3", "transparent"],
+            opacity: 0.5,
+        },
         legend: { show: false },
-        markers: { size: 1 },
+        markers: { size: 3 },
         xaxis: {
-            categories: ["22th", "23th", "24th", "25th", "26th", "27th", "28th"],
+            categories: daysOfWeek,
+            title: {
+                text: "Day of Week",
+            },
+        },
+        yaxis: {
+            title: {
+                text: "Visitors",
+            },
         },
     };
 
-    const series = [
-        {
-            name: "High - 2023",
-            data: [100, 120, 170, 167, 180, 177, 160],
-        },
-        {
-            name: "Low - 2023",
-            data: [60, 80, 70, 67, 80, 77, 100],
-        },
-    ];
-
     return (
-        <div className="card mb-4">
+        <div className="card">
             {/* Card Header */}
-            <div className="card-header border-0">
+            <div className="card-header">
                 <div className="d-flex justify-content-between">
                     <h3 className="card-title">Online Store Visitors</h3>
-                    <a
-                        href="#"
-                        className="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
-                    >
-                        View Report
-                    </a>
+
                 </div>
             </div>
 
             {/* Card Body */}
-            <div className="card-body">
+            <div className="card-body" style={{height: '344px'}}>
                 {/* Visitors Count */}
                 <div className="d-flex">
                     <p className="d-flex flex-column mb-0">
-                        <span className="fw-bold fs-5">820</span>
+                        <span className="fw-bold fs-5">{totalVisitors}</span>
                         <span>Visitors Over Time</span>
                     </p>
 
                     <p className="ms-auto d-flex flex-column text-end mb-0">
-                        <span className="text-success">
-                            <i className="bi bi-arrow-up"></i> 12.5%
+                        <span className={isPositive ? "text-success" : "text-danger"}>
+                            <i className={`bi bi-arrow-${isPositive ? 'up' : 'down'}`}></i> {Math.abs(Number(percentageChange))}%
                         </span>
                         <span className="text-secondary">Since last week</span>
                     </p>
                 </div>
 
                 {/* Chart */}
-                <div className="position-relative mb-4">
+                <div className="position-relative mb-1">
                     <Chart
                         options={options}
                         series={series}
@@ -79,14 +140,25 @@ const OnlineStoreVisitors: React.FC = () => {
                 </div>
 
                 {/* Legend */}
-                <div className="d-flex flex-row justify-content-end">
-                    <span className="me-2">
-                        <i className="bi bi-square-fill text-primary"></i> This Week
-                    </span>
-                    <span>
-                        <i className="bi bi-square-fill text-secondary"></i> Last Week
-                    </span>
+                <div className="d-flex flex-row justify-content-end flex-wrap gap-2">
+                    {weeks.map((week, index) => (
+                        <span key={week} className="me-2">
+                            <i
+                                className="bi bi-square-fill"
+                                style={{ color: colors[index] }}
+                            ></i> Week {week}
+                        </span>
+                    ))}
                 </div>
+            </div>
+
+            <div className="card-footer d-flex justify-content-end align-items-center" style={{height: '45px'}}>
+                <Link
+                    to="#"
+                    className="btn btn-sm btn-secondary float-end"
+                >
+                    View Report
+                </Link>
             </div>
         </div>
     );
