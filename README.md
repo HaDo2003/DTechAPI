@@ -44,7 +44,7 @@ DTech is a modern web-based e-commerce platform built with ASP.NET Core. It enab
 - VNPay integration for secure online transactions
 
 ### 📡 Real-Time Features
-- SignalR to update user pages when admins add new products (no page reload)
+- SignalR to help customer contact admin via direct chat
 
 ## 🚀 Getting Started
 
