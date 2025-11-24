@@ -133,6 +133,19 @@
         max-width: 33.33%;
         margin-bottom: 20px;
     }
+
+    .custom-radio-group {
+        gap: 12px !important;
+    }
+
+    .custom-label-radio {
+        font-size: 0.9rem;
+    }
+
+    .custom-radio {
+        width: 16px;
+        height: 16px;
+    }
 }
 
 /*=========================================================
@@ -183,6 +196,46 @@
         max-height: 20%;
         width: auto;
         max-width: 25%;
+    }
+
+    .cart-img-custom {
+        width: 55px;
+        height: 55px;
+    }
+
+    .cart-quantity-control {
+        transform: scale(0.9);
+    }
+
+    .cart-item-row .fw-bold {
+        font-size: 0.9rem;
+    }
+
+    .profile-img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .custom-upload {
+        width: 100% !important;
+    }
+
+    form .btn-primary {
+        width: 100%;
+    }
+
+    .custom-radio-group {
+        gap: 8px !important;
+        justify-content: flex-start;
+    }
+
+    .custom-label-radio {
+        font-size: 0.9rem;
+    }
+
+    .custom-radio {
+        width: 16px;
+        height: 16px;
     }
 }
 

@@ -15,13 +15,14 @@ const InputWithLabel: React.FC<InputProps> = ({ label, name, type, value, requir
         <div className="row m-2">
             {label === "Gender" ? (
                 <>
-                    <label className="col-3 align-content-center">
+                    <label className="col-12 col-sm-3 align-content-center mb-1 mb-sm-0">
                         {label}
                     </label>
-                    <div className="form-group py-2 custom-radio-container col-9">
-                        <div className="custom-radio-group d-flex gap-3">
+
+                    <div className="form-group py-2 custom-radio-container col-12 col-sm-9">
+                        <div className="custom-radio-group d-flex align-items-center flex-nowrap gap-3">
                             {["Male", "Female", "Other"].map((g) => (
-                                <div key={g}>
+                                <div key={g} className="d-flex align-items-center">
                                     <input
                                         type="radio"
                                         name="gender"
@@ -32,7 +33,7 @@ const InputWithLabel: React.FC<InputProps> = ({ label, name, type, value, requir
                                         onChange={onChange}
                                         required={required}
                                     />
-                                    <label className="custom-label-radio" htmlFor={g}>
+                                    <label htmlFor={g} className="custom-label-radio ms-1">
                                         {g}
                                     </label>
                                 </div>
@@ -40,7 +41,6 @@ const InputWithLabel: React.FC<InputProps> = ({ label, name, type, value, requir
                         </div>
                     </div>
                 </>
-
             ) :
                 <>
                     <div className="col-3 align-content-center">

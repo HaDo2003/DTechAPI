@@ -13,7 +13,7 @@ const FCategory: React.FC<FCategoryItemProps> = ({
     path
 }) => {
     return (
-        <div className="col">
+        <div className="col-xl-2 col-lg-4 col-md-4 col-4">
             <Link to={path} className="category-item">
                 <div className="icon-container">
                     <i className={`fa-solid fa-${iconlink}`}></i>

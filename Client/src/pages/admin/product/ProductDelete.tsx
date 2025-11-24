@@ -5,24 +5,27 @@ import { adminService } from "../../../services/AdminService";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
 import DeletePage from "../DeletePage";
-import type { ProductForm } from "../../../types/Product";
+import type { ProductFormProp } from "../../../types/Product";
 
 const ProductDelete: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { token } = useAuth();
-    const [data, setData] = useState<ProductForm | null>(null);
+    const [data, setData] = useState<ProductFormProp | null>(null);
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (id) {
             (async () => {
-                const res = await adminService.getSingleData<ProductForm>(`/api/product/get/${id}`, token ?? "");
+                setLoading(true);
+                const res = await adminService.getSingleData<ProductFormProp>(`/api/product/get/${id}`, token ?? "");
                 if (res) {
-                    const product = res as unknown as ProductForm;
+                    const product = res.data as unknown as ProductFormProp;
                     setData(product);
+                    console.log(product);
                 }
+                setLoading(false);
             })();
         }
     }, [id, token]);
@@ -70,9 +73,9 @@ const ProductDelete: React.FC = () => {
                 </div>
             )}
 
-            <DeletePage<ProductForm>
+            <DeletePage<ProductFormProp["productInfor"]>
                 entityName="Product"
-                data={data}
+                data={data.productInfor}
                 fields={[
                     { key: "name", label: "Name" },
                     { key: "slug", label: "Slug" },

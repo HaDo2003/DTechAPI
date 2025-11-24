@@ -78,6 +78,13 @@ namespace DTech.API.Controllers.Admin
                 if (!createRes.Success) return ControllerHelper.HandleResponse(createRes, this);
                 var productId = createRes.Data != null ? Convert.ToInt32(createRes.Data) : 0;
 
+                // Create colors
+                if (model.ProductColors != null && model.ProductColors.Count != 0)
+                {
+                    var colorRes = await productService.UpdateProductColorsAsync(productId, model.ProductColors, userId);
+                    if (!colorRes.Success) return ControllerHelper.HandleResponse(colorRes, this);
+                }
+
                 // Create specifications
                 if (model.Specifications != null && model.Specifications.Count != 0)
                 {
@@ -118,6 +125,13 @@ namespace DTech.API.Controllers.Admin
                 var infoRes = await productService.UpdateProductAsync(id, model.ProductInfor, userId);
                 if (!infoRes.Success) return ControllerHelper.HandleResponse(infoRes, this);
 
+                // Update colors
+                if (model.ProductColors != null && model.ProductColors.Count != 0)
+                {
+                    var colorRes = await productService.UpdateProductColorsAsync(id, model.ProductColors, userId);
+                    if (!colorRes.Success) return ControllerHelper.HandleResponse(colorRes, this);
+                }
+
                 // Update specifications
                 if (model.Specifications != null && model.Specifications.Count != 0)
                 {
@@ -125,11 +139,11 @@ namespace DTech.API.Controllers.Admin
                     if (!specRes.Success) return ControllerHelper.HandleResponse(specRes, this);
                 }
 
+                // Update images
                 var existingDtos = new List<ProductImageDto>();
                 var newDtos = new List<ProductImageDto>();
                 if (model.ExistingImageUploads != null && model.ExistingImageIds != null)
                 {
-                    // Update images
                     existingDtos = [.. model.ExistingImageIds.Select((imageId, idx) => new ProductImageDto
                     {
                         ImageId = imageId,
@@ -148,11 +162,18 @@ namespace DTech.API.Controllers.Admin
 
                 var allImageDtos = existingDtos.Concat(newDtos).ToList();
 
-                if (allImageDtos.Any())
+                if (allImageDtos.Count != 0)
                 {
                     var imageRes = await productService.UpdateProductImageAsync(id, allImageDtos, userId);
                     if (!imageRes.Success) return ControllerHelper.HandleResponse(imageRes, this);
                 }
+
+                //// Update models
+                //if (model.ProductModels != null && model.ProductModels.Count != 0)
+                //{
+                //    var modelRes = await productService.UpdateProductModelsAsync(id, model.ProductModels, userId);
+                //    if (!modelRes.Success) return ControllerHelper.HandleResponse(modelRes, this);
+                //}
 
                 return Ok(new { Success = true, Message = "Product updated successfully." });
             }

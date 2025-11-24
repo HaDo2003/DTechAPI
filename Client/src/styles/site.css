@@ -597,8 +597,8 @@ Register
 
 .custom-label-radio {
     margin-left: 0.5em;
+    font-size: 0.95rem;
 }
-
 
 input[type="radio"].custom-radio {
     display: none;
@@ -1678,6 +1678,7 @@ Cart
     width: 100px;
     height: 100%;
     object-fit: cover;
+    border-radius: 8px;
 }
 
 .cart-product-name {
@@ -1737,6 +1738,12 @@ Cart
 /*=========================================================
 Profile
 ===========================================================*/
+.profile-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
 .no-bullets {
     list-style-type: none;
     padding-left: 0;

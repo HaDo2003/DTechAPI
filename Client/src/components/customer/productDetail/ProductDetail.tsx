@@ -438,43 +438,56 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
                             )}
 
                             <div className="quantity-section">
-                                <label htmlFor="quantity" className="quantity-label">Quantity:</label>
-                                <div className="quantity-control">
-                                    <button type="button" className="btn-quantity-adjust" onClick={handleQuantityDecrease} disabled={statusText === "Out of Stock"}>−</button>
-                                    <input
-                                        type="text"
-                                        className="quantity-input"
-                                        id="quantity"
-                                        name="quantity"
-                                        value={quantity}
-                                        readOnly
-                                    />
-                                    <button type="button" className="btn-quantity-adjust" onClick={handleQuantityIncrease} disabled={statusText === "Out of Stock"}>+</button>
-                                </div>
-                                <button
-                                    type="button"
-                                    className="btn-add-to-cart"
-                                    onClick={handleAddToCart}
-                                    disabled={statusText === "Out of Stock"}
-                                    title={statusText === "Out of Stock" ? "This product is currently out of stock" : "Add to cart"}
-                                    style={{
-                                        pointerEvents: statusText === "Out of Stock" ? "none" : "auto",
-                                        opacity: statusText === "Out of Stock" ? 0.6 : 1,
-                                        cursor: statusText === "Out of Stock" ? "not-allowed" : "pointer"
-                                    }}
-                                >
-                                    <i className="fas fa-shopping-cart"></i>
-                                    {statusText === "Out of Stock" ? " Out of Stock" : " Add to Cart"}
-                                </button>
+                                <div className="row g-2 g-md-3">
+                                    <div className="col-12 col-sm-auto d-flex align-items-center">
+                                        <label htmlFor="quantity" className="quantity-label mb-0">
+                                            Quantity:
+                                        </label>
+                                    </div>
 
-                                <button
-                                    type="button"
-                                    className={`btn-wishlist
-                                        ${isWishlisted ? "btn-wishlist-red" : "btn-wishlist-white"}`}
-                                    onClick={(e) => toggleWishlist(e)}
-                                >
-                                    <i className="fas fa-heart"></i>
-                                </button>
+                                    <div className="col-12 col-sm-auto">
+                                        <div className="quantity-control" style={{ maxWidth: '142px' }}>
+                                            <button type="button" className="btn-quantity-adjust" onClick={handleQuantityDecrease} disabled={statusText === "Out of Stock"}>−</button>
+                                            <input
+                                                type="text"
+                                                className="quantity-input"
+                                                id="quantity"
+                                                name="quantity"
+                                                value={quantity}
+                                                readOnly
+                                            />
+                                            <button type="button" className="btn-quantity-adjust" onClick={handleQuantityIncrease} disabled={statusText === "Out of Stock"}>+</button>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm">
+                                        <div className="d-flex gap-2">
+                                            <button
+                                                type="button"
+                                                className="btn-add-to-cart flex-grow-1"
+                                                onClick={handleAddToCart}
+                                                disabled={statusText === "Out of Stock"}
+                                                title={statusText === "Out of Stock" ? "This product is currently out of stock" : "Add to cart"}
+                                                style={{
+                                                    pointerEvents: statusText === "Out of Stock" ? "none" : "auto",
+                                                    opacity: statusText === "Out of Stock" ? 0.6 : 1,
+                                                    cursor: statusText === "Out of Stock" ? "not-allowed" : "pointer",
+                                                    minWidth: 0
+                                                }}
+                                            >
+                                                <i className="fas fa-shopping-cart"></i>
+                                                <span className="ms-1 d-none d-md-inline">{statusText === "Out of Stock" ? "Out of Stock" : "Add to Cart"}</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`btn-wishlist flex-shrink-0 ${isWishlisted ? "btn-wishlist-red" : "btn-wishlist-white"}`}
+                                                onClick={(e) => toggleWishlist(e)}
+                                            >
+                                                <i className="fas fa-heart"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="buy-now-section">

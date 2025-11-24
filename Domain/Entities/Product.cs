@@ -72,6 +72,7 @@ namespace DTech.Domain.Entities
         public string? UpdatedBy { get; set; }
 
         public StatusEnums Status { get; set; } = StatusEnums.Available;
+        public int? QuantityInStock { get; set; }
 
         public virtual Brand? Brand { get; set; }
 

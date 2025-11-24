@@ -73,12 +73,12 @@ const CartPage: React.FC = () => {
                 <div className="row">
                     <div className="col-12">
                         <div className="card">
-                            <div className="card-header px-2">
+                            <div className="card-header px-2 d-none d-md-block">
                                 <div className="row g-0 text-center">
-                                    <div className="col-4">Product Information</div>
-                                    <div className="col-2">Unit Price</div>
-                                    <div className="col-3">Quantity</div>
-                                    <div className="col-2">Total amount</div>
+                                    <div className="col-md-4">Product Information</div>
+                                    <div className="col-md-2">Unit Price</div>
+                                    <div className="col-md-3">Quantity</div>
+                                    <div className="col-md-2">Total amount</div>
                                 </div>
                             </div>
                             <div className="card-body">
@@ -97,25 +97,25 @@ const CartPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="row mt-3">
-                            <div className="col-8 d-flex align-items-end">
-                                <Link to="/" className="btn btn-primary">
+                        <div className="row mt-3 g-3">
+                            <div className="col-12 col-md-3 d-flex align-items-end">
+                                <Link to="/" className="btn btn-primary w-100 w-md-auto">
                                     Continue Shopping
                                 </Link>
                             </div>
-                            <div className="col-4 text-start">
-                                <div className="row">
-                                    <div className="col-6 text-start fw-bold fs-3">
-                                        Grand Total:
+                            <div className="col-12 col-md-5 d-md-block d-sm-none"></div>
+                            <div className="col-12 col-md-4">
+                                <div className="row g-2">
+                                    <div className="col-6 col-md-12 d-flex align-items-center justify-content-start justify-content-md-between">
+                                        <span className="fw-bold fs-5 fs-md-3 me-2">Grand Total:</span>
+                                        <span id="grand-total" className="fw-bold fs-5 fs-md-3 text-end">{formatGrandTotal}</span>
                                     </div>
-                                    <div id="grand-total" className="col-6 text-end fw-bold fs-3">
-                                        {formatGrandTotal}
+                                    <div className="col-6 col-md-12">
+                                        <Link to="/check-out" className="btn btn-danger w-100">
+                                            Check Out
+                                        </Link>
                                     </div>
                                 </div>
-
-                                <Link to="/check-out" className="btn btn-danger col-12">
-                                    Check Out
-                                </Link>
                             </div>
                         </div>
                     </div>

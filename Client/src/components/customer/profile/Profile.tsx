@@ -100,7 +100,7 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
                 <hr />
                 <div className="row">
                     {/* Left side */}
-                    <div className="col-9">
+                    <div className="col-12 col-md-9 order-2 order-md-1">
                         <InputWithLabel
                             label="User Name"
                             name="userName"
@@ -150,31 +150,36 @@ const Profile: React.FC<ProfileProps> = ({ customer }) => {
                     </div>
 
                     {/* Right side (Image upload) */}
-                    <div className="col-3">
-                        <div className="d-flex flex-column align-items-center">
-                            <img
-                                src={form.image || "/default-profile.png"}
-                                alt="Profile"
-                                style={{ maxWidth: "100%" }}
-                                className="w-32 h-32 rounded-full object-cover border shadow"
-                            />
-                            <label htmlFor="input-file" className="custom-upload text-center my-2">
-                                Update Photo
-                            </label>
-                            <input
-                                type="file"
-                                id="input-file"
-                                name="imageUpload"
-                                className="form-control custom-photo-input d-none"
-                                accept="image/*"
-                                onChange={handleChange}
-                            />
-                            <input type="hidden" name="Image" value={form.image ?? ""} />
-                        </div>
+                    <div className="col-12 col-md-3 d-flex flex-column align-items-center order-1 order-md-2 mb-3">
+
+                        <img
+                            src={form.image || "/default-profile.png"}
+                            alt="Profile"
+                            className="profile-img rounded shadow"
+                        />
+
+                        <label
+                            htmlFor="input-file"
+                            className="btn btn-danger w-100 text-white mt-3"
+                        >
+                            Update Photo
+                        </label>
+
+                        <input
+                            type="file"
+                            id="input-file"
+                            name="imageUpload"
+                            className="d-none"
+                            accept="image/*"
+                            onChange={handleChange}
+                        />
+
+                        <input type="hidden" name="Image" value={form.image ?? ""} />
+
                     </div>
                 </div>
 
-                <div className="ps-3">
+                <div className="mt-3">
                     <button type="submit" className="btn btn-primary">
                         <i className="fa-solid fa-floppy-disk fa-sm"></i> Save
                     </button>
