@@ -1704,6 +1704,7 @@ Cart
 }
 
 .cart-btn-quantity-adjust {
+    padding-bottom: 4%;
     width: 30px;
     height: 30px;
     background-color: #f8f9fa;

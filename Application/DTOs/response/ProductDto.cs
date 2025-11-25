@@ -8,7 +8,7 @@ namespace DTech.Application.DTOs.response
         public string? Name { get; set; }
         public string? Slug { get; set; }
         public string? Warranty { get; set; }
-        public bool? StatusProduct { get; set; }
+        public int? QuantityInStock { get; set; }
         public decimal? Price { get; set; }
         public decimal? Discount { get; set; }
         public decimal? PriceAfterDiscount { get; set; }

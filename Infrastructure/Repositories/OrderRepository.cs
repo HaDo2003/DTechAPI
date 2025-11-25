@@ -120,7 +120,9 @@ namespace DTech.Infrastructure.Repositories
 
         public async Task<Order?> UpdateStatusAsync(string orderId, string customerId, int orderStatusId)
         {
-            var order = await context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId && o.CustomerId == customerId);
+            var order = await context.Orders
+                .Include(op => op.OrderProducts)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId && o.CustomerId == customerId);
             if (order == null)
                 return null;
 

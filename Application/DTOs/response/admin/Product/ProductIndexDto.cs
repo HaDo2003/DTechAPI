@@ -5,6 +5,6 @@
         public int? Id { get; set; }
         public string? Name { get; set; }
         public decimal? Price { get; set; }
-        public string? StatusProduct { get; set; }
+        public int? QuantityInStock { get; set; } = 0;
     }
 }

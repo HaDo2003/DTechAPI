@@ -58,7 +58,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
     }, [token, product]);
 
     let statusText;
-    if (product.statusProduct) {
+    if (product.quantityInStock > 0) {
         statusText = "In Stock";
     } else {
         statusText = "Out of Stock";
@@ -247,7 +247,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product, isOpen, onClos
                                     />
                                     <ProductInfoItem
                                         label="Status"
-                                        value={product.statusProduct ? "In Stock" : "Out of Stock"}
+                                        value={product.quantityInStock > 0 ? "In Stock" : "Out of Stock"}
                                         sizexl="col-xl-4"
                                     />
                                     <ProductInfoItem

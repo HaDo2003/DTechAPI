@@ -238,6 +238,42 @@ namespace DTech.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<bool> DecreaseStockAsync(int? productId, int? quantity)
+        {
+            if (productId == null || quantity <= 0 || quantity == null)
+                return false;
+
+            var product = await context.Products
+                .FirstOrDefaultAsync(p => p.ProductId == productId);
+
+            if (product == null || product.QuantityInStock < quantity)
+                return false;
+
+            product.QuantityInStock -= quantity;
+
+            context.Products.Update(product);
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> IncreaseStockAsync(int? productId, int? quantity)
+        {
+            if (productId == null || quantity == null || quantity <= 0)
+                return false;
+
+            var product = await context.Products
+                .FirstOrDefaultAsync(p => p.ProductId == productId);
+
+            if (product == null)
+                return false;
+
+            product.QuantityInStock += quantity;
+
+            context.Products.Update(product);
+            await context.SaveChangesAsync();
+            return true;
+        }
+
         // Repo for Product Images
         public async Task<List<ProductImage>> GetImageAsync(int productId)
         {
@@ -434,7 +470,7 @@ namespace DTech.Infrastructure.Repositories
             existingProduct.Name = product.Name;
             existingProduct.Slug = product.Slug;
             existingProduct.Warranty = product.Warranty;
-            existingProduct.StatusProduct = product.StatusProduct;
+            existingProduct.QuantityInStock = product.QuantityInStock;
             existingProduct.InitialCost = product.InitialCost;
             existingProduct.Price = product.Price;
             existingProduct.Discount = product.Discount;
@@ -450,8 +486,8 @@ namespace DTech.Infrastructure.Repositories
             existingProduct.UpdatedBy = product.UpdatedBy;
             existingProduct.Status = product.Status;
 
-            Console.WriteLine($"[DEBUG] product.StatusProduct = '{product.StatusProduct}'");
-            Console.WriteLine($"[DEBUG] existingProduct StatusProduct = {existingProduct.StatusProduct}");
+            Console.WriteLine($"[DEBUG] product.QuantityInStock = '{product.QuantityInStock}'");
+            Console.WriteLine($"[DEBUG] existingProduct QuantityInStock = {existingProduct.QuantityInStock}");
 
             context.Products.Update(existingProduct);
             var result = await context.SaveChangesAsync();

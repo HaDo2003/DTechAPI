@@ -403,9 +403,7 @@ namespace DTech.Application.Services
                 Id = p.ProductId,
                 Name = p.Name,
                 Price = p.Price,
-                StatusProduct = p.StatusProduct == true ? "In stock"
-                       : p.StatusProduct == false ? "Out of stock"
-                       : "Unknown",
+                QuantityInStock = p.QuantityInStock
             }).ToList();
 
             return new IndexResDto<List<ProductIndexDto>>
@@ -436,12 +434,7 @@ namespace DTech.Application.Services
                     Name = product.Name,
                     Slug = product.Slug,
                     Warranty = product.Warranty,
-                    StatusProduct = product.StatusProduct switch
-                    {
-                        true => "in stock",
-                        false => "out of stock",
-                        null => "Unknown"
-                    },
+                    QuantityInStock = product.QuantityInStock,
                     InitialCost = product.InitialCost,
                     Price = product.Price,
                     Discount = product.Discount,
@@ -556,12 +549,7 @@ namespace DTech.Application.Services
                     Name = model.Name,
                     Slug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-"),
                     Warranty = model.Warranty,
-                    StatusProduct = model.StatusProduct?.Trim().ToLower() switch
-                    {
-                        "in stock" => true,
-                        "out of stock" => false,
-                        _ => false
-                    },
+                    QuantityInStock = model.QuantityInStock,
                     InitialCost = model.InitialCost,
                     Price = model.Price,
                     Discount = model.Discount,
@@ -653,12 +641,7 @@ namespace DTech.Application.Services
                     Name = model.Name,
                     Slug = model.Name?.ToLower().Replace(" ", "-").Replace("/", "-"),
                     Warranty = model.Warranty,
-                    StatusProduct = model.StatusProduct?.Trim().ToLower() switch
-                    {
-                        "in stock" => true,
-                        "out of stock" => false,
-                        _ => false
-                    },
+                    QuantityInStock = model.QuantityInStock,
                     InitialCost = model.InitialCost,
                     Price = model.Price,
                     Discount = model.Discount,

@@ -103,7 +103,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
     const formattedOriginalPrice = priceFormatter(product.price);
     const formattedSavePrice = priceFormatter(savePrice);
     let statusText;
-    if (product.statusProduct) {
+    if (product.quantityInStock > 0) {
         statusText = "In Stock";
     } else {
         statusText = "Out of Stock";

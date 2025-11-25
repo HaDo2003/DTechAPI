@@ -16,7 +16,8 @@ namespace DTech.Application.Services
         IMapper mapper,
         ICloudinaryService cloudinaryService,
         IBackgroundTaskQueue backgroundTaskQueue,
-        IEmailService emailService
+        IEmailService emailService,
+        IUnitOfWorkService unitOfWorkService
     ) : ICustomerService
     {
         readonly string folderName = "Pre-thesis/Customer";
@@ -215,7 +216,7 @@ namespace DTech.Application.Services
                     Id = op.Id,
                     Name = op.Product.Name,
                     Photo = op.Product.Photo,
-                    Price = op.Product.Price,
+                    Price = op.Price,
                     Quantity = op.Quantity,
                     CostAtPurchase = op.CostAtPurchase,
                 }).ToList()
@@ -230,43 +231,79 @@ namespace DTech.Application.Services
             if (!customer)
                 return new OrderDetailResDto { Success = false, Message = "Customer not found" };
 
-            int orderStatusId = 7;
-            var orderUpdated = await orderRepo.UpdateStatusAsync(orderId, customerId, orderStatusId);
-            if(orderUpdated == null)
-                return new OrderDetailResDto { Success = false, Message = "Fail to cancel order" };
+            await unitOfWorkService.BeginTransactionAsync();
 
-            OrderDetailResDto model = new()
+            try
             {
-                OrderId = orderUpdated.OrderId,
-                OrderDate = orderUpdated.OrderDate,
-                Name = orderUpdated.Name,
-                NameReceive = orderUpdated.NameReceive,
-                ShippingAddress = orderUpdated.ShippingAddress,
-                Address = orderUpdated.Address,
-                StatusName = orderUpdated.Status?.Description ?? "Unknown",
-                Note = orderUpdated.Note,
-                CostDiscount = orderUpdated.CostDiscount,
-                ShippingCost = orderUpdated.ShippingCost,
-                FinalCost = orderUpdated.FinalCost,
-                Payment = orderUpdated.Payment == null
-                    ? null
-                    : new PaymentDto
-                    {
-                        Status = orderUpdated.Payment.Status,
-                        PaymentMethodName = orderUpdated.Payment.PaymentMethod!.Description ?? string.Empty,
-                    },
-                OrderProducts = orderUpdated.OrderProducts?.Select(op => new OrderProductDto
+                // 1. Update status to Cancelled
+                int orderStatusId = 7;
+                var orderUpdated = await orderRepo.UpdateStatusAsync(orderId, customerId, orderStatusId);
+                if (orderUpdated == null)
                 {
-                    Id = op.Id,
-                    Name = op.Product.Name,
-                    Photo = op.Product.Photo,
-                    Price = op.Product.Price,
-                    Quantity = op.Quantity,
-                    CostAtPurchase = op.CostAtPurchase,
-                }).ToList()
-            };
+                    await unitOfWorkService.RollbackTransactionAsync();
+                    return new OrderDetailResDto { Success = false, Message = "Fail to cancel order" };
+                }
 
-            return model;
+                // 2. Restore stock for each product
+                foreach (var op in orderUpdated.OrderProducts)
+                {
+                    Console.WriteLine($"[DEBUG REBACK] Restore stock for Product: {op.ProductId}, quantity: {op.Quantity}");
+                    bool restored = await productRepo.IncreaseStockAsync(op.ProductId, op.Quantity);
+                    if (!restored)
+                    {
+                        await unitOfWorkService.RollbackTransactionAsync();
+                        return new OrderDetailResDto
+                        {
+                            Success = false,
+                            Message = $"Failed to restore stock for Product {op.ProductId}"
+                        };
+                    }
+                }
+
+                await unitOfWorkService.CommitTransactionAsync();
+
+                // 3. Return updated response
+                return new OrderDetailResDto
+                {
+                    Success = true,
+                    OrderId = orderUpdated.OrderId,
+                    OrderDate = orderUpdated.OrderDate,
+                    Name = orderUpdated.Name,
+                    NameReceive = orderUpdated.NameReceive,
+                    ShippingAddress = orderUpdated.ShippingAddress,
+                    Address = orderUpdated.Address,
+                    StatusName = orderUpdated.Status?.Description ?? "Unknown",
+                    Note = orderUpdated.Note,
+                    CostDiscount = orderUpdated.CostDiscount,
+                    ShippingCost = orderUpdated.ShippingCost,
+                    FinalCost = orderUpdated.FinalCost,
+                    Payment = orderUpdated.Payment == null
+                        ? null
+                        : new PaymentDto
+                        {
+                            Status = orderUpdated.Payment.Status,
+                            PaymentMethodName = orderUpdated.Payment.PaymentMethod!.Description ?? string.Empty,
+                        },
+                    OrderProducts = orderUpdated.OrderProducts.Select(op => new OrderProductDto
+                    {
+                        Id = op.Id,
+                        Name = op.Product.Name,
+                        Photo = op.Product.Photo,
+                        Price = op.Product.Price,
+                        Quantity = op.Quantity,
+                        CostAtPurchase = op.CostAtPurchase,
+                    }).ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                await unitOfWorkService.RollbackTransactionAsync();
+                return new OrderDetailResDto
+                {
+                    Success = false,
+                    Message = "Error: " + ex.Message
+                };
+            }
         }
 
         public async Task<MessageResponse> AddProductToWishlistAsync(string customerId, int productId)

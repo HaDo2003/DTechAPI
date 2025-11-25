@@ -12,7 +12,7 @@ export interface Product {
     name: string;
     slug: string;
     warranty: string;
-    statusProduct: boolean;
+    quantityInStock: number;
     price: number;
     discount: number;
     priceAfterDiscount: number;
@@ -43,7 +43,7 @@ export interface ProductForm {
     name?: string;
     slug?: string;
     warranty?: string;
-    statusProduct?: string;
+    quantityInStock: number;
     initialCost?: number;
     price?: number;
     discount?: number;

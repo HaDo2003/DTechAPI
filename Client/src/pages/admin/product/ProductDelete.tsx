@@ -87,7 +87,7 @@ const ProductDelete: React.FC = () => {
                     { key: "dateOfManufacture", label: "Date of Manufacture" },
                     { key: "madeIn", label: "Made In" },
                     { key: "promotionalGift", label: "Promotional Gift" },
-                    { key: "statusProduct", label: "Status" },
+                    { key: "quantityInStock", label: "Quantity In Stock" },
                 ]}
                 imageKey="photo"
                 onDelete={handleDelete}

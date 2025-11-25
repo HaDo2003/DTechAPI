@@ -20,7 +20,8 @@ namespace DTech.Domain.Interfaces
         Task<Product?> GetProductByIdAsync(int? productId);
         Task<IQueryable<Product>> GetProductByQuery(string query);
         Task<List<Product>> GetRecentProductsAsync(int number);
-
+        Task<bool> DecreaseStockAsync(int? productId, int? quantity);
+        Task<bool> IncreaseStockAsync(int? productId, int? quantity);
         // Repo for Product Images
         Task<List<ProductImage>> GetImageAsync(int productId);
         Task AddImagesAsync(List<ProductImage> images);

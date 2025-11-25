@@ -20,7 +20,8 @@ namespace DTech.Application.Services
         IPaymentRepository paymentRepo,
         IMapper mapper,
         IBackgroundTaskQueue backgroundTaskQueue,
-        IEmailService emailService
+        IEmailService emailService,
+        IUnitOfWorkService unitOfWorkService
     ) : ICheckOutService
     {
         // Main Methods
@@ -284,45 +285,87 @@ namespace DTech.Application.Services
                 Total = total
             };
         }
-        private async Task<(bool Sucess, string Message, Order? order)> ProcessOrderAsync(string customerId, CheckOutDto model, Cart? cart)
+        private async Task<(bool Success, string Message, Order? order)> ProcessOrderAsync(string customerId, CheckOutDto model, Cart? cart)
         {
-            var shipping = await CreateShippingAsync();
-            if (shipping == null) return (false, "Fail to create Shipping", null);
+            await unitOfWorkService.BeginTransactionAsync();
 
-            var payment = await CreatePaymentAsync(model);
-            if (payment == null) return (false, "Fail to create Payment", null);
-
-            var order = await CreateOrderAsync(customerId, model, shipping.ShippingId, payment.PaymentId);
-            if(order == null) return (false, "Fail to create Order", null);
-
-            // For CART
-            if (cart != null)
+            try
             {
-                var orderProducts = await CreateOrderDetailAsync(order, cart);
-                if (orderProducts == null) return (false, "Fail to create order detail", null);
+                var shipping = await CreateShippingAsync();
+                if (shipping == null)
+                    return await FailTransaction("Fail to create Shipping");
 
-                var isClear = await cartRepo.ClearCartAsync(cart);
-                if (!isClear) return (false, "Fail to clear cart", null);
+                var payment = await CreatePaymentAsync(model);
+                if (payment == null)
+                    return await FailTransaction("Fail to create Payment");
+
+                var order = await CreateOrderAsync(customerId, model, shipping.ShippingId, payment.PaymentId);
+                if (order == null)
+                    return await FailTransaction("Fail to create Order");
+
+                // For cart checkout
+                if (cart != null)
+                {
+                    foreach (var cartProduct in cart.CartProducts)
+                    {
+                        bool stockUpdated = await productRepo.DecreaseStockAsync(
+                            cartProduct.ProductId,
+                            cartProduct.Quantity
+                        );
+
+                        if (!stockUpdated)
+                            return await FailTransaction($"Insufficient stock for product {cartProduct.ProductId}");
+                    }
+
+                    var orderProducts = await CreateOrderDetailAsync(order, cart);
+                    if (orderProducts == null)
+                        return await FailTransaction("Fail to create Order Detail");
+
+                    var isClear = await cartRepo.ClearCartAsync(cart);
+                    if (!isClear)
+                        return await FailTransaction("Fail to clear cart");
+                }
+                // For buy now checkout
+                else
+                {
+                    var firstItem = model.OrderSummary.Items.FirstOrDefault();
+                    if (firstItem == null)
+                        return await FailTransaction("Invalid order item");
+
+                    bool stockUpdated = await productRepo.DecreaseStockAsync(
+                        firstItem.ProductId,
+                        firstItem.Quantity
+                    );
+
+                    if (!stockUpdated)
+                        return await FailTransaction("Insufficient stock");
+
+                    var orderProducts = await CreateOrderDetailForBuyNowAsync(order, model.OrderSummary);
+                    if (orderProducts == null)
+                        return await FailTransaction("Fail to create Order Detail");
+                }
+
+                if (!string.IsNullOrEmpty(model.ReductionCode))
+                {
+                    var isUsed = await couponRepo.UseCodeAsync(model.ReductionCode, customerId);
+                    if (!isUsed)
+                        return await FailTransaction("Fail to use coupon");
+
+                    var isAdded = await orderRepo.AddOrderCouponAsync(model.ReductionCode, order.OrderId!);
+                    if (!isAdded)
+                        return await FailTransaction("Fail to add coupon to order");
+                }
+
+                await unitOfWorkService.CommitTransactionAsync();
+
+                var result = await orderRepo.GetOrderByIdAsync(order.OrderId);
+                return (true, "Process order successfully", result);
             }
-            // For BUY NOW
-            else
+            catch (Exception ex)
             {
-                var orderProducts = await CreateOrderDetailForBuyNowAsync(order, model.OrderSummary);
-                if (orderProducts == null) return (false, "Fail to create order detail", null);
+                await unitOfWorkService.RollbackTransactionAsync();
+                return (false, ex.Message, null);
             }
-
-
-            if (!string.IsNullOrEmpty(model.ReductionCode))
-            {
-                var isUsed = await couponRepo.UseCodeAsync(model.ReductionCode, customerId);
-                if (!isUsed) return (false, "Fail to add used coupon", null);
-
-                var isAdded = await orderRepo.AddOrderCouponAsync(model.ReductionCode, order.OrderId!);
-                if (!isAdded) return (false, "Fail to add used coupon to order", null);
-            }
-
-            var fetchOrder = await orderRepo.GetOrderByIdAsync(order.OrderId);
-            return (true, "Process order sucessfully", fetchOrder);
         }
 
         private async Task<Shipping?> CreateShippingAsync()
@@ -499,6 +542,12 @@ namespace DTech.Application.Services
                     );
                 });
             }
+        }
+
+        private async Task<(bool, string, Order?)> FailTransaction(string message)
+        {
+            await unitOfWorkService.RollbackTransactionAsync();
+            return (false, message, null);
         }
     }
 }

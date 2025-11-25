@@ -65,7 +65,7 @@ namespace DTech.Application.Services
                 Name = p.Name ?? "",
                 Slug = p.Slug ?? "",
                 Warranty = p.Warranty,
-                StatusProduct = p.StatusProduct,
+                QuantityInStock = p.QuantityInStock,
                 Price = p.Price,
                 Discount = p.Discount,
                 PriceAfterDiscount = p.PriceAfterDiscount,

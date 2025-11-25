@@ -27,8 +27,7 @@ namespace DTech.Domain.Entities
         [Required(ErrorMessage = "Please enter warranty of product")]
         public string? Warranty { get; set; }
 
-        [Display(Name = "Product Status")]
-        public bool? StatusProduct { get; set; }
+        public int? QuantityInStock { get; set; } = 0;
 
         [Required(ErrorMessage = "Please enter initial cost of product")]
         [Display(Name = "Initial Cost")]
@@ -72,7 +71,6 @@ namespace DTech.Domain.Entities
         public string? UpdatedBy { get; set; }
 
         public StatusEnums Status { get; set; } = StatusEnums.Available;
-        public int? QuantityInStock { get; set; }
 
         public virtual Brand? Brand { get; set; }
 

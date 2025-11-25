@@ -187,7 +187,7 @@ export const managementConfig: Record<
       { key: "id", label: "Product Id" },
       { key: "name", label: "Name" },
       { key: "price", label: "Price" },
-      { key: "statusProduct", label: "Status Product" },
+      { key: "quantityInStock", label: "Quantity In Stock" },
       { key: "actions", label: "Function" },
     ],
   },

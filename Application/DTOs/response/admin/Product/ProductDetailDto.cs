@@ -9,7 +9,7 @@ namespace DTech.Application.DTOs.Response.Admin.Product
         public string? Name { get; set; }
         public string? Slug { get; set; }
         public string? Warranty { get; set; }
-        public string? StatusProduct { get; set; }
+        public int? QuantityInStock { get; set; } = 0;
         public decimal? InitialCost { get; set; }
         public decimal? Price { get; set; }
         public decimal? Discount { get; set; }

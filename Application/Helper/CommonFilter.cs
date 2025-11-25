@@ -26,7 +26,7 @@ namespace DTech.Application.Helper
             if (filter.InStock.HasValue)
             {
                Console.WriteLine($"[DEBUG FILTER] InStock filter: {filter.InStock.Value}");
-               query = query.Where(p => p.StatusProduct == filter.InStock.Value);
+               query = query.Where(p => p.QuantityInStock > 0);
             }
 
             if (filter.Rating.HasValue)

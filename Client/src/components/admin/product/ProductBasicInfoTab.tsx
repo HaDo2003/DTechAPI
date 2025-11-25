@@ -74,7 +74,7 @@ const ProductBasicInfoTab: React.FC<Props> = ({
 
         fd.append("Name", info.name ?? "");
         fd.append("Warranty", info.warranty ?? "");
-        fd.append("StatusProduct", info.statusProduct ?? "");
+        fd.append("QuantityInStock", info.quantityInStock?.toString() ?? "0");
         fd.append("InitialCost", info.initialCost?.toString() ?? "0")
         fd.append("Price", info.price?.toString() ?? "0");
         fd.append("Discount", info.discount?.toString() ?? "0");
@@ -228,20 +228,14 @@ const ProductBasicInfoTab: React.FC<Props> = ({
                     />
                 </div>
                 <div className="col">
-                    <div className="form-group">
-                        <label htmlFor="statusProduct-select">Status</label>
-                        <select
-                            id="statusProduct-select"
-                            name="statusProduct"
-                            value={formData.statusProduct ?? ""}
-                            onChange={handleChange}
-                            className="form-control"
-                            required
-                        >
-                            <option value="in stock">In stock</option>
-                            <option value="out of stock">Out of stock</option>
-                        </select>
-                    </div>
+                    <InputField
+                        label="Quantity In Stock"
+                        name="quantityInStock"
+                        type="number"
+                        value={formData.quantityInStock?.toString() ?? "0"}
+                        onChange={handleChange}
+                        required
+                    />
                 </div>
             </div>
 

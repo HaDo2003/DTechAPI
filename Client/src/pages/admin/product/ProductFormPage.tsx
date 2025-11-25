@@ -26,7 +26,7 @@ const ProductFormPage: React.FC = () => {
             name: "",
             slug: "",
             warranty: "",
-            statusProduct: "",
+            quantityInStock: 0,
             price: 0,
             discount: 0,
             priceAfterDiscount: 0,
@@ -91,7 +91,7 @@ const ProductFormPage: React.FC = () => {
 
             fd.append("ProductInfor.Name", info.productInfor.name ?? "");
             fd.append("ProductInfor.Warranty", info.productInfor.warranty ?? "");
-            fd.append("ProductInfor.StatusProduct", info.productInfor.statusProduct ?? "");
+            fd.append("ProductInfor.QuantityInStock", info.productInfor.quantityInStock?.toString() ?? "0");
             fd.append("ProductInfor.InitialCost", info.productInfor.initialCost?.toString() ?? "0")
             fd.append("ProductInfor.Price", info.productInfor.price?.toString() ?? "0");
             fd.append("ProductInfor.Discount", info.productInfor.discount?.toString() ?? "0");

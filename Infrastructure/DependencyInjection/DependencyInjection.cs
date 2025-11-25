@@ -117,6 +117,7 @@ namespace DTech.Infrastructure.DependencyInjection
 
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IUnitOfWorkService, UnitOfWorkService>();
             services.AddTransient<IEmailService, EmailService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddHostedService<QueuedHostedService>();

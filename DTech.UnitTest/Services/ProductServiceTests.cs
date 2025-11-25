@@ -406,8 +406,8 @@ namespace DTech.UnitTest.Services
             // Arrange
             var products = new List<Product>
             {
-                new() { ProductId = 1, Name = "Product 1", Price = 100, StatusProduct = true },
-                new() { ProductId = 2, Name = "Product 2", Price = 200, StatusProduct = false }
+                new() { ProductId = 1, Name = "Product 1", Price = 100, QuantityInStock = 1 },
+                new() { ProductId = 2, Name = "Product 2", Price = 200, QuantityInStock = 0 }
             };
 
             _productRepoMock.Setup(repo => repo.GetAllProductsAsync())
@@ -420,8 +420,8 @@ namespace DTech.UnitTest.Services
             result.Success.Should().BeTrue();
             result.Data.Should().HaveCount(2);
             result.Data![0].Name.Should().Be("Product 1");
-            result.Data[0].StatusProduct.Should().Be("In stock");
-            result.Data[1].StatusProduct.Should().Be("Out of stock");
+            result.Data[0].QuantityInStock.Should().Be(1);
+            result.Data[1].QuantityInStock.Should().Be(0);
         }
 
         // --------------------------------------------------------------------
@@ -454,7 +454,7 @@ namespace DTech.UnitTest.Services
                 ProductId = productId,
                 Name = "Product 1",
                 Price = 100,
-                StatusProduct = true,
+                QuantityInStock = 1,
                 ProductColors =
                 [
                     new() { ColorId = 1, ColorName = "Red", ColorCode = "#FF0000" }
@@ -619,7 +619,7 @@ namespace DTech.UnitTest.Services
                 Discount = 10,
                 BrandId = 1,
                 CategoryId = 1,
-                StatusProduct = "in stock",
+                QuantityInStock = 10,
                 PhotoUpload = mockFile.Object
             };
             var currentUserId = "admin123";
@@ -686,7 +686,7 @@ namespace DTech.UnitTest.Services
                 PhotoUpload = mockFile.Object,
                 BrandId = 1,
                 CategoryId = 1,
-                StatusProduct = "in stock"
+                QuantityInStock = 10
             };
             var currentUserId = "admin123";
 
