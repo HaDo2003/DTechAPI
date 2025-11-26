@@ -30,23 +30,18 @@ namespace DTech.Infrastructure.Repositories
 
         public async Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> operation)
         {
-            var strategy = context.Database.CreateExecutionStrategy();
-
-            return await strategy.ExecuteAsync(async () =>
+            using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+            try
             {
-                using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
-                try
-                {
-                    var result = await operation();
-                    await transaction.CommitAsync();
-                    return result;
-                }
-                catch
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            });
+                var result = await operation();
+                await transaction.CommitAsync();
+                return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<List<VisitorCount>?> GetVisitorCountAsync()
