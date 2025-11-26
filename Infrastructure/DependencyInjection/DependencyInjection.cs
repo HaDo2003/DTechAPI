@@ -137,6 +137,8 @@ namespace DTech.Infrastructure.DependencyInjection
                 }
             }
 
+            services.AddSignalR();
+
             return services;
         }
     }

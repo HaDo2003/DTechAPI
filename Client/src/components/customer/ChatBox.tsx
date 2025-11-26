@@ -1,55 +1,86 @@
 import React, { useState, useEffect, useRef } from "react";
-import Zalo from '../../assets/zalo.png'
-
-export interface ChatMessage {
-  id: string;
-  senderId: string;
-  message: string;
-  timestamp: string;
-};
+import Zalo from '../../assets/zalo.png';
+import { type ChatMessage } from "../../types/ChatMessage";
+import { useSignalR } from "../../hooks/useSignalR";
 
 type FullChatProps = {
-  currentUserId: string;
+  currentUserId: string;   // Customer ID
+  adminId: string;         // Admin ID
   messages: ChatMessage[];
 };
 
-const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
+const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages || []);
+
   const chatBodyRef = useRef<HTMLDivElement | null>(null);
 
+  // -----------------------------
+  // ⭐ USE YOUR SIGNALR HOOK
+  // -----------------------------
+  const hubUrl = "https://localhost:7094/hubs/chatsHub";
+  const { connection, connected } = useSignalR(hubUrl, () => localStorage.getItem("token"));
+
+  // Auto-scroll
   useEffect(() => {
-    // auto-scroll to bottom when messages change
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   }, [chatMessages]);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  // -----------------------------
+  // 📥 Listen for messages
+  // -----------------------------
+  useEffect(() => {
+    if (!connection) return;
+
+    connection.on("ReceiveMessage", (senderId: string, message: string) => {
+      setChatMessages(prev => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          senderId,
+          message,
+          timestamp: new Date().toISOString()
+        }
+      ]);
+    });
+
+    return () => {
+      connection?.off("ReceiveMessage");
+    };
+  }, [connection]);
+
+  // -----------------------------
+  // 📤 Send message
+  // -----------------------------
+  const handleSend = async () => {
+    if (!inputValue.trim() || !connection) return;
+
+    await connection.invoke("SendMessage", adminId, inputValue);
 
     const newMessage: ChatMessage = {
       id: Date.now().toString(),
       senderId: currentUserId,
       message: inputValue,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
 
-    setChatMessages([...chatMessages, newMessage]);
+    setChatMessages(prev => [...prev, newMessage]);
     setInputValue("");
   };
 
   return (
     <>
-      {/* Redirect to Zalo Chat */}
+      {/* Zalo */}
       <div className="chat-widget-zalo">
         <a href="https://chat.zalo.me/" target="_blank" rel="noopener noreferrer" className="chat-btn-zalo">
           <img src={Zalo} alt="Zalo Chat" className="zalo-icon" />
         </a>
       </div>
 
-      {/* Chat Widget */}
+      {/* Floating Chat */}
       <div className="chat-widget">
         <button className="chat-btn" onClick={() => setIsOpen(!isOpen)}>
           <i className="fas fa-comments"></i>
@@ -57,6 +88,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
 
         {isOpen && (
           <div className="chat-window">
+
             <div className="chat-header">
               <h6 className="mb-0">
                 <i className="fas fa-headset me-2"></i>
@@ -64,7 +96,18 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
               </h6>
             </div>
 
-            <div className="chat-body" id="chatBody" ref={chatBodyRef}>
+            {/* ⭐ Connection status */}
+            <div
+              style={{
+                padding: "5px",
+                fontSize: "12px",
+                color: connected ? "green" : "red",
+              }}
+            >
+              {connected ? "Connect success" : "Connecting..."}
+            </div>
+
+            <div className="chat-body" ref={chatBodyRef}>
               {chatMessages.length === 0 ? (
                 <div className="message">
                   <div className="bot-message">Hello! How can I help you ?</div>
@@ -85,6 +128,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
               )}
             </div>
 
+            {/* Footer */}
             <div className="chat-footer">
               <div className="input-group">
                 <input
@@ -92,6 +136,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
                   className="form-control"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Text..."
                 />
                 <button className="btn btn-danger" onClick={handleSend}>
@@ -99,6 +144,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
                 </button>
               </div>
             </div>
+
           </div>
         )}
       </div>
