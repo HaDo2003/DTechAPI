@@ -30,49 +30,82 @@ namespace DTech.Application.Services
                 _ => DayOfWeekEnums.Monday
             };
 
-            try
-            {
-                await dataRepo.ExecuteInTransactionAsync(async () =>
-                {
-                    var existing = await dataRepo.GetVisitorCountByDateAsync(today);
+            const int maxRetries = 5;
 
-                    if (existing != null)
+            for (int attempt = 0; attempt < maxRetries; attempt++)
+            {
+                try
+                {
+                    await dataRepo.ExecuteInTransactionAsync(async () =>
                     {
-                        // Update existing record
-                        existing.Count += 1;
-                        await dataRepo.UpdateVisitorCountAsync(existing);
-                    }
-                    else
-                    {
-                        // Create new record
-                        var newVisitorCount = new VisitorCount
+                        var existing = await dataRepo.GetVisitorCountByDateAsync(today);
+
+                        if (existing != null)
                         {
-                            Date = today,
-                            Day = customDay,
-                            Week = weekOfYear,
-                            Count = 1
+                            // Update existing record
+                            existing.Count += 1;
+                            await dataRepo.UpdateVisitorCountAsync(existing);
+                        }
+                        else
+                        {
+                            // Create new record
+                            var newVisitorCount = new VisitorCount
+                            {
+                                Date = today,
+                                Day = customDay,
+                                Week = weekOfYear,
+                                Count = 1
+                            };
+                            await dataRepo.CreateVisitorCountAsync(newVisitorCount);
+                        }
+
+                        return true;
+                    });
+
+                    return new IndexResDto<object?>
+                    {
+                        Success = true,
+                        Message = "Visitor count updated successfully"
+                    };
+                }
+                catch (DbUpdateException ex)
+                {
+                    // Catch concurrency and constraint violations
+                    var errorMessage = ex.InnerException?.Message ?? ex.Message;
+                    var shouldRetry = errorMessage.Contains("could not serialize") ||
+                                     errorMessage.Contains("concurrent update") ||
+                                     errorMessage.Contains("duplicate key") ||
+                                     errorMessage.Contains("unique constraint");
+
+                    if (!shouldRetry || attempt == maxRetries - 1)
+                    {
+                        Console.WriteLine($"Error updating visitor count: {errorMessage}");
+                        return new IndexResDto<object?>
+                        {
+                            Success = false,
+                            Message = "Failed to update visitor count"
                         };
-                        await dataRepo.CreateVisitorCountAsync(newVisitorCount);
                     }
 
-                    return true;
-                });
+                    // Exponential backoff: 50ms, 100ms, 200ms, 400ms
+                    await Task.Delay(TimeSpan.FromMilliseconds(50 * Math.Pow(2, attempt)));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating visitor count: {ex.Message}");
+                    return new IndexResDto<object?>
+                    {
+                        Success = false,
+                        Message = "Failed to update visitor count"
+                    };
+                }
+            }
 
-                return new IndexResDto<object?>
-                {
-                    Success = true,
-                    Message = "Visitor count updated successfully"
-                };
-            }
-            catch (Exception ex)
+            return new IndexResDto<object?>
             {
-                Console.WriteLine($"Error updating visitor count: {ex.Message}");
-                return new IndexResDto<object?>
-                {
-                    Success = false,
-                    Message = "Failed to update visitor count"
-                };
-            }
+                Success = false,
+                Message = "Failed to update visitor count"
+            };
         }
     }
 }
