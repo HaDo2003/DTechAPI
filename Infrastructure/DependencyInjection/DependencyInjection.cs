@@ -11,6 +11,7 @@ using DTech.Infrastructure.Services.Background;
 using Ganss.Xss;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -75,6 +76,22 @@ namespace DTech.Infrastructure.DependencyInjection
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ClockSkew = TimeSpan.Zero
                     };
+
+                    // Configure JWT for SignalR
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             services.Configure<JwtSettings>(
@@ -138,6 +155,8 @@ namespace DTech.Infrastructure.DependencyInjection
             }
 
             services.AddSignalR();
+            
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
             return services;
         }

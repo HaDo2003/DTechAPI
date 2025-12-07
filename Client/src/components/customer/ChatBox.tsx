@@ -2,14 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import Zalo from '../../assets/zalo.png';
 import { type ChatMessage } from "../../types/ChatMessage";
 import { useSignalR } from "../../hooks/useSignalR";
+import { useAuth } from "../../context/AuthContext";
 
 type FullChatProps = {
-  currentUserId: string;   // Customer ID
-  adminId: string;         // Admin ID
+  currentUserId: string;
+  adminId: string;
   messages: ChatMessage[];
 };
 
 const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages }) => {
+  const { token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages || []);
@@ -17,10 +19,10 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
   const chatBodyRef = useRef<HTMLDivElement | null>(null);
 
   // -----------------------------
-  // ⭐ USE YOUR SIGNALR HOOK
+  // USE SIGNALR HOOK
   // -----------------------------
   const hubUrl = "https://localhost:7094/hubs/chatsHub";
-  const { connection, connected } = useSignalR(hubUrl, () => localStorage.getItem("token"));
+  const { connection, connected } = useSignalR(hubUrl, token);
 
   // Auto-scroll
   useEffect(() => {
@@ -30,7 +32,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
   }, [chatMessages]);
 
   // -----------------------------
-  // 📥 Listen for messages
+  // Listen for messages
   // -----------------------------
   useEffect(() => {
     if (!connection) return;
@@ -53,7 +55,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
   }, [connection]);
 
   // -----------------------------
-  // 📤 Send message
+  // Send message
   // -----------------------------
   const handleSend = async () => {
     if (!inputValue.trim() || !connection) return;
@@ -82,7 +84,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
 
       {/* Floating Chat */}
       <div className="chat-widget">
-        <button className="chat-btn" onClick={() => setIsOpen(!isOpen)}>
+        <button className="chat-btn" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle chat window">
           <i className="fas fa-comments"></i>
         </button>
 
@@ -139,7 +141,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
                   onKeyPress={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Text..."
                 />
-                <button className="btn btn-danger" onClick={handleSend}>
+                <button className="btn btn-danger" onClick={handleSend} aria-label="Send message">
                   <i className="fas fa-paper-plane"></i>
                 </button>
               </div>

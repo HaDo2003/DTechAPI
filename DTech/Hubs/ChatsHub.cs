@@ -1,15 +1,27 @@
 ﻿using DTech.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DTech.API.Hubs
 {
+    [Authorize]
     public class ChatsHub(
         IChatService chatService
     ) : Hub
     {
+        public override async Task OnConnectedAsync()
+        {
+            var userId = Context.UserIdentifier;
+            var userName = Context.User?.Identity?.Name;
+            Console.WriteLine($"User connected - UserIdentifier: {userId}, UserName: {userName}");
+            await base.OnConnectedAsync();
+        }
+
         public async Task SendMessage(string? receiverId, string message)
         {
             var senderId = Context.UserIdentifier;
+            Console.WriteLine($"SendMessage called - SenderId: {senderId}, ReceiverId: {receiverId}");
+
             senderId ??= null;
             receiverId ??= "7aede655-1203-45b4-a00e-a0f81a812ecb";
 
