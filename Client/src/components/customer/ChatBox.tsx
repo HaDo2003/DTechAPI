@@ -1,62 +1,117 @@
 import React, { useState, useEffect, useRef } from "react";
-import Zalo from '../../assets/zalo.png'
+import { type ChatMessage } from "../../types/ChatMessage";
+import { useSignalR } from "../../hooks/useSignalR";
+import { useAuth } from "../../context/AuthContext";
+import { chatService } from "../../services/ChatService";
 
-export interface ChatMessage {
-  id: string;
-  senderId: string;
-  message: string;
-  timestamp: string;
-};
-
-type FullChatProps = {
-  currentUserId: string;
-  messages: ChatMessage[];
-};
-
-const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
+const ChatBox: React.FC = () => {
+  const { token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages || []);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string>("guest");
   const chatBodyRef = useRef<HTMLDivElement | null>(null);
 
+  // -----------------------------
+  // USE SIGNALR HOOK
+  // -----------------------------
+  const { connection } = useSignalR(token);
+
+  // Auto-scroll
   useEffect(() => {
-    // auto-scroll to bottom when messages change
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   }, [chatMessages]);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  // -----------------------------
+  // Get user ID from server after connection
+  // -----------------------------
+  useEffect(() => {
+    if (!connection) return;
 
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
-      senderId: currentUserId,
-      message: inputValue,
-      timestamp: new Date().toISOString(),
+    connection.on("SetUserId", (userId: string) => {
+      setCurrentUserId(userId);
+    });
+
+    return () => {
+      connection?.off("SetUserId");
+    };
+  }, [connection]);
+
+  // -----------------------------
+  // Fetch chat history when opening chat
+  // -----------------------------
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!isOpen || !token) return;
+
+      try {
+        const history = await chatService.getChatHistory(token);
+        if (history && history.length > 0) {
+          setChatMessages(history);
+        }
+      } catch (error) {
+        console.error("Failed to load chat history:", error);
+      }
     };
 
-    setChatMessages([...chatMessages, newMessage]);
+    fetchHistory();
+  }, [isOpen, token]);
+
+  // -----------------------------
+  // Listen for messages
+  // -----------------------------
+  useEffect(() => {
+    if (!connection) return;
+
+    connection.on("ReceiveMessage", (senderId: string | null, message: string) => {
+      setChatMessages(prev => [
+        ...prev,
+        {
+          senderId: senderId || "guest",
+          message,
+          timestamp: new Date().toISOString()
+        }
+      ]);
+    });
+
+    return () => {
+      connection?.off("ReceiveMessage");
+    };
+  }, [connection]);
+
+  // -----------------------------
+  // Send message
+  // -----------------------------
+  const handleSend = async () => {
+    if (!inputValue.trim() || !connection) return;
+
+    // Server handles the admin ID
+    // await connection.invoke("SendMessage", null, inputValue);
+    await chatService.sendMessage(inputValue, connection);
+
+    const newMessage: ChatMessage = {
+      senderId: currentUserId,
+      message: inputValue,
+      timestamp: new Date().toISOString()
+    };
+
+    setChatMessages(prev => [...prev, newMessage]);
     setInputValue("");
   };
 
   return (
     <>
-      {/* Redirect to Zalo Chat */}
-      <div className="chat-widget-zalo">
-        <a href="https://chat.zalo.me/" target="_blank" rel="noopener noreferrer" className="chat-btn-zalo">
-          <img src={Zalo} alt="Zalo Chat" className="zalo-icon" />
-        </a>
-      </div>
-
-      {/* Chat Widget */}
+      {/* Floating Chat */}
       <div className="chat-widget">
-        <button className="chat-btn" onClick={() => setIsOpen(!isOpen)}>
+        <button className="chat-btn" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle chat window">
           <i className="fas fa-comments"></i>
         </button>
 
         {isOpen && (
           <div className="chat-window">
+
             <div className="chat-header">
               <h6 className="mb-0">
                 <i className="fas fa-headset me-2"></i>
@@ -64,7 +119,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
               </h6>
             </div>
 
-            <div className="chat-body" id="chatBody" ref={chatBodyRef}>
+            <div className="chat-body" ref={chatBodyRef}>
               {chatMessages.length === 0 ? (
                 <div className="message">
                   <div className="bot-message">Hello! How can I help you ?</div>
@@ -85,6 +140,7 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
               )}
             </div>
 
+            {/* Footer */}
             <div className="chat-footer">
               <div className="input-group">
                 <input
@@ -92,13 +148,15 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
                   className="form-control"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Text..."
                 />
-                <button className="btn btn-danger" onClick={handleSend}>
+                <button className="btn btn-danger" onClick={handleSend} aria-label="Send message">
                   <i className="fas fa-paper-plane"></i>
                 </button>
               </div>
             </div>
+
           </div>
         )}
       </div>
@@ -106,4 +164,4 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, messages }) => {
   );
 };
 
-export default ChatWidget;
+export default ChatBox;

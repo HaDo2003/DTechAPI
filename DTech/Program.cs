@@ -1,4 +1,5 @@
 using dotenv.net;
+using DTech.API.Hubs;
 using DTech.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
@@ -54,6 +55,14 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ConfigureEndpointDefaults(listenOptions =>
+    {
+        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2;
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -70,13 +79,15 @@ if (app.Environment.IsDevelopment())
         return Task.CompletedTask;
     });
 }
-app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
 
+app.UseCors("AllowReactApp");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<ChatsHub>("/hubs/chatsHub").RequireCors("AllowReactApp");
 app.MapControllers();
 
 app.Run();

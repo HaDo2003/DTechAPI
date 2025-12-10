@@ -57,6 +57,7 @@ import ProductPage from "./pages/customer/ProductPage";
 import NewsInitial from "./pages/customer/NewsInitial";
 import NewsCategoryDetail from "./pages/customer/NewsCategoryDetail";
 import NewsDetail from "./pages/customer/NewsDetail";
+import CustomerSupport from "./pages/admin/CustomerSupport";
 
 function App() {
   return (
@@ -106,7 +107,15 @@ function App() {
         >
           <Route index element={<Dashboard />} />
 
+
           {/* Only for ADMIN routes */}
+          <Route
+            path="customer-support" element={
+              <AdminRoute allowedRoles={["Admin"]}>
+                <CustomerSupport />
+              </AdminRoute>
+            }
+          />
           {/* Admin Page */}
           <Route
             path="admin"

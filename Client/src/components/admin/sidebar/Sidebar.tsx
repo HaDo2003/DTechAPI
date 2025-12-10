@@ -60,7 +60,7 @@ const Sidebar: React.FC<AdminSidebarProps> = ({
 
             {/* Customer Support */}
             <li className={menuItemClass(mainPage === "customer-support")}>
-              <Link to="/admin/chat" className={activeClass(mainPage === "customer-support")}>
+              <Link to="/admin/customer-support" className={activeClass(mainPage === "customer-support")}>
                 <i className="nav-icon bi bi-chat-dots-fill"></i>
                 <p>Customer Support</p>
               </Link>
@@ -90,7 +90,6 @@ const Sidebar: React.FC<AdminSidebarProps> = ({
                       return allowed.some((r) => (user?.roles ?? "").toLowerCase() === r);
                     })
                     .map((item) => {
-                      // Exact match or match with trailing slash to prevent partial matches
                       const isActive =
                         location.pathname === item.to ||
                         location.pathname.startsWith(item.to + "/");
