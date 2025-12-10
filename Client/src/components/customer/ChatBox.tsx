@@ -1,28 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
-import Zalo from '../../assets/zalo.png';
 import { type ChatMessage } from "../../types/ChatMessage";
 import { useSignalR } from "../../hooks/useSignalR";
 import { useAuth } from "../../context/AuthContext";
+import { chatService } from "../../services/ChatService";
 
-type FullChatProps = {
-  currentUserId: string;
-  adminId: string;
-  messages: ChatMessage[];
-};
-
-const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages }) => {
+const ChatBox: React.FC = () => {
   const { token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages || []);
-
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string>("guest");
   const chatBodyRef = useRef<HTMLDivElement | null>(null);
 
   // -----------------------------
   // USE SIGNALR HOOK
   // -----------------------------
-  const hubUrl = "https://localhost:7094/hubs/chatsHub";
-  const { connection, connected } = useSignalR(hubUrl, token);
+  const { connection } = useSignalR(token);
 
   // Auto-scroll
   useEffect(() => {
@@ -32,17 +25,51 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
   }, [chatMessages]);
 
   // -----------------------------
+  // Get user ID from server after connection
+  // -----------------------------
+  useEffect(() => {
+    if (!connection) return;
+
+    connection.on("SetUserId", (userId: string) => {
+      setCurrentUserId(userId);
+    });
+
+    return () => {
+      connection?.off("SetUserId");
+    };
+  }, [connection]);
+
+  // -----------------------------
+  // Fetch chat history when opening chat
+  // -----------------------------
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (!isOpen || !token) return;
+
+      try {
+        const history = await chatService.getChatHistory(token);
+        if (history && history.length > 0) {
+          setChatMessages(history);
+        }
+      } catch (error) {
+        console.error("Failed to load chat history:", error);
+      }
+    };
+
+    fetchHistory();
+  }, [isOpen, token]);
+
+  // -----------------------------
   // Listen for messages
   // -----------------------------
   useEffect(() => {
     if (!connection) return;
 
-    connection.on("ReceiveMessage", (senderId: string, message: string) => {
+    connection.on("ReceiveMessage", (senderId: string | null, message: string) => {
       setChatMessages(prev => [
         ...prev,
         {
-          id: Date.now().toString(),
-          senderId,
+          senderId: senderId || "guest",
           message,
           timestamp: new Date().toISOString()
         }
@@ -60,10 +87,11 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
   const handleSend = async () => {
     if (!inputValue.trim() || !connection) return;
 
-    await connection.invoke("SendMessage", adminId, inputValue);
+    // Server handles the admin ID
+    // await connection.invoke("SendMessage", null, inputValue);
+    await chatService.sendMessage(inputValue, connection);
 
     const newMessage: ChatMessage = {
-      id: Date.now().toString(),
       senderId: currentUserId,
       message: inputValue,
       timestamp: new Date().toISOString()
@@ -75,13 +103,6 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
 
   return (
     <>
-      {/* Zalo */}
-      <div className="chat-widget-zalo">
-        <a href="https://chat.zalo.me/" target="_blank" rel="noopener noreferrer" className="chat-btn-zalo">
-          <img src={Zalo} alt="Zalo Chat" className="zalo-icon" />
-        </a>
-      </div>
-
       {/* Floating Chat */}
       <div className="chat-widget">
         <button className="chat-btn" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle chat window">
@@ -96,17 +117,6 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
                 <i className="fas fa-headset me-2"></i>
                 Chat Support
               </h6>
-            </div>
-
-            {/* ⭐ Connection status */}
-            <div
-              style={{
-                padding: "5px",
-                fontSize: "12px",
-                color: connected ? "green" : "red",
-              }}
-            >
-              {connected ? "Connect success" : "Connecting..."}
             </div>
 
             <div className="chat-body" ref={chatBodyRef}>
@@ -154,4 +164,4 @@ const ChatWidget: React.FC<FullChatProps> = ({ currentUserId, adminId, messages 
   );
 };
 
-export default ChatWidget;
+export default ChatBox;

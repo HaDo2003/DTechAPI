@@ -11,19 +11,23 @@ namespace DTech.API.Hubs
     {
         public override async Task OnConnectedAsync()
         {
-            var userId = Context.UserIdentifier;
+            var userId = Context.UserIdentifier ?? "guest";
             var userName = Context.User?.Identity?.Name;
             Console.WriteLine($"User connected - UserIdentifier: {userId}, UserName: {userName}");
+
+            await Clients.Caller.SendAsync("SetUserId", userId);
+
             await base.OnConnectedAsync();
         }
 
         public async Task SendMessage(string? receiverId, string message)
         {
-            var senderId = Context.UserIdentifier;
-            Console.WriteLine($"SendMessage called - SenderId: {senderId}, ReceiverId: {receiverId}");
+            var senderId = Context.UserIdentifier ?? "guest";
 
-            senderId ??= null;
-            receiverId ??= "7aede655-1203-45b4-a00e-a0f81a812ecb";
+            const string defaultAdminId = "7aede655-1203-45b4-a00e-a0f81a812ecb";
+            receiverId ??= defaultAdminId;
+
+            Console.WriteLine($"SendMessage called - SenderId: {senderId}, ReceiverId: {receiverId}");
 
             await chatService.SaveMessageAsync(senderId, receiverId, message);
 

@@ -1,16 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 
-const pool = new Map<string, {
-  conn: signalR.HubConnection;
-  refs: number;
-  subs: Set<(s: boolean) => void>;
-  timer?: ReturnType<typeof setTimeout>;
-}>();
+/**
+ * Connection pool entry structure
+ * Stores shared connections to prevent duplicate connections to the same hub
+ */
+interface PoolEntry {
+  connection: signalR.HubConnection;
+  referenceCount: number;
+  subscribers: Set<(isConnected: boolean) => void>;
+  cleanupTimer?: ReturnType<typeof setTimeout>;
+}
 
-export const useSignalR = (hubUrl: string, token?: string | null) => {
-  const [connected, setConnected] = useState(false);
-  const connRef = useRef<signalR.HubConnection | null>(null);
+// Global pool to share connections across components
+const connectionPool = new Map<string, PoolEntry>();
+
+// Delay before actually closing a connection (handles React remounts)
+const CLEANUP_DELAY = 100;
+
+export const useSignalR = (token?: string | null) => {
+  const [_, setConnected] = useState(false);
+  const connectionRef = useRef<signalR.HubConnection | null>(null);
+  const hubUrl = "https://localhost:7094/hubs/chatsHub";
 
   useEffect(() => {
     if (!token) {
@@ -18,16 +29,35 @@ export const useSignalR = (hubUrl: string, token?: string | null) => {
       return;
     }
 
-    let entry = pool.get(hubUrl);
+    if (!hubUrl) {
+      setConnected(false);
+      return;
+    }
 
-    if (entry) {
-      clearTimeout(entry.timer);
-      entry.refs++;
-      entry.subs.add(setConnected);
-      connRef.current = entry.conn;
-      setConnected(entry.conn.state === signalR.HubConnectionState.Connected);
-    } else {
-      const conn = new signalR.HubConnectionBuilder()
+    const existingEntry = connectionPool.get(hubUrl);
+
+    // Reuse existing connection if available
+    if (existingEntry) {
+      // Cancel any pending cleanup
+      if (existingEntry.cleanupTimer) {
+        clearTimeout(existingEntry.cleanupTimer);
+        existingEntry.cleanupTimer = undefined;
+      }
+
+      // Increment reference count and subscribe this component
+      existingEntry.referenceCount++;
+      existingEntry.subscribers.add(setConnected);
+      connectionRef.current = existingEntry.connection;
+
+      // Update connection state
+      const isCurrentlyConnected =
+        existingEntry.connection.state === signalR.HubConnectionState.Connected;
+      setConnected(isCurrentlyConnected);
+    }
+    // Create new connection if none exists
+    else {
+      // Build SignalR connection
+      const newConnection = new signalR.HubConnectionBuilder()
         .withUrl(hubUrl, {
           accessTokenFactory: () => token || "",
           skipNegotiation: true,
@@ -37,49 +67,80 @@ export const useSignalR = (hubUrl: string, token?: string | null) => {
         .configureLogging(signalR.LogLevel.Error)
         .build();
 
-      const subs = new Set([setConnected]);
-      const broadcast = (s: boolean) => subs.forEach(fn => fn(s));
+      // Initialize subscribers set
+      const subscribers = new Set([setConnected]);
 
-      conn.onclose(() => {
+      // Helper function to notify all subscribers of connection state changes
+      const notifySubscribers = (isConnected: boolean) => {
+        subscribers.forEach(callback => callback(isConnected));
+      };
+
+      // Set up connection event handlers
+      newConnection.onclose(() => {
         console.log("SignalR disconnected");
-        broadcast(false);
-      });
-      conn.onreconnecting(() => {
-        console.log("SignalR reconnecting...");
-        broadcast(false);
-      });
-      conn.onreconnected(() => {
-        console.log("SignalR reconnected");
-        broadcast(true);
+        notifySubscribers(false);
       });
 
-      conn.start()
+      newConnection.onreconnecting(() => {
+        console.log("SignalR reconnecting...");
+        notifySubscribers(false);
+      });
+
+      newConnection.onreconnected(() => {
+        console.log("SignalR reconnected");
+        notifySubscribers(true);
+      });
+
+      // Start the connection
+      newConnection.start()
         .then(() => {
           console.log("SignalR connected successfully");
-          broadcast(true);
+          notifySubscribers(true);
         })
-        .catch(() => {});
+        .catch(() => {
+          // Error already logged by SignalR at Error level
+        });
 
-      entry = { conn, refs: 1, subs };
-      pool.set(hubUrl, entry);
-      connRef.current = conn;
+      // Store in pool
+      const newEntry: PoolEntry = {
+        connection: newConnection,
+        referenceCount: 1,
+        subscribers
+      };
+      connectionPool.set(hubUrl, newEntry);
+      connectionRef.current = newConnection;
     }
 
+    // Cleanup function when component unmounts
     return () => {
-      const e = pool.get(hubUrl);
-      if (!e) return;
+      const entry = connectionPool.get(hubUrl);
+      if (!entry) return;
 
-      e.subs.delete(setConnected);
-      e.timer = setTimeout(async () => {
-        if (--e.refs <= 0) {
-          pool.delete(hubUrl);
-          if (e.conn.state === signalR.HubConnectionState.Connected) {
-            await e.conn.stop().catch(() => {});
+      // Remove this component from subscribers
+      entry.subscribers.delete(setConnected);
+
+      // Schedule connection cleanup with delay (handles React Strict Mode)
+      entry.cleanupTimer = setTimeout(async () => {
+        entry.referenceCount--;
+
+        // Only close connection if no components are using it
+        if (entry.referenceCount <= 0) {
+          connectionPool.delete(hubUrl);
+
+          const isConnected =
+            entry.connection.state === signalR.HubConnectionState.Connected;
+
+          if (isConnected) {
+            await entry.connection.stop().catch(() => {
+              // Ignore stop errors
+            });
           }
         }
-      }, 100);
+      }, CLEANUP_DELAY);
     };
   }, [hubUrl, token]);
 
-  return { connection: connRef.current, connected };
+  return {
+    connection: connectionRef.current
+  };
 };
