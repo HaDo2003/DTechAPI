@@ -364,6 +364,7 @@ namespace DTech.Application.Services
             catch (Exception ex)
             {
                 await unitOfWorkService.RollbackTransactionAsync();
+                Console.WriteLine($"Debug Error: {ex.Message}");
                 return (false, ex.Message, null);
             }
         }

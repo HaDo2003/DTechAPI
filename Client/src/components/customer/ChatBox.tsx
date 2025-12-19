@@ -3,6 +3,8 @@ import { type ChatMessage } from "../../types/ChatMessage";
 import { useSignalR } from "../../hooks/useSignalR";
 import { useAuth } from "../../context/AuthContext";
 import { chatService } from "../../services/ChatService";
+import { jwtDecode } from "jwt-decode";
+import { type TokenPayload } from "../../utils/jwtDecoder";
 
 const ChatBox: React.FC = () => {
   const { token } = useAuth();
@@ -17,6 +19,24 @@ const ChatBox: React.FC = () => {
   // -----------------------------
   const { connection } = useSignalR(token);
 
+  // -----------------------------
+  // Get user ID from token on mount
+  // -----------------------------
+  useEffect(() => {
+    if (token) {
+      try {
+        const decoded = jwtDecode<TokenPayload>(token);
+        if (decoded.sub) {
+          setCurrentUserId(decoded.sub);
+        }
+      } catch (error) {
+        console.error("Failed to decode token:", error);
+      }
+    } else {
+      setCurrentUserId("guest");
+    }
+  }, [token]);
+
   // Auto-scroll
   useEffect(() => {
     if (chatBodyRef.current) {
@@ -25,7 +45,7 @@ const ChatBox: React.FC = () => {
   }, [chatMessages]);
 
   // -----------------------------
-  // Get user ID from server after connection
+  // Get user ID from server after connection (backup)
   // -----------------------------
   useEffect(() => {
     if (!connection) return;

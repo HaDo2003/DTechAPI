@@ -138,9 +138,12 @@ namespace DTech.API.Controllers
             if (string.IsNullOrWhiteSpace(query))
                 return BadRequest(new { message = "Query cannot be empty." });
 
-            var products = await productService.SearchProductsAsync(query, page, pageSize, sortOrder, userId);
+            var result = await productService.SearchProductsAsync(query, page, pageSize, sortOrder, userId);
 
-            return Ok(new { products, initialSort = sortOrder, success = true });
+            if (result == null)
+                return NotFound(new { message = "No products found.", success = false });
+
+            return Ok(new { products = result.Products, initialSort = sortOrder, success = true });
         }
 
         [HttpPost("{categorySlug}/filter")]

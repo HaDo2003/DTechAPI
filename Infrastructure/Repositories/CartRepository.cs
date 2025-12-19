@@ -83,12 +83,24 @@ namespace DTech.Infrastructure.Repositories
         }
         public async Task<bool> ClearCartAsync(Cart cart)
         {
-            if (cart != null)
+            try
             {
-                context.CartProducts.RemoveRange(cart.CartProducts);
-                await context.SaveChangesAsync();
-                return true;
+                if (cart != null)
+                {
+                    var cartProductsToRemove = await context.CartProducts
+                        .Where(cp => cp.CartId == cart.CartId)
+                        .ToListAsync();
+
+                    context.CartProducts.RemoveRange(cartProductsToRemove);
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+            } catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Clear Cart: {ex.Message}");
+                return false;
             }
+
             return false;
         }
     }

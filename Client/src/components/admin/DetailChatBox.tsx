@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
-import { chatService } from "../../services/ChatService";
 import type { ChatMessage, FullChat } from "../../types/ChatMessage";
 
 interface DetailChatBoxProps extends FullChat {
@@ -16,9 +15,6 @@ const DetailChatBox: React.FC<DetailChatBoxProps> = ({
     messages,
     connection
 }) => {
-    console.log('DetailChatBox - currentUserId (admin):', currentUserId);
-    console.log('DetailChatBox - senderId (customer):', senderId);
-
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages || []);
     const [inputMessage, setInputMessage] = useState("");
     const chatContainerRef = useRef<HTMLDivElement>(null);
