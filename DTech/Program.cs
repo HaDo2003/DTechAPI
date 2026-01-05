@@ -1,7 +1,9 @@
 using dotenv.net;
 using DTech.API.Hubs;
+using DTech.Infrastructure.Data;
 using DTech.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 //DotEnv.Load();
@@ -78,6 +80,21 @@ if (app.Environment.IsDevelopment())
         context.Response.Redirect("/swagger/v1/swagger.json");
         return Task.CompletedTask;
     });
+}
+
+// Apply migrations automatically on startup (for Docker deployment)
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DTechDbContext>();
+    try
+    {
+        dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
 }
 
 app.UseHttpsRedirection();

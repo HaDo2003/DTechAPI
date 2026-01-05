@@ -12,7 +12,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["DTech/DTech.csproj", "DTech/"]
+COPY ["DTech/DTech.API.csproj", "DTech/"]
+COPY ["Application/DTech.Application.csproj", "Application/"]
+COPY ["Domain/DTech.Domain.csproj", "Domain/"]
+COPY ["Infrastructure/DTech.Infrastructure.csproj", "Infrastructure/"]
 RUN dotnet restore "./DTech/DTech.csproj"
 COPY . .
 WORKDIR "/src/DTech"
