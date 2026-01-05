@@ -15,7 +15,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://localhost:7094',
+        // target: 'https://localhost:7094',
+        target: 'https://dtechapi.onrender.com',
         changeOrigin: true,
         secure: false,
       },
