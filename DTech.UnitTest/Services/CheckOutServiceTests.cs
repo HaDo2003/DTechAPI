@@ -25,6 +25,7 @@ namespace DTech.UnitTest.Services
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<IBackgroundTaskQueue> _backgroundTaskQueueMock;
         private readonly Mock<IEmailService> _emailServiceMock;
+        private readonly Mock<IUnitOfWorkService> _unitOfWorkMock;
         private readonly CheckOutService _checkOutService;
 
         public CheckOutServiceTests()
@@ -40,6 +41,7 @@ namespace DTech.UnitTest.Services
             _mapperMock = new Mock<IMapper>();
             _backgroundTaskQueueMock = new Mock<IBackgroundTaskQueue>();
             _emailServiceMock = new Mock<IEmailService>();
+            _unitOfWorkMock = new Mock<IUnitOfWorkService>();
 
             _checkOutService = new CheckOutService(
                 _customerRepoMock.Object,
@@ -52,7 +54,8 @@ namespace DTech.UnitTest.Services
                 _paymentRepoMock.Object,
                 _mapperMock.Object,
                 _backgroundTaskQueueMock.Object,
-                _emailServiceMock.Object
+                _emailServiceMock.Object,
+                _unitOfWorkMock.Object
             );
         }
 

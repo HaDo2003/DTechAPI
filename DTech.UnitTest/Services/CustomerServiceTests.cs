@@ -21,6 +21,7 @@ namespace DTech.UnitTest.Services
         private readonly Mock<ICloudinaryService> _cloudinaryServiceMock;
         private readonly Mock<IBackgroundTaskQueue> _backgroundTaskQueueMock;
         private readonly Mock<IEmailService> _emailServiceMock;
+        private readonly Mock<IUnitOfWorkService> _unitOfWorkService;
         private readonly CustomerService _customerService;
         public CustomerServiceTests()
         {
@@ -31,6 +32,8 @@ namespace DTech.UnitTest.Services
             _cloudinaryServiceMock = new Mock<ICloudinaryService>();
             _backgroundTaskQueueMock = new Mock<IBackgroundTaskQueue>();
             _emailServiceMock = new Mock<IEmailService>();
+            _unitOfWorkService = new Mock<IUnitOfWorkService>();
+
             _customerService = new CustomerService(
                 _customerRepositoryMock.Object,
                 _orderRepositoryMock.Object,
@@ -38,7 +41,8 @@ namespace DTech.UnitTest.Services
                 _mapperMock.Object,
                 _cloudinaryServiceMock.Object,
                 _backgroundTaskQueueMock.Object,
-                _emailServiceMock.Object
+                _emailServiceMock.Object,
+                _unitOfWorkService.Object
             );
         }
 
@@ -808,8 +812,10 @@ namespace DTech.UnitTest.Services
                 [
                     new() {
                         Id = 1,
+                        ProductId = 101,
                         Product = new Product
                         {
+                            ProductId = 101,
                             Name = "Product 1",
                             Photo = "photo1.jpg",
                             Price = 50
@@ -822,8 +828,20 @@ namespace DTech.UnitTest.Services
 
             _customerRepositoryMock.Setup(repo => repo.CheckCustomerAsync(customerId))
                 .ReturnsAsync(true);
+            
+            // Mock UnitOfWork transaction methods
+            _unitOfWorkService.Setup(uow => uow.BeginTransactionAsync())
+                .Returns(Task.CompletedTask);
+            _unitOfWorkService.Setup(uow => uow.CommitTransactionAsync())
+                .Returns(Task.CompletedTask);
+            _unitOfWorkService.Setup(uow => uow.RollbackTransactionAsync())
+                .Returns(Task.CompletedTask);
+            
             _orderRepositoryMock.Setup(repo => repo.UpdateStatusAsync(orderId, customerId, 7))
                 .ReturnsAsync(cancelledOrder);
+    
+            _productRepositoryMock.Setup(repo => repo.IncreaseStockAsync(101, 2))
+                .ReturnsAsync(true);
 
             // Act
             var result = await _customerService.CancelOrderAsync(customerId, orderId);
@@ -832,6 +850,85 @@ namespace DTech.UnitTest.Services
             result.Success.Should().BeTrue();
             result.OrderId.Should().Be(orderId);
             result.StatusName.Should().Be("Cancelled");
+    
+            // Verify the stock was restored
+            _productRepositoryMock.Verify(repo => repo.IncreaseStockAsync(101, 2), Times.Once);
+            _unitOfWorkService.Verify(uow => uow.BeginTransactionAsync(), Times.Once);
+            _unitOfWorkService.Verify(uow => uow.CommitTransactionAsync(), Times.Once);
+            _unitOfWorkService.Verify(uow => uow.RollbackTransactionAsync(), Times.Never);
+        }
+
+        [Fact]
+        public async Task CancelOrderAsync_StockRestoreFails_RollsBackTransaction()
+        {
+            // Arrange
+            var customerId = "customer123";
+            var orderId = "order123";
+
+            var cancelledOrder = new Order
+            {
+                OrderId = orderId,
+                CustomerId = customerId,
+                OrderDate = DateTime.Now,
+                Name = "John Doe",
+                NameReceive = "Jane Doe",
+                ShippingAddress = "123 Main St",
+                Address = "456 Oak St",
+                Note = "Test note",
+                CostDiscount = 10,
+                ShippingCost = 5,
+                FinalCost = 100,
+                Status = new OrderStatus { Description = "Cancelled" },
+                Payment = new Payment
+                {
+                    Status = PaymentStatusEnums.Pending,
+                    PaymentMethod = new PaymentMethod { Description = "Credit Card" }
+                },
+                OrderProducts =
+                [
+                    new() {
+                Id = 1,
+                ProductId = 101,
+                Product = new Product
+                {
+                    ProductId = 101,
+                    Name = "Product 1",
+                    Photo = "photo1.jpg",
+                    Price = 50
+                },
+                Quantity = 2,
+                CostAtPurchase = 45
+            }
+                ]
+            };
+
+            _customerRepositoryMock.Setup(repo => repo.CheckCustomerAsync(customerId))
+                .ReturnsAsync(true);
+
+            _unitOfWorkService.Setup(uow => uow.BeginTransactionAsync())
+                .Returns(Task.CompletedTask);
+            _unitOfWorkService.Setup(uow => uow.CommitTransactionAsync())
+                .Returns(Task.CompletedTask);
+            _unitOfWorkService.Setup(uow => uow.RollbackTransactionAsync())
+                .Returns(Task.CompletedTask);
+
+            _orderRepositoryMock.Setup(repo => repo.UpdateStatusAsync(orderId, customerId, 7))
+                .ReturnsAsync(cancelledOrder);
+
+            // Mock IncreaseStockAsync to return false (failure)
+            _productRepositoryMock.Setup(repo => repo.IncreaseStockAsync(101, 2))
+                .ReturnsAsync(false);
+
+            // Act
+            var result = await _customerService.CancelOrderAsync(customerId, orderId);
+
+            // Assert
+            result.Success.Should().BeFalse();
+            result.Message.Should().Be("Failed to restore stock for Product 101");
+
+            // Verify rollback was called
+            _unitOfWorkService.Verify(uow => uow.RollbackTransactionAsync(), Times.Once);
+            _unitOfWorkService.Verify(uow => uow.CommitTransactionAsync(), Times.Never);
         }
 
         // --------------------------------------------------------------------

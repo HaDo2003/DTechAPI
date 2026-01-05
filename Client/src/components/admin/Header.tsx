@@ -6,7 +6,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ user }) => {
-  
+
   return (
     <nav className="app-header navbar navbar-expand bg-body w-100">
       <div className="container-fluid">
