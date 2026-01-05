@@ -9,7 +9,7 @@ import AdminLayout from './layouts/AdminLayout';
 import AdminRoute from './routes/adminRoute';
 
 //Utils
-import ScrollToTop from './utils/scrollToTop';
+import ScrollToTop from './utils/ScrollToTop';
 import Checkout from './pages/customer/CheckOut';
 import AccessDenied from './pages/customer/AccessDenied';
 import Dashboard from './pages/admin/Dashboard';
