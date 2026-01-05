@@ -1,5 +1,5 @@
-import '../../styles/site.css'
-import '../../styles/responsive.css'
+import '../styles/site.css'
+import '../styles/responsive.css'
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Footer from "../components/customer/footer/Footer";
