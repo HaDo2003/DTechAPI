@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import DTechLogo from '@/assets/DTechlogo.png';
-import NavItem from '@/components/customer/header/desktop/NavItem';
-import MenuItem from '@/components/customer/header/desktop/MenuItem';
-import DropDownItem from '@/components/customer/header/desktop/DropDownItem';
-import AccountItem from '@/components/customer/header/AccountItem';
+import NavItem from '@/components/customer/head/NavItem';
+import MenuItem from '@/components/customer/head/MenuItem';
+import DropDownItem from '@/components/customer/head/DropDownItem';
+import AccountItem from '@/components/customer/head/AccountItem';
 
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
