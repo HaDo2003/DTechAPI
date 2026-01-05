@@ -10,10 +10,20 @@ namespace DTech.Infrastructure.Services.Background
     {
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            // Wait for 30 seconds to allow migrations to complete
+            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                await CheckAndUpdateCodeStatus();
-                await CheckEndDateDiscount();
+                try
+                {
+                    await CheckAndUpdateCodeStatus();
+                    await CheckEndDateDiscount();
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error in CodeStatusCheckerService");
+                }
                 await Task.Delay(TimeSpan.FromHours(24), stoppingToken); // Runs every 24 hours
             }
         }

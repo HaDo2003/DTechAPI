@@ -18,6 +18,10 @@ namespace DTech.Infrastructure.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_OrderProducts_Orders_OrderId",
                 table: "OrderProducts");
+            
+            // Drop the identity constraint first
+            migrationBuilder.Sql(@"ALTER TABLE ""Orders"" ALTER COLUMN ""OrderId"" DROP IDENTITY IF EXISTS;");
+            
             migrationBuilder.AlterColumn<string>(
                 name: "OrderId",
                 table: "Orders",

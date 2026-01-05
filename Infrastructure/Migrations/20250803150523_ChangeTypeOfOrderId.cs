@@ -19,14 +19,16 @@ namespace DTech.Infrastructure.Migrations
                 name: "FK_OrderProducts_Orders_OrderId",
                 table: "OrderProducts");
 
+            // Drop the identity constraint first
+            migrationBuilder.Sql(@"ALTER TABLE ""Orders"" ALTER COLUMN ""OrderId"" DROP IDENTITY IF EXISTS;");
+            
             migrationBuilder.AlterColumn<string>(
                 name: "OrderId",
                 table: "Orders",
                 type: "text",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "integer")
-                .OldAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                oldType: "integer");
 
             migrationBuilder.AlterColumn<string>(
                 name: "OrderId",

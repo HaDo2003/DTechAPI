@@ -1,0 +1,31 @@
+services:
+  dtech.api:
+    image: ${DOCKER_REGISTRY-}dtechapi
+    build:
+      context: .
+      dockerfile: DTech/Dockerfile
+    container_name: dtech_api
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DTech=Host=postgres;Database=dtechdb;Username=postgres;Password=password123
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    container_name: dtech_postgres
+    environment:
+      POSTGRES_DB: dtechdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:
