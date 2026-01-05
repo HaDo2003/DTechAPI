@@ -38,6 +38,12 @@ namespace DTech.Infrastructure.Services.Background
                     .Where(c => c.EndDate < DateOnly.FromDateTime(DateTime.Now) && c.Status != StatusEnums.Unavailable)
                     .ToList();
 
+                if (outdatedCodes == null || outdatedCodes.Count == 0)
+                {
+                    logger.LogInformation("No outdated codes found.");
+                    return;
+                }
+
                 foreach (var code in outdatedCodes)
                 {
                     code.Status = StatusEnums.Unavailable;
@@ -59,6 +65,13 @@ namespace DTech.Infrastructure.Services.Background
                 var products = dbContext.Products
                     .Where(p => p.EndDateDiscount < DateOnly.FromDateTime(DateTime.Now) && p.Discount != 0)
                     .ToList();
+
+                if (products == null || products.Count == 0)
+                {
+                    logger.LogInformation("No products with outdated discounts found.");
+                    return;
+                }
+
                 foreach (var product in products)
                 {
                     product.Discount = 0;
