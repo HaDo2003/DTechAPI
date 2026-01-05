@@ -6,11 +6,6 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vite.dev/config/
 export default defineConfig({
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src')
-    },
-  },
   plugins: [
     react(),
     tsconfigPaths(),
@@ -20,6 +15,11 @@ export default defineConfig({
       gzipSize: true,
     })
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    },
+  },
   server: {
     proxy: {
       '/api': {

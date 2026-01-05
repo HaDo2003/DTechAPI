@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import DTechLogo from '../../../../assets/DTechlogo.png';
-import NavItem from './desktop/NavItem';
-import MenuItem from './desktop/MenuItem';
-import DropDownItem from './desktop/DropDownItem';
-import AccountItem from './AccountItem';
+import NavItem from './NavItem';
+import MenuItem from './MenuItem';
+import DropDownItem from './DropDownItem';
+import AccountItem from '../AccountItem';
 
-import { useAuth } from '../../../context/AuthContext';
-import { useCart } from '../../../context/CartContext';
+import { useAuth } from '../../../../context/AuthContext';
+import { useCart } from '../../../../context/CartContext';
 
 interface HeaderProps {
     onSearch?: (query: string) => void;
