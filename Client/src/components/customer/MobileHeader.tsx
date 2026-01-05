@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react';
-import DTechLogoSmall from '../../../../assets/DTechlogosmall.png';
-import MainMenuItem from './MainMenuItem';
-import AccessoryItem from './AccessoryItem';
-import AccountItem from '../AccountItem';
+import DTechLogoSmall from '../../assets/DTechlogosmall.png';
+import MainMenuItem from './header/mobile/MainMenuItem';
+import AccessoryItem from './header/mobile/AccessoryItem';
+import AccountItem from './header/AccountItem';
 import { useNavigate } from 'react-router-dom';
 
-import { useAuth } from '../../../../context/AuthContext';
-import { useCart } from '../../../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
 
 interface MobileHeaderProps {
     searchQuery?: string;
