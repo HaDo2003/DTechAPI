@@ -25,8 +25,21 @@ namespace DTech.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
         {
+            // Get connection string, handle both DTech and DATABASE_URL formats
+            var connectionString = config.GetConnectionString("DTech");
+            
+            // If DTech connection string is empty, try DATABASE_URL (Render format)
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                if (!string.IsNullOrEmpty(databaseUrl))
+                {
+                    connectionString = ConvertDatabaseUrlToConnectionString(databaseUrl);
+                }
+            }
+            
             services.AddDbContext<DTechDbContext>(options =>
-                options.UseNpgsql(config.GetConnectionString("DTech")));
+                options.UseNpgsql(connectionString));
 
             //Identity Configuration
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -163,6 +176,15 @@ namespace DTech.Infrastructure.DependencyInjection
             services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
             return services;
+        }
+        
+        private static string ConvertDatabaseUrlToConnectionString(string databaseUrl)
+        {
+            // Parse DATABASE_URL format: postgresql://user:password@host:port/database
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            
+            return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
         }
     }
 }
