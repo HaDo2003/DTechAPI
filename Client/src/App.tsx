@@ -2,62 +2,62 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Layout
-import CustomerLayout from './layouts/CustomerLayout';
-import AdminLayout from './layouts/AdminLayout';
+import CustomerLayout from '@/layouts/CustomerLayout';
+import AdminLayout from '@/layouts/AdminLayout';
 
 // Admin Pages
-import AdminRoute from './routes/adminRoute';
+import AdminRoute from '@/routes/adminRoute';
 
 //Utils
-import ScrollToTop from './utils/ScrollToTop';
-import Checkout from './pages/customer/CheckOut';
-import AccessDenied from './pages/customer/AccessDenied';
-import Dashboard from './pages/admin/Dashboard';
-import PrivateRoute from './routes/privateRoute';
+import ScrollToTop from '@/utils/ScrollToTop';
+import Checkout from '@/pages/customer/CheckOut';
+import AccessDenied from '@/pages/customer/AccessDenied';
+import Dashboard from '@/pages/admin/Dashboard';
+import PrivateRoute from '@/routes/privateRoute';
 
 // Customer Pages
-import RouteLink from "./routes/routeLink";
-import Home from './pages/customer/Home';
-import NotFound from './pages/customer/NotFound';
-import CategoryPage from './pages/customer/CategoryPage';
-import ContactPage from './pages/customer/Contact';
-import Login from './pages/customer/Login';
-import Register from './pages/customer/Register';
-import ForgotPassword from './pages/customer/ForgotPassword';
-import ResetPassword from './pages/customer/ResetPassword';
-import CustomerAccount from './pages/customer/CustomerAccount';
-import CartPage from './pages/customer/Cart';
-import OrderSuccess from './pages/customer/OrderSuccess';
-import OrderFail from './pages/customer/OrderFail';
-import SearchPage from './pages/customer/SearchPage';
-import ManagementPage from "./pages/admin/ManagementPage";
-import AdminAccountFormPage from "./pages/admin/admin/AdminAccountFormPage";
-import AdminDelete from "./pages/admin/admin/AdminDelete";
-import AdvertisementFormPage from "./pages/admin/advertisement/AdvertisementFormPage";
-import AdvertisementDelete from "./pages/admin/advertisement/AdvertisementDelete";
-import BrandFormPage from "./pages/admin/brand/BrandFormPage";
-import BrandDelete from "./pages/admin/brand/BrandDelete";
-import CategoryFormPage from "./pages/admin/category/CategoryFormPage";
-import CategoryDelete from "./pages/admin/category/CategoryDelete";
-import CouponFormPage from "./pages/admin/coupon/CouponFormPage";
-import CouponDelete from "./pages/admin/coupon/CouponDelete";
-import CustomerFormPage from "./pages/admin/customer/CustomerFormPage";
-import FeedbackFormPage from "./pages/admin/feedback/FeedbackFormPage";
-import OrderFormPage from "./pages/admin/order/OrderFormPage";
-import PaymentMethodFormPage from "./pages/admin/payment-method/PaymentMethodFormPage";
-import PaymentMethodDelete from "./pages/admin/payment-method/PaymentMethodDelete";
-import PostFormPage from "./pages/admin/post/PostFormPage";
-import PostDelete from "./pages/admin/post/PostDelete";
-import PostCategoryFormPage from "./pages/admin/post-category/PostCategoryFormPage";
-import PostCategoryDelete from "./pages/admin/post-category/PostCategoryDelete";
-import ProductFormPage from "./pages/admin/product/ProductFormPage";
-import ProductDelete from "./pages/admin/product/ProductDelete";
-import Wishlist from "./pages/customer/Wishlist";
-import ProductPage from "./pages/customer/ProductPage";
-import NewsInitial from "./pages/customer/NewsInitial";
-import NewsCategoryDetail from "./pages/customer/NewsCategoryDetail";
-import NewsDetail from "./pages/customer/NewsDetail";
-import CustomerSupport from "./pages/admin/CustomerSupport";
+import RouteLink from "@/routes/routeLink";
+import Home from '@/pages/customer/Home';
+import NotFound from '@/pages/customer/NotFound';
+import CategoryPage from '@/pages/customer/CategoryPage';
+import ContactPage from '@/pages/customer/Contact';
+import Login from '@/pages/customer/Login';
+import Register from '@/pages/customer/Register';
+import ForgotPassword from '@/pages/customer/ForgotPassword';
+import ResetPassword from '@/pages/customer/ResetPassword';
+import CustomerAccount from '@/pages/customer/CustomerAccount';
+import CartPage from '@/pages/customer/Cart';
+import OrderSuccess from '@/pages/customer/OrderSuccess';
+import OrderFail from '@/pages/customer/OrderFail';
+import SearchPage from '@/pages/customer/SearchPage';
+import ManagementPage from "@/pages/admin/ManagementPage";
+import AdminAccountFormPage from "@/pages/admin/admin/AdminAccountFormPage";
+import AdminDelete from "@/pages/admin/admin/AdminDelete";
+import AdvertisementFormPage from "@/pages/admin/advertisement/AdvertisementFormPage";
+import AdvertisementDelete from "@/pages/admin/advertisement/AdvertisementDelete";
+import BrandFormPage from "@/pages/admin/brand/BrandFormPage";
+import BrandDelete from "@/pages/admin/brand/BrandDelete";
+import CategoryFormPage from "@/pages/admin/category/CategoryFormPage";
+import CategoryDelete from "@/pages/admin/category/CategoryDelete";
+import CouponFormPage from "@/pages/admin/coupon/CouponFormPage";
+import CouponDelete from "@/pages/admin/coupon/CouponDelete";
+import CustomerFormPage from "@/pages/admin/customer/CustomerFormPage";
+import FeedbackFormPage from "@/pages/admin/feedback/FeedbackFormPage";
+import OrderFormPage from "@/pages/admin/order/OrderFormPage";
+import PaymentMethodFormPage from "@/pages/admin/payment-method/PaymentMethodFormPage";
+import PaymentMethodDelete from "@/pages/admin/payment-method/PaymentMethodDelete";
+import PostFormPage from "@/pages/admin/post/PostFormPage";
+import PostDelete from "@/pages/admin/post/PostDelete";
+import PostCategoryFormPage from "@/pages/admin/post-category/PostCategoryFormPage";
+import PostCategoryDelete from "@/pages/admin/post-category/PostCategoryDelete";
+import ProductFormPage from "@/pages/admin/product/ProductFormPage";
+import ProductDelete from "@/pages/admin/product/ProductDelete";
+import Wishlist from "@/pages/customer/Wishlist";
+import ProductPage from "@/pages/customer/ProductPage";
+import NewsInitial from "@/pages/customer/NewsInitial";
+import NewsCategoryDetail from "@/pages/customer/NewsCategoryDetail";
+import NewsDetail from "@/pages/customer/NewsDetail";
+import CustomerSupport from "@/pages/admin/CustomerSupport";
 
 function App() {
   return (
