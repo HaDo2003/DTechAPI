@@ -2,14 +2,14 @@ import '../styles/site.css'
 import '../styles/responsive.css'
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import DesktopHeader from "../components/customer/header/desktop/DesktopHeader";
-import MobileHeader from "../components/customer/header/mobile/MobileHeader";
-import Footer from "../components/customer/footer/Footer";
-import Breadcrumb from "../components/customer/Breadcrumb";
-import ChatBox from "../components/customer/ChatBox";
-import { visitorDataService } from '../services/VisitorDataService';
-import { useAuth } from '../context/AuthContext';
-import ZaloBox from '../components/customer/ZaloBox';
+import DesktopHeader from "../components/customer/header/desktop/DesktopHeader.tsx";
+import MobileHeader from "../components/customer/header/mobile/MobileHeader.tsx";
+import Footer from "../components/customer/footer/Footer.tsx";
+import Breadcrumb from "../components/customer/Breadcrumb.tsx";
+import ChatBox from "../components/customer/ChatBox.tsx";
+import { visitorDataService } from '../services/VisitorDataService.ts';
+import { useAuth } from '../context/AuthContext.ts';
+import ZaloBox from '../components/customer/ZaloBox.tsx';
 // import { AuthDebugger } from "../context/AuthContext";
 
 const CustomerLayout: React.FC = () => {
