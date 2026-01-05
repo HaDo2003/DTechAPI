@@ -4,7 +4,7 @@ using DTech.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
-DotEnv.Load();
+//DotEnv.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

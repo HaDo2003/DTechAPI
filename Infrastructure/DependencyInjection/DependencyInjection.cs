@@ -54,8 +54,12 @@ namespace DTech.Infrastructure.DependencyInjection
 
             // Jwt Authentication
             var jwtSettings = config.GetSection("Jwt");
-            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
-            var key = Encoding.UTF8.GetBytes(jwtKey!) ?? throw new InvalidOperationException("JWT Key not found");
+            var jwtKey =
+                Environment.GetEnvironmentVariable("JWT_KEY")
+                ?? config["Jwt:Key"]
+                ?? throw new InvalidOperationException("JWT Key not found");
+
+            var key = Encoding.UTF8.GetBytes(jwtKey);
 
             services.AddAuthentication(options =>
             {
