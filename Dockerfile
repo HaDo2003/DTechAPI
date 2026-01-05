@@ -30,4 +30,4 @@ RUN dotnet publish "./DTech.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "DTech.dll"]
+ENTRYPOINT ["dotnet", "DTech.API.dll"]
