@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
-import DTechLogoSmall from '@/assets/DTechlogosmall.png';
-import MainMenuItem from '@/components/customer/head/mobile/MainMenuItem';
-import AccessoryItem from '@/components/customer/head/mobile/AccessoryItem';
-import AccountItem from '@/components/customer/head/AccountItem';
+import DTechLogoSmall from '../../assets/DTechlogosmall.png';
+import MainMenuItem from './head/mobile/MainMenuItem';
+import AccessoryItem from './head/mobile/AccessoryItem';
+import AccountItem from './head/AccountItem';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
