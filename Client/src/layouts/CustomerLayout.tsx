@@ -3,7 +3,7 @@ import '../styles/responsive.css'
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import DesktopHeader from "../components/customer/header/desktop/DesktopHeader";
-import MobileHeader from "../components/customer/header/mobile/MobileHeader.tsx";
+import MobileHeader from "../components/customer/header/mobile/MobileHeader";
 import Footer from "../components/customer/footer/Footer";
 import Breadcrumb from "../components/customer/Breadcrumb";
 import ChatBox from "../components/customer/ChatBox";
