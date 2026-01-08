@@ -26,7 +26,6 @@ export default defineConfig({
         // target: 'https://localhost:7094',
         target: 'https://dtechapi.onrender.com',
         changeOrigin: true,
-        secure: false,
       },
     },
   },

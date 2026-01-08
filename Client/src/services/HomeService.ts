@@ -12,6 +12,6 @@ export interface HomePageData {
 }
 
 export const getHomeData = async (): Promise<HomePageData> => {
-  const res = await axios.get<HomePageData>("/api/home");
+  const res = await axios.get<HomePageData>("/home");
   return res.data;
 };
