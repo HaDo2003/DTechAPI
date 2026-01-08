@@ -1,4 +1,5 @@
-import axios from "axios";
+// import axios from "axios";
+import axios from "../utils/axiosInstance";
 import type { Advertisement } from "../types/Advertisment";
 import type { Product } from "../types/Product";
 
