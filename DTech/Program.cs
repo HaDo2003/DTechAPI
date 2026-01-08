@@ -55,7 +55,8 @@ builder.Services.AddCors(options =>
                 "http://localhost:5173",
                 "https://localhost:5173",
                 "https://www.dtech-iu.me",
-                "https://dtech-iu.me"
+                "https://dtech-iu.me",
+                "https://dtech-api.vercel.app"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()
