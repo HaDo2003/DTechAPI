@@ -20,15 +20,16 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     },
   },
-  server: {
-    proxy: {
-      '/api': {
-        // target: 'https://localhost:7094',
-        target: 'https://dtechapi.onrender.com',
-        changeOrigin: true,
-      },
-    },
-  },
+  // server: {
+  //   proxy: {
+  //     '/api': {
+  //       // target: 'https://localhost:7094',
+  //       target: 'https://dtechapi.onrender.com',
+  //       changeOrigin: true,
+  //       secure: true,
+  //     },
+  //   },
+  // },
   build: {
     rollupOptions: {
       output: {
