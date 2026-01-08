@@ -54,7 +54,8 @@ builder.Services.AddCors(options =>
               .WithOrigins(
                 "http://localhost:5173",
                 "https://localhost:5173",
-                "https://www.dtech-iu.me/"
+                "https://www.dtech-iu.me",
+                "https://dtech-iu.me"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()

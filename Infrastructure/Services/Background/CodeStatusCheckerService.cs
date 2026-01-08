@@ -10,8 +10,8 @@ namespace DTech.Infrastructure.Services.Background
     {
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // Wait for 30 seconds to allow migrations to complete
-            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+            // Wait for 60 seconds to allow migrations and app startup to complete
+            await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken);
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -20,11 +20,26 @@ namespace DTech.Infrastructure.Services.Background
                     await CheckAndUpdateCodeStatus();
                     await CheckEndDateDiscount();
                 }
+                catch (OperationCanceledException)
+                {
+                    // This is expected when the application is shutting down
+                    logger.LogInformation("CodeStatusCheckerService is stopping.");
+                    break;
+                }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error in CodeStatusCheckerService");
+                    logger.LogError(ex, "Error in CodeStatusCheckerService: {Message}", ex.Message);
                 }
-                await Task.Delay(TimeSpan.FromHours(24), stoppingToken); // Runs every 24 hours
+
+                try
+                {
+                    await Task.Delay(TimeSpan.FromHours(24), stoppingToken); // Runs every 24 hours
+                }
+                catch (OperationCanceledException)
+                {
+                    // This is expected when the application is shutting down
+                    break;
+                }
             }
         }
 
