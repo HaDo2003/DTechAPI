@@ -2,11 +2,11 @@ import '../styles/site.css'
 import '../styles/responsive.css'
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import DesktopHeader from "../components/customer/header/desktop/DesktopHeader";
-import MobileHeader from "../components/customer/header/mobile/MobileHeader";
 import Footer from "../components/customer/footer/Footer";
 import Breadcrumb from "../components/customer/Breadcrumb";
 import ChatBox from "../components/customer/ChatBox";
+import DesktopHeader from "../components/customer/DesktopHeader";
+import MobileHeader from "../components/customer/MobileHeader";
 import { visitorDataService } from '../services/VisitorDataService';
 import { useAuth } from '../context/AuthContext';
 import ZaloBox from '../components/customer/ZaloBox';
