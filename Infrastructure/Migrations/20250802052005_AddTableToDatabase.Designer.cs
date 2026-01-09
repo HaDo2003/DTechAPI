@@ -432,11 +432,9 @@ namespace DTech.Infrastructure.Migrations
 
             modelBuilder.Entity("DTech.Domain.Entities.Order", b =>
                 {
-                    b.Property<int>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderId"));
+                    b.Property<string>("OrderId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Address")
                         .HasColumnType("text");
@@ -541,8 +539,8 @@ namespace DTech.Infrastructure.Migrations
                     b.Property<int?>("CouponId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("integer");
+                    b.Property<string>("OrderId")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -567,8 +565,8 @@ namespace DTech.Infrastructure.Migrations
                     b.Property<decimal?>("InitialCost")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("integer");
+                    b.Property<string>("OrderId")
+                        .HasColumnType("text");
 
                     b.Property<decimal?>("Price")
                         .HasColumnType("numeric");

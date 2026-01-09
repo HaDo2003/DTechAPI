@@ -7,7 +7,6 @@ namespace DTech.Domain.Entities
     {
         [Key]
         [Display(Name = "ID")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? OrderId { get; set; }
 
         [Display(Name = "Customer")]
@@ -24,7 +23,7 @@ namespace DTech.Domain.Entities
         [Display(Name = "Order Date")]
         public DateTime? OrderDate { get; set; }
 
-        //Billing 
+        //Billing
         [Display(Name = "Billing Name")]
         public string? Name { get; set; }
 

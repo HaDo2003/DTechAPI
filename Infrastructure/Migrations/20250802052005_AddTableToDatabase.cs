@@ -624,8 +624,7 @@ namespace DTech.Infrastructure.Migrations
                 name: "Orders",
                 columns: table => new
                 {
-                    OrderId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    OrderId = table.Column<string>(type: "text", nullable: false),
                     CustomerId = table.Column<string>(type: "text", nullable: true),
                     PaymentId = table.Column<int>(type: "integer", nullable: true),
                     ShippingId = table.Column<int>(type: "integer", nullable: true),
@@ -706,7 +705,7 @@ namespace DTech.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    OrderId = table.Column<int>(type: "integer", nullable: true),
+                    OrderId = table.Column<string>(type: "text", nullable: true),
                     CouponId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
@@ -730,7 +729,7 @@ namespace DTech.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    OrderId = table.Column<int>(type: "integer", nullable: true),
+                    OrderId = table.Column<string>(type: "text", nullable: true),
                     ProductId = table.Column<int>(type: "integer", nullable: true),
                     InitialCost = table.Column<decimal>(type: "numeric", nullable: true),
                     Price = table.Column<decimal>(type: "numeric", nullable: true),
