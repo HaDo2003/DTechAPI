@@ -9,7 +9,7 @@ const Slider: React.FC<SliderProps> = ({ advertisements }) => {
   return (
     <div id="carouselExampleAutoplaying" className="carousel slide mb-0" data-bs-ride="carousel">
       <div className="carousel-indicators">
-        {advertisements.map((_, i) => (
+        {(advertisements || []).map((_, i) => (
           <button
             key={i}
             type="button"
@@ -23,7 +23,7 @@ const Slider: React.FC<SliderProps> = ({ advertisements }) => {
       </div>
 
       <div className="carousel-inner">
-        {advertisements.map((slider, i) => (
+        {(advertisements || []).map((slider, i) => (
           <div key={slider.advertisementId} className={`carousel-item ${i === 0 ? "active" : ""} c-item`}>
             <img
               src={slider.image}

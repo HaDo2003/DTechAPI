@@ -90,7 +90,7 @@ const CustomerSupport: React.FC = () => {
                                 </div>
 
                                 <div className="card-body">
-                                    {chatList.map((chat, index) => {
+                                    {(chatList || []).map((chat, index) => {
                                         const isUnread = chat.senderId && unreadChats.has(chat.senderId);
                                         const isActive = selectedChat?.senderId === chat.senderId;
                                         return (

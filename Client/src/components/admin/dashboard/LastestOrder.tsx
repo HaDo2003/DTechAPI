@@ -56,7 +56,7 @@ const LatestOrder: React.FC<LatestOrdersProps> = ({ orders }) => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {(orders || []).map((order) => (
                 <tr key={order.orderId}>
                   <td>
                     <Link

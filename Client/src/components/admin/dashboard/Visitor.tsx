@@ -44,11 +44,17 @@ const OnlineStoreVisitors: React.FC<OnlineStoreVisitorsProps> = ({ visitorCounts
     });
 
     const totalVisitors = visitorCounts.reduce((sum, item) => sum + (item.count ?? 0), 0);
-    const currentWeek = weeks[weeks.length - 1];
-    const previousWeek = weeks[weeks.length - 2];
+    
+    // Handle empty weeks array safely
+    const currentWeek = weeks.length > 0 ? weeks[weeks.length - 1] : undefined;
+    const previousWeek = weeks.length > 1 ? weeks[weeks.length - 2] : undefined;
 
-    const currentWeekTotal = groupedByWeek[currentWeek]?.reduce((sum, item) => sum + (item.count ?? 0), 0) || 0;
-    const previousWeekTotal = groupedByWeek[previousWeek]?.reduce((sum, item) => sum + (item.count ?? 0), 0) || 0;
+    const currentWeekTotal = currentWeek !== undefined 
+        ? (groupedByWeek[currentWeek]?.reduce((sum, item) => sum + (item.count ?? 0), 0) || 0) 
+        : 0;
+    const previousWeekTotal = previousWeek !== undefined 
+        ? (groupedByWeek[previousWeek]?.reduce((sum, item) => sum + (item.count ?? 0), 0) || 0) 
+        : 0;
 
     const percentageChange = previousWeekTotal > 0
         ? (((currentWeekTotal - previousWeekTotal) / previousWeekTotal) * 100).toFixed(1)
@@ -131,12 +137,18 @@ const OnlineStoreVisitors: React.FC<OnlineStoreVisitorsProps> = ({ visitorCounts
 
                 {/* Chart */}
                 <div className="position-relative mb-1">
-                    <Chart
-                        options={options}
-                        series={series}
-                        type="line"
-                        height={200}
-                    />
+                    {weeks.length > 0 ? (
+                        <Chart
+                            options={options}
+                            series={series}
+                            type="line"
+                            height={200}
+                        />
+                    ) : (
+                        <div className="text-center text-muted py-5">
+                            <p>No visitor data available</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Legend */}

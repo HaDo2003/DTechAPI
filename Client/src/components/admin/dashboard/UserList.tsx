@@ -8,7 +8,7 @@ interface LatestMembersProps {
 }
 
 const UserList: React.FC<LatestMembersProps> = ({ customers }) => {
-  const count = customers.length;
+  const count = (customers || []).length;
 
   return (
     <div className="col-md-6">
@@ -33,7 +33,7 @@ const UserList: React.FC<LatestMembersProps> = ({ customers }) => {
         {/* Card Body */}
         <div className="card-body p-0">
           <div className="row text-center m-1">
-            {customers.map((customer, index) => (
+            {(customers || []).map((customer, index) => (
               <div className="col-3 p-2" key={index}>
                 <img
                   className="img-fluid rounded-circle"
