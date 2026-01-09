@@ -95,7 +95,8 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<DTechDbContext>();
     try
     {
-        dbContext.Database.Migrate();
+        await dbContext.Database.MigrateAsync();
+        await DbSeeder.SeedAsync(dbContext, scope.ServiceProvider);
     }
     catch (Exception ex)
     {
