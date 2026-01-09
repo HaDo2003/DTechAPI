@@ -27,9 +27,14 @@ namespace DTech.Infrastructure.DependencyInjection
         {
             // Get connection string, handle both DTech and DATABASE_URL formats
             var connectionString = config.GetConnectionString("DTech");
-            
+
+            // If connectionString is in postgresql:// format, convert it
+            if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
+            {
+                connectionString = ConvertDatabaseUrlToConnectionString(connectionString);
+            }
             // If DTech connection string is empty, try DATABASE_URL (Render format)
-            if (string.IsNullOrEmpty(connectionString))
+            else if (string.IsNullOrEmpty(connectionString))
             {
                 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
                 if (!string.IsNullOrEmpty(databaseUrl))
@@ -37,7 +42,15 @@ namespace DTech.Infrastructure.DependencyInjection
                     connectionString = ConvertDatabaseUrlToConnectionString(databaseUrl);
                 }
             }
-            
+
+            // Validate connection string exists
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "Database connection string not found. Please set either 'ConnectionStrings__DTech' " +
+                    "or 'DATABASE_URL' environment variable.");
+            }
+
             services.AddDbContext<DTechDbContext>(options =>
                 options.UseNpgsql(connectionString));
 
@@ -101,7 +114,7 @@ namespace DTech.Infrastructure.DependencyInjection
                         {
                             var accessToken = context.Request.Query["access_token"];
                             var path = context.HttpContext.Request.Path;
-                            
+
                             if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
                             {
                                 context.Token = accessToken;
@@ -172,19 +185,22 @@ namespace DTech.Infrastructure.DependencyInjection
             }
 
             services.AddSignalR();
-            
+
             services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
             return services;
         }
-        
+
         private static string ConvertDatabaseUrlToConnectionString(string databaseUrl)
         {
             // Parse DATABASE_URL format: postgresql://user:password@host:port/database
             var uri = new Uri(databaseUrl);
             var userInfo = uri.UserInfo.Split(':');
             
-            return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+            // Use default PostgreSQL port (5432) if not specified
+            var port = uri.Port > 0 ? uri.Port : 5432;
+
+            return $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
         }
     }
 }
