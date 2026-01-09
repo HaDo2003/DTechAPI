@@ -85,9 +85,10 @@ const Sidebar: React.FC<AdminSidebarProps> = ({
                 <ul className="nav nav-treeview">
                   {informationMenu
                     .filter((item) => {
-                      if (!item.roles || item.roles.length === 0) return true;
+                      if (!item.roles || !Array.isArray(item.roles) || item.roles.length === 0) return true;
+                      const userRole = (user?.roles ?? "").toLowerCase();
                       const allowed = item.roles.map((r) => r.toLowerCase());
-                      return allowed.some((r) => (user?.roles ?? "").toLowerCase() === r);
+                      return allowed.includes(userRole);
                     })
                     .map((item) => {
                       const isActive =
