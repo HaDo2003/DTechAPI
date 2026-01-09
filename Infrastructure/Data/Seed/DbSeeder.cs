@@ -806,7 +806,7 @@ public static class DbSeeder
             MadeIn = "USA",
             Photo = "https://res.cloudinary.com/dwbibirzk/image/upload/v1746971153/Pre-thesis/Product/r37gw9kkenkh9htlaxg6.jpg",
             CreatedBy = "Admin1",
-            CreateDate = DateTime.Parse("2025-05-11 21:43:13.177584+07").ToUniversalTime(),
+            CreateDate = DateTime.SpecifyKind(DateTime.Parse("2025-05-11 14:43:13.177584"), DateTimeKind.Utc),
             Status = StatusEnums.Available
         },
         new() { BrandId=3, CategoryId=12, Name="DareU EH733 Headphones", Slug="dareu-eh733-headphones", Warranty="12", QuantityInStock=10, InitialCost=37, Price=37, Discount=0, PriceAfterDiscount=37, MadeIn="China", Photo="https://res.cloudinary.com/dwbibirzk/image/upload/v1746971439/Pre-thesis/Product/cnzutgunppuf3jkimneg.jpg", CreatedBy="Admin1", CreateDate = DateTime.UtcNow, Status = StatusEnums.Available },
@@ -831,7 +831,7 @@ public static class DbSeeder
             MadeIn = "China",
             Photo = "https://res.cloudinary.com/dwbibirzk/image/upload/v1746971872/Pre-thesis/Product/zzrvwv6pdej0jtybowlu.jpg",
             CreatedBy = "Admin1",
-            CreateDate = DateTime.Parse("2025-05-11 20:57:48.781543+07").ToUniversalTime(),
+            CreateDate = DateTime.SpecifyKind(DateTime.Parse("2025-05-11 13:57:48.781543"), DateTimeKind.Utc),
             Status = StatusEnums.Available
         },
 
@@ -851,7 +851,7 @@ public static class DbSeeder
             MadeIn = "USA",
             Photo = "https://res.cloudinary.com/dwbibirzk/image/upload/v1746971985/Pre-thesis/Product/bswaoqtehndbzwexgwdx.jpg",
             CreatedBy = "Admin1",
-            CreateDate = DateTime.Parse("2025-05-11 20:59:41.477143+07").ToUniversalTime(),
+            CreateDate = DateTime.SpecifyKind(DateTime.Parse("2025-05-11 13:59:41.477143"), DateTimeKind.Utc),
             Status = StatusEnums.Available
         },
 
@@ -870,7 +870,7 @@ public static class DbSeeder
             MadeIn = "China",
             Photo = "https://res.cloudinary.com/dwbibirzk/image/upload/v1746972084/Pre-thesis/Product/qsvqqxs87pbgpxesonbz.jpg",
             CreatedBy = "Admin1",
-            CreateDate = DateTime.Parse("2025-05-11 21:01:21.09041+07").ToUniversalTime(),
+            CreateDate = DateTime.SpecifyKind(DateTime.Parse("2025-05-11 14:01:21.09041"), DateTimeKind.Utc),
             Status = StatusEnums.Available
         },
 
@@ -890,7 +890,7 @@ public static class DbSeeder
             MadeIn = "USA",
             Photo = "https://res.cloudinary.com/dwbibirzk/image/upload/v1746972262/Pre-thesis/Product/evtbjswn6hfgke4sk5x5.jpg",
             CreatedBy = "Admin1",
-            CreateDate = DateTime.Parse("2025-05-11 21:04:18.663014+07").ToUniversalTime(),
+            CreateDate = DateTime.SpecifyKind(DateTime.Parse("2025-05-11 14:04:18.663014"), DateTimeKind.Utc),
             Status = StatusEnums.Available
         },
         new() { BrandId=5, CategoryId=10, Name="Logitech G102 Gen 2 Lightsync White Mouse", Slug="logitech-g102-gen-2-lightsync-white-mouse", Warranty="12", QuantityInStock=10, InitialCost=23, Price=23, Discount=0, PriceAfterDiscount=23, MadeIn="Korea", Photo="https://res.cloudinary.com/dwbibirzk/image/upload/v1746972311/Pre-thesis/Product/hffjteanuhmgjkkpqtfr.jpg", CreatedBy="Admin1", CreateDate = DateTime.UtcNow, Status = StatusEnums.Available },
@@ -913,7 +913,7 @@ public static class DbSeeder
             MadeIn = "USA",
             Photo = "https://res.cloudinary.com/dwbibirzk/image/upload/v1760019739/logipopkey_a7w2gt.png",
             CreatedBy = "Admin1",
-            CreateDate = new DateTime(2025, 10, 11, 21, 06, 26),
+            CreateDate = DateTime.SpecifyKind(new DateTime(2025, 10, 11, 21, 06, 26), DateTimeKind.Utc),
             Status = StatusEnums.Available
         },
 
@@ -934,8 +934,8 @@ public static class DbSeeder
             MadeIn = "Japan",
             Photo = "https://res.cloudinary.com/dwbibirzk/image/upload/v1760540702/Pre-thesis/Product/ujuldib35jhrneqcc6aw.jpg",
             CreatedBy = "Admin1",
-            CreateDate = new DateTime(2025, 10, 15, 22, 04, 58),
-            UpdateDate = new DateTime(2025, 10, 15, 22, 25, 24),
+            CreateDate = DateTime.SpecifyKind(new DateTime(2025, 10, 15, 22, 04, 58), DateTimeKind.Utc),
+            UpdateDate = DateTime.SpecifyKind(new DateTime(2025, 10, 15, 22, 25, 24), DateTimeKind.Utc),
             UpdatedBy = "Admin1",
             Status = StatusEnums.Available
         }
