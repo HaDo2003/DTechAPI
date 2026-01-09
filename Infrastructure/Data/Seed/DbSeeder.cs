@@ -19,6 +19,7 @@ public static class DbSeeder
         await SeedProvincesAsync(context);
         await SeedRolesAsync(serviceProvider);
         await SeedAdminAsync(serviceProvider);
+        await SeedProductsAsync(context);
     }
 
     private static async Task SeedRolesAsync(IServiceProvider serviceProvider)
@@ -103,7 +104,7 @@ public static class DbSeeder
 
         const string adminRole = "Admin";
         const string adminEmail = "admin@gmail.com";
-        const string adminPassword = "Admin@123"; // change in production
+        const string adminPassword = "Admin@123";
 
         // 1️⃣ Ensure role exists
         if (!await roleManager.RoleExistsAsync(adminRole))
