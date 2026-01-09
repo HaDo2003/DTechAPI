@@ -111,7 +111,7 @@ const CustomerSupport: React.FC = () => {
                                                 <div style={{ position: 'relative' }}>
                                                     <img
                                                         alt={chat.senderName || "User"}
-                                                        src={chat.avatarUrl || "/assets/default-avatar.jpg"}
+                                                        src={chat.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.senderName || 'User')}&background=0D8ABC&color=fff&size=128`}
                                                         className="rounded-circle"
                                                         style={{ width: 48, height: 48, objectFit: 'cover' }}
                                                     />

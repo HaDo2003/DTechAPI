@@ -49,7 +49,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
                 <div className="d-flex">
                   <div className="flex-shrink-0">
                     <img
-                      src="/assets/default-avatar.jpg"
+                      src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff&size=128"
                       alt="User Avatar"
                       className="img-size-50 rounded-circle me-3"
                     />
@@ -111,7 +111,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
           <li className="nav-item dropdown user-menu">
             <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">
               <img
-                src={user?.avatar || "/assets/default-avatar.jpg"}
+                src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.userName || 'Guest')}&background=0D8ABC&color=fff&size=128`}
                 className="user-image rounded-circle shadow"
                 alt={user?.userName || "User"}
               />
@@ -120,7 +120,7 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
             <ul className="dropdown-menu dropdown-menu-lg dropdown-menu-end">
               <li className="user-header text-bg-primary">
                 <img
-                  src={user?.avatar || "/assets/default-avatar.jpg"}
+                  src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.userName || 'Guest')}&background=0D8ABC&color=fff&size=128`}
                   className="rounded-circle shadow"
                   alt="User"
                 />
