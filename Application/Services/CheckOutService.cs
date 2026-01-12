@@ -621,7 +621,7 @@ namespace DTech.Application.Services
             return paymentMethodId switch
             {
                 1 => PaymentMethodEnums.COD,
-                3 => PaymentMethodEnums.VNPay,
+                2 => PaymentMethodEnums.VNPay,
                 _ => throw new Exception("Unsupported payment method")
             };
         }
