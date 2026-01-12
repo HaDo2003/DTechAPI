@@ -461,6 +461,7 @@ namespace DTech.Application.Services
         {
             var order = new Order
             {
+                OrderId = Guid.NewGuid().ToString(),
                 CustomerId = customerId,
                 ShippingId = shippingId,
                 PaymentId = paymentId,
