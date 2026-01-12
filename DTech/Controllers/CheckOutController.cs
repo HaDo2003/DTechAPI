@@ -119,20 +119,20 @@ namespace DTech.API.Controllers
 
                 if (result == null)
                 {
-                    return Redirect($"https://www.dtech-iu.me//order-fail/order-failed");
+                    return Redirect($"https://www.dtech-iu.me/order-fail/order-failed");
                 }
 
-                return Redirect($"https://www.dtech-iu.me//order-success/{orderId}");
+                return Redirect($"https://www.dtech-iu.me/order-success/{orderId}");
             }
             catch (VnpayException ex)
             {
                 Console.WriteLine($"VNPAY Exception: {ex.Message}");
-                return Redirect($"https://www.dtech-iu.me//order-fail/order-failed");
+                return Redirect($"https://www.dtech-iu.me/order-fail/order-failed");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
-                return Redirect($"https://www.dtech-iu.me//order-fail/order-failed");
+                return Redirect($"https://www.dtech-iu.me/order-fail/order-failed");
             }
         }
     }
