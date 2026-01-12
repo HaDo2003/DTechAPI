@@ -24,5 +24,22 @@ namespace DTech.Infrastructure.Repositories
                 return null;
             }
         }
+
+        public async Task<bool> UpdateAsync(Payment payment)
+        {
+            try
+            {
+                context.ChangeTracker.Clear();
+                context.Payments.Update(payment);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating payment: {ex.Message}");
+                Console.WriteLine($"Inner exception: {ex.InnerException?.Message}");
+                return false;
+            }
+        }
     }
 }

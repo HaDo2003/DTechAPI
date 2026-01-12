@@ -17,6 +17,7 @@ export interface OrderSuccessModel {
     phone?: string;
     email?: string;
     paymentMethod?: PaymentMethod;
+    paymentUrl?: string;
     address?: string;
     shippingAddress?: string;
     shippingCost?: number;

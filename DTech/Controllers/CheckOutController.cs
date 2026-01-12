@@ -1,9 +1,12 @@
 ﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
+using DTech.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using VNPAY;
+using VNPAY.Models.Exceptions;
 
 namespace DTech.API.Controllers
 {
@@ -11,7 +14,8 @@ namespace DTech.API.Controllers
     [Route("api/[controller]")]
     [Authorize]
     public class CheckOutController(
-        ICheckOutService checkOutService
+        ICheckOutService checkOutService,
+        IVnpayClient vnpayClient
     ) : ControllerBase
     {
         [HttpGet("check-out")]
@@ -98,6 +102,38 @@ namespace DTech.API.Controllers
                 return BadRequest(new { success = false, response.Message });
 
             return Ok(response);
+        }
+
+        [HttpGet("vnpay-callback")]
+        public IActionResult VnPayCallback()
+        {
+            try
+            {
+                var paymentResult = vnpayClient.GetPaymentResult(this.Request);
+
+                var orderId = long.Parse(
+                    paymentResult.Description.Replace("ORDER_", "")
+                ).ToString();
+
+                var result = checkOutService.HandleVnPayCallback(orderId);
+
+                if (result == null)
+                {
+                    return Redirect($"http://localhost:5173/order-fail/order-failed");
+                }
+
+                return Redirect($"http://localhost:5173/order-success/{orderId}");
+            }
+            catch (VnpayException ex)
+            {
+                Console.WriteLine($"VNPAY Exception: {ex.Message}");
+                return Redirect($"http://localhost:5173/order-fail/order-failed");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return Redirect($"http://localhost:5173/order-fail/order-failed");
+            }
         }
     }
 }
