@@ -21,15 +21,13 @@ namespace DTech.API.Controllers
             {
                 var paymentResult = vnpayClient.GetPaymentResult(this.Request);
 
-                var orderId = long.Parse(
-                    paymentResult.Description.Replace("ORDER_", "")
-                ).ToString();
+                var orderId = paymentResult.Description.Replace("ORDER_", "");
 
                 var result = checkOutService.HandleVnPayCallback(orderId);
 
                 if (result == null)
                 {
-                    return Redirect($"https://www.dtech-iu.me/order-fail/order-failed");
+                    return Redirect($"https://www.dtech-iu.me/order-fail");
                 }
 
                 return Redirect($"https://www.dtech-iu.me/order-success/{orderId}");
@@ -37,12 +35,12 @@ namespace DTech.API.Controllers
             catch (VnpayException ex)
             {
                 Console.WriteLine($"VNPAY Exception: {ex.Message}");
-                return Redirect($"https://www.dtech-iu.me/order-fail/order-failed");
+                return Redirect($"https://www.dtech-iu.me/order-fail");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception: {ex.Message}");
-                return Redirect($"https://www.dtech-iu.me/order-fail/order-failed");
+                return Redirect($"https://www.dtech-iu.me/order-fail");
             }
         }
     }
