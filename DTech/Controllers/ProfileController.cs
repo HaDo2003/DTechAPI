@@ -50,7 +50,7 @@ namespace DTech.API.Controllers
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
+
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
@@ -73,8 +73,8 @@ namespace DTech.API.Controllers
             if (!response.Success)
                 return BadRequest(new { response.Message });
 
-            return Ok(new 
-            { 
+            return Ok(new
+            {
                 Message = "Add Address successfully.",
                 response.AddressId
             });
