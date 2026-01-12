@@ -8,7 +8,7 @@ type OrdersProps = {
   onRefresh?: () => Promise<void>;
 };
 
-const Orders: React.FC<OrdersProps> = ({ orders, onRefresh }) => {
+const Orders: React.FC<OrdersProps> = ({ orders }) => {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
