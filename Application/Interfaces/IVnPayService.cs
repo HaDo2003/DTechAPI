@@ -5,8 +5,7 @@ namespace DTech.Application.Interfaces
 {
     public interface IVnPayService
     {
-        string CreatePaymentUrl(PaymentInformationModel model, string? clientIp);
-        PaymentResponseModel PaymentExecute(IQueryCollection collections);
+        string CreateVnPayPaymentUrl(long amount, string description);
 
     }
 }

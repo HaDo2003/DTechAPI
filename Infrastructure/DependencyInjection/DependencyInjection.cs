@@ -3,7 +3,6 @@ using DTech.Application.Mapping;
 using DTech.Application.Services;
 using DTech.Application.Settings;
 using DTech.Domain.Entities;
-using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using DTech.Infrastructure.Repositories;
 using DTech.Infrastructure.Services;
@@ -18,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
+using VNPAY.Extensions;
 
 namespace DTech.Infrastructure.DependencyInjection
 {
@@ -53,6 +53,16 @@ namespace DTech.Infrastructure.DependencyInjection
 
             services.AddDbContext<DTechDbContext>(options =>
                 options.UseNpgsql(connectionString));
+
+            var vnpayConfig = config.GetSection("VNPAY");
+
+            services.AddVnpayClient(config =>
+            {
+                config.TmnCode = vnpayConfig["TmnCode"]!;
+                config.HashSecret = vnpayConfig["HashSecret"]!;
+                config.CallbackUrl = vnpayConfig["CallbackUrl"]!;
+                config.BaseUrl = vnpayConfig["BaseUrl"]!;
+            });
 
             //Identity Configuration
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -162,6 +172,7 @@ namespace DTech.Infrastructure.DependencyInjection
                 }
             }
 
+            services.AddScoped<IVnPayService, VnPayService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUnitOfWorkService, UnitOfWorkService>();
