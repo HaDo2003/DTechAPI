@@ -40,7 +40,7 @@ const CustomerLayout: React.FC = () => {
 
       <main className="container padding-custom">
         <Breadcrumb />
-        <Outlet /> {/* Renders child route components here */}
+        <Outlet />
       </main>
       <div className="">
         <Footer />
