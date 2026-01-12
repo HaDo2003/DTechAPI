@@ -1,12 +1,33 @@
-import React from "react";
-import { useLocation, useParams } from "react-router-dom";
+import React, { useMemo } from "react";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import type { OrderSuccessModel } from "../../types/OrderSuccess";
 import NotFound from "./NotFound";
 
 const OrderSuccess: React.FC = () => {
   const location = useLocation();
-  const order: OrderSuccessModel = location.state;
+  const [searchParams] = useSearchParams();
   const { orderId } = useParams<{ orderId: string }>();
+
+  // Get order data from location state or query parameters
+  const order: OrderSuccessModel = useMemo(() => {
+    if (location.state) {
+      return location.state;
+    }
+    
+    // If no state, construct from query parameters (VNPay redirect)
+    return {
+      success: true,
+      orderId: orderId || "",
+      email: searchParams.get("email") || "",
+      phone: searchParams.get("phone") || "",
+      totalCost: parseFloat(searchParams.get("totalCost") || "0"),
+      shippingCost: parseFloat(searchParams.get("shippingCost") || "0"),
+      finalCost: parseFloat(searchParams.get("finalCost") || "0"),
+      paymentMethod: {
+        description: searchParams.get("paymentMethod") || "VNPay"
+      }
+    };
+  }, [location.state, searchParams, orderId]);
 
   if (orderId === undefined) {
     return <NotFound />

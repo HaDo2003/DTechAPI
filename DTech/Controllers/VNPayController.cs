@@ -25,12 +25,20 @@ namespace DTech.API.Controllers
 
                 var result = checkOutService.HandleVnPayCallback(orderId);
 
-                if (result == null)
+                if (result == null || !result.Success)
                 {
                     return Redirect($"https://www.dtech-iu.me/order-fail");
                 }
 
-                return Redirect($"https://www.dtech-iu.me/order-success/{orderId}");
+                // Pass order data as query parameters
+                var queryParams = $"?email={Uri.EscapeDataString(result.Email ?? "")}" +
+                                 $"&phone={Uri.EscapeDataString(result.Phone ?? "")}" +
+                                 $"&totalCost={result.TotalCost}" +
+                                 $"&shippingCost={result.ShippingCost}" +
+                                 $"&finalCost={result.FinalCost}" +
+                                 $"&paymentMethod={Uri.EscapeDataString(result.PaymentMethod?.Description ?? "VNPay")}";
+
+                return Redirect($"https://www.dtech-iu.me/order-success/{orderId}{queryParams}");
             }
             catch (VnpayException ex)
             {

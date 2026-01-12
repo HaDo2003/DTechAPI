@@ -9,10 +9,10 @@ import AlertForm from "../AlertForm";
 type OrderDetailProps = {
     orderId: string;
     onClose?: () => void;
-    // onRefresh?: () => Promise<void>;
+    onRefresh?: () => Promise<void>;
 };
 
-const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose }) => {
+const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose, onRefresh }) => {
     const { token } = useAuth();
     const [order, setOrder] = useState<OrderDetailResponse | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -42,6 +42,8 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose }) => {
                 if (data.success) {
                     setOrder(data);
                     setAlert({ message: "Cancel order successfully", type: "success" });
+                    // Refresh the orders list to reflect the cancellation
+                    await onRefresh?.();
                 }
             } catch (err) {
                 setAlert({ message: "Fail to cancel order", type: "error" });

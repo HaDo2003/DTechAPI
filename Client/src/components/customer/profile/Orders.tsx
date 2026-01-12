@@ -61,6 +61,7 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
           onClose={() => {
             setSelectedOrderId(null);
           }}
+          onRefresh={onRefresh}
         />
       ) : (
         <div className="table-responsive">
