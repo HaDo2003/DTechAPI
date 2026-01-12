@@ -15,7 +15,7 @@ namespace DTech.API.Controllers
     ) : ControllerBase
     {
         [HttpGet("vnpay-callback")]
-        public IActionResult VnPayCallback()
+        public async Task<IActionResult> VnPayCallback()
         {
             try
             {
@@ -23,7 +23,7 @@ namespace DTech.API.Controllers
 
                 var orderId = paymentResult.Description.Replace("ORDER_", "");
 
-                var result = checkOutService.HandleVnPayCallback(orderId);
+                var result = await checkOutService.HandleVnPayCallback(orderId);
 
                 if (result == null || !result.Success)
                 {
