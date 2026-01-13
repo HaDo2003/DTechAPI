@@ -73,7 +73,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onClose, onRefresh }
                         <div className="row">
                             <div className="col-6 mb-2 text-start">
                                 <span className="fw-bold">Payment Status: </span>
-                                <span className={`${order.payment?.status === "Paid" ? "text-success" : "text-danger"} fw-bold`}></span>
+                                <span className={`${order.payment?.status === "Paid" ? "text-success" : "text-danger"} fw-bold`}>{order.payment?.status}</span>
                             </div>
                             <div className="mb-4 col-6 text-start">
                                 <span className="fw-bold">Order Status: </span>

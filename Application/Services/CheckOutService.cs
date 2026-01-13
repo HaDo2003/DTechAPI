@@ -468,6 +468,11 @@ namespace DTech.Application.Services
                 CreatedBy = model.BillingName
             };
 
+            if(model.PaymentMethod != 1)
+            {
+                payment.Status = PaymentStatusEnums.Pending;
+            }
+
             return await paymentRepo.AddAsync(payment);
         }
 
