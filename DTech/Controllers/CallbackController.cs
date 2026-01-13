@@ -9,7 +9,7 @@ namespace DTech.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [AllowAnonymous]
-    public class VNPayController(
+    public class CallbackController(
         ICheckOutService checkOutService,
         IVnpayClient vnpayClient
     ) : ControllerBase
@@ -30,15 +30,7 @@ namespace DTech.API.Controllers
                     return Redirect($"https://www.dtech-iu.me/order-fail");
                 }
 
-                // Pass order data as query parameters
-                var queryParams = $"?email={Uri.EscapeDataString(result.Email ?? "")}" +
-                                 $"&phone={Uri.EscapeDataString(result.Phone ?? "")}" +
-                                 $"&totalCost={result.TotalCost}" +
-                                 $"&shippingCost={result.ShippingCost}" +
-                                 $"&finalCost={result.FinalCost}" +
-                                 $"&paymentMethod={Uri.EscapeDataString(result.PaymentMethod?.Description ?? "VNPay")}";
-
-                return Redirect($"https://www.dtech-iu.me/order-success/{orderId}{queryParams}");
+                return Redirect($"https://www.dtech-iu.me/order-success/{orderId}");
             }
             catch (VnpayException ex)
             {

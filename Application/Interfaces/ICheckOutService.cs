@@ -10,6 +10,7 @@ namespace DTech.Application.Interfaces
         Task<CheckOutDto> BuyNowAsync(string customerId, BuyNowReqDto modelReq);
         Task<OrderSummaryResDto> ApplyCouponBuyNowAsync(string code, string customerId, int productId, int quantity);
         Task<OrderResDto> PlaceOrderAsync(string customerId, CheckOutDto model);
+        Task<OrderResDto> GetOrderByIdAsync(string orderId, string customerId);
         Task<OrderResDto> HandleVnPayCallback(string orderId);
     }
 }

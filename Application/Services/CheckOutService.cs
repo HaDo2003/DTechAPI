@@ -134,7 +134,7 @@ namespace DTech.Application.Services
                     Console.WriteLine("Generated VNPay Payment URL: " + paymentUrl);
                 }
 
-                // SendEmail(order);
+                SendEmail(order);
 
                 OrderResDto result = new()
                 {
@@ -180,6 +180,41 @@ namespace DTech.Application.Services
             }
         }
 
+        public async Task<OrderResDto> GetOrderByIdAsync(string orderId, string customerId) {             
+            var order = await orderRepo.GetOrderByIdAsync(orderId);
+            if (order == null || order.CustomerId != customerId)
+                return new OrderResDto { Success = false, Message = "Order not found" };
+            OrderResDto result = new()
+            {
+                Success = true,
+                OrderId = order.OrderId,
+                Phone = order.Phone,
+                Email = order.Email,
+                Address = order.Address,
+                ShippingAddress = order.ShippingAddress,
+                ShippingCost = order.ShippingCost ?? 0,
+                CostDiscount = order.CostDiscount ?? 0,
+                TotalCost = order.TotalCost ?? 0,
+                FinalCost = order.FinalCost ?? 0,
+                PaymentMethodEnum = MapPaymentMethod(order.Payment?.PaymentMethodId),
+                OrderProducts = order.OrderProducts?
+                    .Where(op => op?.Product != null)
+                    .Select(op => new OrderProductDto
+                    {
+                        Id = op.Id,
+                        Name = op.Product.Name,
+                        Photo = op.Product.Photo,
+                        Quantity = op.Quantity,
+                        CostAtPurchase = op.CostAtPurchase,
+                        Price = op.Price,
+                        ProductColor = op.ColorId != null && op.Product.ProductColors != null
+                            ? mapper.Map<ProductColorDto>(op.Product.ProductColors.FirstOrDefault(pc => pc.ColorId == op.ColorId))
+                            : null
+                    }).ToList()
+            };
+            return result;
+        }
+
         public async Task<OrderResDto> HandleVnPayCallback(string orderId)
         {
             var order = await orderRepo.GetOrderByIdAsync(orderId);
@@ -195,34 +230,13 @@ namespace DTech.Application.Services
             if (!paymentUpdateResult)
                 return new OrderResDto { Success = false, Message = "Failed to update payment status" };
 
+            SendEmail(order);
+
             OrderResDto result = new()
             {
                 Success = true,
                 Message = "Payment successful",
                 OrderId = order.OrderId,
-                Phone = order.Phone,
-                Email = order.Email,
-                Address = order.Address,
-                ShippingAddress = order.ShippingAddress,
-                ShippingCost = order.ShippingCost ?? 0,
-                CostDiscount = order.CostDiscount ?? 0,
-                TotalCost = order.TotalCost ?? 0,
-                FinalCost = order.FinalCost ?? 0,
-                PaymentMethodEnum = MapPaymentMethod(order.Payment.PaymentMethodId),
-                OrderProducts = order.OrderProducts?
-                    .Where(op => op?.Product != null)
-                    .Select(op => new OrderProductDto
-                    {
-                        Id = op.Id,
-                        Name = op.Product.Name,
-                        Photo = op.Product.Photo,
-                        Quantity = op.Quantity,
-                        CostAtPurchase = op.CostAtPurchase,
-                        Price = op.Price,
-                        ProductColor = op.ColorId != null && op.Product.ProductColors != null
-                            ? mapper.Map<ProductColorDto>(op.Product.ProductColors.FirstOrDefault(pc => pc.ColorId == op.ColorId))
-                            : null
-                    }).ToList()
             };
 
             return result;
@@ -622,6 +636,7 @@ namespace DTech.Application.Services
             {
                 1 => PaymentMethodEnums.COD,
                 2 => PaymentMethodEnums.VNPay,
+                3 => PaymentMethodEnums.PayPal,
                 _ => throw new Exception("Unsupported payment method")
             };
         }

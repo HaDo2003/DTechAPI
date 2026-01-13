@@ -48,5 +48,16 @@ export const checkOutService = {
         } catch (err) {
             return handleAxiosError(err, "Failed to place order. Please try again.");
         }
+    },
+
+    async orderSuccessData(token: string, orderId: string): Promise<OrderSuccessModel> {
+        try {
+            const res = await axios.get<OrderSuccessModel>(`/api/checkOut/order-success/${orderId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return { ...res.data, success: true };
+        } catch (err) {
+            return handleAxiosError(err, "Failed to fetch order success data. Please try again.");
+        }
     }
 }

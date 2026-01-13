@@ -3,6 +3,7 @@
     public enum PaymentMethodEnums
     {
         COD,
-        VNPay
+        VNPay,
+        PayPal
     }
 }

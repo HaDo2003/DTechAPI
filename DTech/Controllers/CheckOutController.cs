@@ -103,5 +103,19 @@ namespace DTech.API.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("order-success/{orderId}")]
+        public async Task<IActionResult> OrderSuccess(string orderId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+            var response = await checkOutService.GetOrderByIdAsync(orderId, userId);
+            if (response == null)
+                return NotFound(new { Message = "Order not found." });
+            if (!response.Success)
+                return BadRequest(new { response.Message });
+            return Ok(response);
+        }
     }
 }
