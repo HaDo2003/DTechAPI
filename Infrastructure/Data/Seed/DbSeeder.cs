@@ -947,58 +947,57 @@ public static class DbSeeder
     }
 
     private static async Task SeedVisitorCountsAsync(DTechDbContext context)
-{
-    if (await context.VisitorCounts.AnyAsync())
-        return;
-
-    var visitorCounts = new List<VisitorCount>
     {
-        new VisitorCount { Count = 90,  Date = new DateOnly(2025,10,27), Day = DayOfWeekEnums.Tuesday,   Week = 44 },
-        new VisitorCount { Count = 78,  Date = new DateOnly(2025,10,28), Day = DayOfWeekEnums.Wednesday, Week = 44 },
-        new VisitorCount { Count = 55,  Date = new DateOnly(2025,10,29), Day = DayOfWeekEnums.Thursday,  Week = 44 },
-        new VisitorCount { Count = 81,  Date = new DateOnly(2025,10,30), Day = DayOfWeekEnums.Friday,    Week = 44 },
-        new VisitorCount { Count = 64,  Date = new DateOnly(2025,10,31), Day = DayOfWeekEnums.Saturday,  Week = 44 },
-        new VisitorCount { Count = 50,  Date = new DateOnly(2025,11,01), Day = DayOfWeekEnums.Sunday,    Week = 44 },
-        new VisitorCount { Count = 62,  Date = new DateOnly(2025,11,02), Day = DayOfWeekEnums.Monday,    Week = 44 },
+        if (await context.VisitorCounts.AnyAsync())
+            return;
 
-        new VisitorCount { Count = 104, Date = new DateOnly(2025,11,03), Day = DayOfWeekEnums.Tuesday,   Week = 45 },
-        new VisitorCount { Count = 35,  Date = new DateOnly(2025,11,04), Day = DayOfWeekEnums.Wednesday, Week = 45 },
-        new VisitorCount { Count = 47,  Date = new DateOnly(2025,11,05), Day = DayOfWeekEnums.Thursday,  Week = 45 },
-        new VisitorCount { Count = 92,  Date = new DateOnly(2025,11,06), Day = DayOfWeekEnums.Friday,    Week = 45 },
-        new VisitorCount { Count = 75,  Date = new DateOnly(2025,11,07), Day = DayOfWeekEnums.Saturday,  Week = 45 },
-        new VisitorCount { Count = 50,  Date = new DateOnly(2025,11,08), Day = DayOfWeekEnums.Sunday,    Week = 45 },
-        new VisitorCount { Count = 86,  Date = new DateOnly(2025,11,09), Day = DayOfWeekEnums.Monday,    Week = 45 },
+        var visitorCounts = new List<VisitorCount>
+        {
+            new VisitorCount { Count = 90,  Date = new DateOnly(2025,10,27), Day = DayOfWeekEnums.Tuesday,   Week = 44 },
+            new VisitorCount { Count = 78,  Date = new DateOnly(2025,10,28), Day = DayOfWeekEnums.Wednesday, Week = 44 },
+            new VisitorCount { Count = 55,  Date = new DateOnly(2025,10,29), Day = DayOfWeekEnums.Thursday,  Week = 44 },
+            new VisitorCount { Count = 81,  Date = new DateOnly(2025,10,30), Day = DayOfWeekEnums.Friday,    Week = 44 },
+            new VisitorCount { Count = 64,  Date = new DateOnly(2025,10,31), Day = DayOfWeekEnums.Saturday,  Week = 44 },
+            new VisitorCount { Count = 50,  Date = new DateOnly(2025,11,01), Day = DayOfWeekEnums.Sunday,    Week = 44 },
+            new VisitorCount { Count = 62,  Date = new DateOnly(2025,11,02), Day = DayOfWeekEnums.Monday,    Week = 44 },
 
-        new VisitorCount { Count = 67,  Date = new DateOnly(2025,11,10), Day = DayOfWeekEnums.Tuesday,   Week = 46 },
-        new VisitorCount { Count = 2,   Date = new DateOnly(2025,11,11), Day = DayOfWeekEnums.Wednesday, Week = 46 },
-        new VisitorCount { Count = 1,   Date = new DateOnly(2025,11,12), Day = DayOfWeekEnums.Thursday,  Week = 46 },
+            new VisitorCount { Count = 104, Date = new DateOnly(2025,11,03), Day = DayOfWeekEnums.Tuesday,   Week = 45 },
+            new VisitorCount { Count = 35,  Date = new DateOnly(2025,11,04), Day = DayOfWeekEnums.Wednesday, Week = 45 },
+            new VisitorCount { Count = 47,  Date = new DateOnly(2025,11,05), Day = DayOfWeekEnums.Thursday,  Week = 45 },
+            new VisitorCount { Count = 92,  Date = new DateOnly(2025,11,06), Day = DayOfWeekEnums.Friday,    Week = 45 },
+            new VisitorCount { Count = 75,  Date = new DateOnly(2025,11,07), Day = DayOfWeekEnums.Saturday,  Week = 45 },
+            new VisitorCount { Count = 50,  Date = new DateOnly(2025,11,08), Day = DayOfWeekEnums.Sunday,    Week = 45 },
+            new VisitorCount { Count = 86,  Date = new DateOnly(2025,11,09), Day = DayOfWeekEnums.Monday,    Week = 45 },
 
-        new VisitorCount { Count = 2,   Date = new DateOnly(2025,11,24), Day = DayOfWeekEnums.Tuesday,   Week = 48 },
-        new VisitorCount { Count = 5,   Date = new DateOnly(2025,11,25), Day = DayOfWeekEnums.Wednesday, Week = 48 },
-        new VisitorCount { Count = 13,  Date = new DateOnly(2025,11,26), Day = DayOfWeekEnums.Thursday,  Week = 48 },
+            new VisitorCount { Count = 67,  Date = new DateOnly(2025,11,10), Day = DayOfWeekEnums.Tuesday,   Week = 46 },
+            new VisitorCount { Count = 2,   Date = new DateOnly(2025,11,11), Day = DayOfWeekEnums.Wednesday, Week = 46 },
+            new VisitorCount { Count = 1,   Date = new DateOnly(2025,11,12), Day = DayOfWeekEnums.Thursday,  Week = 46 },
 
-        new VisitorCount { Count = 5,   Date = new DateOnly(2025,12,07), Day = DayOfWeekEnums.Monday,    Week = 49 },
-        new VisitorCount { Count = 5,   Date = new DateOnly(2025,12,07), Day = DayOfWeekEnums.Monday,    Week = 49 },
+            new VisitorCount { Count = 2,   Date = new DateOnly(2025,11,24), Day = DayOfWeekEnums.Tuesday,   Week = 48 },
+            new VisitorCount { Count = 5,   Date = new DateOnly(2025,11,25), Day = DayOfWeekEnums.Wednesday, Week = 48 },
+            new VisitorCount { Count = 13,  Date = new DateOnly(2025,11,26), Day = DayOfWeekEnums.Thursday,  Week = 48 },
 
-        new VisitorCount { Count = 2,   Date = new DateOnly(2025,12,10), Day = DayOfWeekEnums.Thursday,  Week = 50 },
-        new VisitorCount { Count = 1,   Date = new DateOnly(2025,12,10), Day = DayOfWeekEnums.Thursday,  Week = 50 },
+            new VisitorCount { Count = 5,   Date = new DateOnly(2025,12,07), Day = DayOfWeekEnums.Monday,    Week = 49 },
+            new VisitorCount { Count = 5,   Date = new DateOnly(2025,12,07), Day = DayOfWeekEnums.Monday,    Week = 49 },
 
-        new VisitorCount { Count = 2,   Date = new DateOnly(2025,12,15), Day = DayOfWeekEnums.Tuesday,   Week = 51 },
-        new VisitorCount { Count = 1,   Date = new DateOnly(2025,12,15), Day = DayOfWeekEnums.Tuesday,   Week = 51 },
-        new VisitorCount { Count = 3,   Date = new DateOnly(2025,12,19), Day = DayOfWeekEnums.Saturday,  Week = 51 },
-        new VisitorCount { Count = 4,   Date = new DateOnly(2025,12,19), Day = DayOfWeekEnums.Saturday,  Week = 51 },
-        new VisitorCount { Count = 2,   Date = new DateOnly(2025,12,21), Day = DayOfWeekEnums.Monday,    Week = 51 },
-        new VisitorCount { Count = 1,   Date = new DateOnly(2025,12,21), Day = DayOfWeekEnums.Monday,    Week = 51 },
+            new VisitorCount { Count = 2,   Date = new DateOnly(2025,12,10), Day = DayOfWeekEnums.Thursday,  Week = 50 },
+            new VisitorCount { Count = 1,   Date = new DateOnly(2025,12,10), Day = DayOfWeekEnums.Thursday,  Week = 50 },
 
-        new VisitorCount { Count = 2,   Date = new DateOnly(2025,12,25), Day = DayOfWeekEnums.Friday,    Week = 52 },
-        new VisitorCount { Count = 1,   Date = new DateOnly(2025,12,25), Day = DayOfWeekEnums.Friday,    Week = 52 },
+            new VisitorCount { Count = 2,   Date = new DateOnly(2025,12,15), Day = DayOfWeekEnums.Tuesday,   Week = 51 },
+            new VisitorCount { Count = 1,   Date = new DateOnly(2025,12,15), Day = DayOfWeekEnums.Tuesday,   Week = 51 },
+            new VisitorCount { Count = 3,   Date = new DateOnly(2025,12,19), Day = DayOfWeekEnums.Saturday,  Week = 51 },
+            new VisitorCount { Count = 4,   Date = new DateOnly(2025,12,19), Day = DayOfWeekEnums.Saturday,  Week = 51 },
+            new VisitorCount { Count = 2,   Date = new DateOnly(2025,12,21), Day = DayOfWeekEnums.Monday,    Week = 51 },
+            new VisitorCount { Count = 1,   Date = new DateOnly(2025,12,21), Day = DayOfWeekEnums.Monday,    Week = 51 },
 
-        new VisitorCount { Count = 1,   Date = new DateOnly(2026,01,08), Day = DayOfWeekEnums.Friday,    Week = 2 },
-        new VisitorCount { Count = 2,   Date = new DateOnly(2026,01,08), Day = DayOfWeekEnums.Friday,    Week = 2 }
-    };
+            new VisitorCount { Count = 2,   Date = new DateOnly(2025,12,25), Day = DayOfWeekEnums.Friday,    Week = 52 },
+            new VisitorCount { Count = 1,   Date = new DateOnly(2025,12,25), Day = DayOfWeekEnums.Friday,    Week = 52 },
 
-    context.VisitorCounts.AddRange(visitorCounts);
-    await context.SaveChangesAsync();
-}
+            new VisitorCount { Count = 1,   Date = new DateOnly(2026,01,08), Day = DayOfWeekEnums.Friday,    Week = 2 },
+            new VisitorCount { Count = 2,   Date = new DateOnly(2026,01,08), Day = DayOfWeekEnums.Friday,    Week = 2 }
+        };
 
+        context.VisitorCounts.AddRange(visitorCounts);
+        await context.SaveChangesAsync();
+    }
 }

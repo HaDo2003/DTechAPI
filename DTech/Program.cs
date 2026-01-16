@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
-//DotEnv.Load();
+DotEnv.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -90,20 +90,22 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 }
 
 // Apply migrations automatically on startup (for Docker deployment)
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<DTechDbContext>();
-    try
-    {
-        await dbContext.Database.MigrateAsync();
-        await DbSeeder.SeedAsync(dbContext, scope.ServiceProvider);
-    }
-    catch (Exception ex)
-    {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database.");
-    }
-}
+// Only for deloyment
+
+//using (var scope = app.Services.CreateScope())
+//{
+//    var dbContext = scope.ServiceProvider.GetRequiredService<DTechDbContext>();
+//    try
+//    {
+//        await dbContext.Database.MigrateAsync();
+//        await DbSeeder.SeedAsync(dbContext, scope.ServiceProvider);
+//    }
+//    catch (Exception ex)
+//    {
+//        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+//        logger.LogError(ex, "An error occurred while migrating the database.");
+//    }
+//}
 
 app.UseHttpsRedirection();
 

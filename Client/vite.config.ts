@@ -15,6 +15,15 @@ export default defineConfig({
       gzipSize: true,
     })
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://localhost:7094',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
