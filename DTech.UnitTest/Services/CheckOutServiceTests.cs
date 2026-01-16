@@ -8,6 +8,7 @@ using DTech.Domain.Enums;
 using DTech.Domain.Interfaces;
 using FluentAssertions;
 using Moq;
+using VNPAY;
 using Xunit;
 
 namespace DTech.UnitTest.Services
@@ -26,6 +27,7 @@ namespace DTech.UnitTest.Services
         private readonly Mock<IBackgroundTaskQueue> _backgroundTaskQueueMock;
         private readonly Mock<IEmailService> _emailServiceMock;
         private readonly Mock<IUnitOfWorkService> _unitOfWorkMock;
+        private readonly Mock<IVnPayService> _vnpayClientMock;
         private readonly CheckOutService _checkOutService;
 
         public CheckOutServiceTests()
@@ -42,6 +44,7 @@ namespace DTech.UnitTest.Services
             _backgroundTaskQueueMock = new Mock<IBackgroundTaskQueue>();
             _emailServiceMock = new Mock<IEmailService>();
             _unitOfWorkMock = new Mock<IUnitOfWorkService>();
+            _vnpayClientMock = new Mock<IVnPayService>();
 
             _checkOutService = new CheckOutService(
                 _customerRepoMock.Object,
@@ -55,7 +58,8 @@ namespace DTech.UnitTest.Services
                 _mapperMock.Object,
                 _backgroundTaskQueueMock.Object,
                 _emailServiceMock.Object,
-                _unitOfWorkMock.Object
+                _unitOfWorkMock.Object,
+                _vnpayClientMock.Object
             );
         }
 

@@ -14,8 +14,7 @@ namespace DTech.API.Controllers
     [Route("api/[controller]")]
     [Authorize]
     public class CheckOutController(
-        ICheckOutService checkOutService,
-        IVnpayClient vnpayClient
+        ICheckOutService checkOutService
     ) : ControllerBase
     {
         [HttpGet("check-out")]

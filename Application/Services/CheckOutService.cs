@@ -125,7 +125,7 @@ namespace DTech.Application.Services
 
                 string? paymentUrl = null;
 
-                if (paymentMethodEnum == PaymentMethodEnums.VNPay)
+                if (paymentMethodEnum == PaymentMethodEnums.VNPay && order.FinalCost > 0)
                 {
                     paymentUrl = vnPayService.CreateVnPayPaymentUrl(
                         (long)order.FinalCost,
