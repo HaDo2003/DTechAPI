@@ -92,7 +92,7 @@ const DetailChatBox: React.FC<DetailChatBoxProps> = ({
                     ref={chatContainerRef}
                     className="p-3 h-100 overflow-auto"
                 >
-                    {chatMessages
+                    {(chatMessages || [])
                         .sort((a, b) =>
                             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
                         )

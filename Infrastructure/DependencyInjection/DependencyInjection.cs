@@ -3,7 +3,6 @@ using DTech.Application.Mapping;
 using DTech.Application.Services;
 using DTech.Application.Settings;
 using DTech.Domain.Entities;
-using DTech.Domain.Interfaces;
 using DTech.Infrastructure.Data;
 using DTech.Infrastructure.Repositories;
 using DTech.Infrastructure.Services;
@@ -18,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
+using VNPAY.Extensions;
 
 namespace DTech.Infrastructure.DependencyInjection
 {
@@ -25,8 +25,44 @@ namespace DTech.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
         {
+            // Get connection string, handle both DTech and DATABASE_URL formats
+            var connectionString = config.GetConnectionString("DTech");
+
+            // If connectionString is in postgresql:// format, convert it
+            if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
+            {
+                connectionString = ConvertDatabaseUrlToConnectionString(connectionString);
+            }
+            // If DTech connection string is empty, try DATABASE_URL (Render format)
+            else if (string.IsNullOrEmpty(connectionString))
+            {
+                var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                if (!string.IsNullOrEmpty(databaseUrl))
+                {
+                    connectionString = ConvertDatabaseUrlToConnectionString(databaseUrl);
+                }
+            }
+
+            // Validate connection string exists
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "Database connection string not found. Please set either 'ConnectionStrings__DTech' " +
+                    "or 'DATABASE_URL' environment variable.");
+            }
+
             services.AddDbContext<DTechDbContext>(options =>
-                options.UseNpgsql(config.GetConnectionString("DTech")));
+                options.UseNpgsql(connectionString));
+
+            var vnpayConfig = config.GetSection("VNPAY");
+
+            services.AddVnpayClient(config =>
+            {
+                config.TmnCode = vnpayConfig["TmnCode"]!;
+                config.HashSecret = vnpayConfig["HashSecret"]!;
+                config.CallbackUrl = vnpayConfig["CallbackUrl"]!;
+                config.BaseUrl = vnpayConfig["BaseUrl"]!;
+            });
 
             //Identity Configuration
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -54,8 +90,12 @@ namespace DTech.Infrastructure.DependencyInjection
 
             // Jwt Authentication
             var jwtSettings = config.GetSection("Jwt");
-            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
-            var key = Encoding.UTF8.GetBytes(jwtKey!) ?? throw new InvalidOperationException("JWT Key not found");
+            var jwtKey =
+                Environment.GetEnvironmentVariable("JWT_KEY")
+                ?? config["Jwt:Key"]
+                ?? throw new InvalidOperationException("JWT Key not found");
+
+            var key = Encoding.UTF8.GetBytes(jwtKey);
 
             services.AddAuthentication(options =>
             {
@@ -84,7 +124,7 @@ namespace DTech.Infrastructure.DependencyInjection
                         {
                             var accessToken = context.Request.Query["access_token"];
                             var path = context.HttpContext.Request.Path;
-                            
+
                             if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
                             {
                                 context.Token = accessToken;
@@ -132,6 +172,7 @@ namespace DTech.Infrastructure.DependencyInjection
                 }
             }
 
+            services.AddScoped<IVnPayService, VnPayService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUnitOfWorkService, UnitOfWorkService>();
@@ -155,10 +196,22 @@ namespace DTech.Infrastructure.DependencyInjection
             }
 
             services.AddSignalR();
-            
+
             services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
             return services;
+        }
+
+        private static string ConvertDatabaseUrlToConnectionString(string databaseUrl)
+        {
+            // Parse DATABASE_URL format: postgresql://user:password@host:port/database
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            
+            // Use default PostgreSQL port (5432) if not specified
+            var port = uri.Port > 0 ? uri.Port : 5432;
+
+            return $"Host={uri.Host};Port={port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
         }
     }
 }

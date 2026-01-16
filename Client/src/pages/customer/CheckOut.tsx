@@ -118,9 +118,18 @@ const Checkout: React.FC = () => {
                 formData,
                 buyNowData ? true : false
             );
-            console.log(formData);
+            console.log("Order response:", res);
             if (res && res.success) {
                 await fetchCart();
+
+                // If payment URL exists (VNPay), redirect to payment gateway
+                if (res.paymentUrl) {
+                    console.log("Redirecting to VNPay:", res.paymentUrl);
+                    window.location.href = res.paymentUrl;
+                    return;
+                }
+
+                // Otherwise go to success page (COD)
                 navigate(`/order-success/${res.orderId}`, { state: res });
             } else {
                 navigate("/order-fail");

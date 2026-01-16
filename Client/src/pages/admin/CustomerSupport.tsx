@@ -90,7 +90,7 @@ const CustomerSupport: React.FC = () => {
                                 </div>
 
                                 <div className="card-body">
-                                    {chatList.map((chat, index) => {
+                                    {(chatList || []).map((chat, index) => {
                                         const isUnread = chat.senderId && unreadChats.has(chat.senderId);
                                         const isActive = selectedChat?.senderId === chat.senderId;
                                         return (
@@ -111,7 +111,7 @@ const CustomerSupport: React.FC = () => {
                                                 <div style={{ position: 'relative' }}>
                                                     <img
                                                         alt={chat.senderName || "User"}
-                                                        src={chat.avatarUrl || "/default-avatar.png"}
+                                                        src={chat.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.senderName || 'User')}&background=0D8ABC&color=fff&size=128`}
                                                         className="rounded-circle"
                                                         style={{ width: 48, height: 48, objectFit: 'cover' }}
                                                     />

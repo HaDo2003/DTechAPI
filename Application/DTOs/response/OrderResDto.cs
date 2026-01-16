@@ -1,4 +1,6 @@
-﻿namespace DTech.Application.DTOs.response
+﻿using DTech.Domain.Enums;
+
+namespace DTech.Application.DTOs.response
 {
     public class OrderResDto
     {
@@ -13,6 +15,8 @@
         public decimal? CostDiscount { get; set; }
         public decimal? TotalCost { get; set; }
         public decimal? FinalCost { get; set; }
+        public PaymentMethodEnums PaymentMethodEnum { get; set; }
+        public string? PaymentUrl { get; set; }
         public PaymentMethodDto? PaymentMethod { get; set; }
         public List<OrderProductDto>? OrderProducts { get; set; }
     }

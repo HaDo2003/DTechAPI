@@ -115,7 +115,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
         : product.description;
 
     // Comment calculations
-    const ratedComments = product.productComments.filter(c => c.rate !== null);
+    const ratedComments = (product.productComments || []).filter(c => c.rate !== null);
     const totalRatings = ratedComments.length;
     const average = totalRatings > 0
         ? ratedComments.reduce((sum, c) => sum + (c.rate || 0), 0) / totalRatings
@@ -364,7 +364,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
 
                         {/* Product Info Row */}
                         <div className="row gy-2 gx-3 text-start">
-                            <ProductInfoItem label="Comment" value={product.productComments.length} sizexl="col-xl-2" />
+                            <ProductInfoItem label="Comment" value={product.productComments?.length || 0} sizexl="col-xl-2" />
                             <ProductInfoItem label="Views" value={product.views} sizexl="col-xl-2" />
                             <ProductInfoItem label="Warranty" value={`${product.warranty} months`} sizexl="col-xl-3" />
                             <ProductInfoItem label="Status" value={statusText} sizexl="col-xl-3" />
@@ -722,7 +722,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
                                 <div className="card-body">
                                     <table className="table table-striped mb-0">
                                         <tbody>
-                                            {product.specifications.length > 0 ? (
+                                            {product.specifications && product.specifications.length > 0 ? (
                                                 product.specifications.slice(0, 5).map((spec, index) => (
                                                     <tr key={index} className="specification-item d-flex text-start row">
                                                         <th className="col-3">{spec.specName}</th>
@@ -735,7 +735,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
                                         </tbody>
                                     </table>
 
-                                    {product.specifications.length > 5 && (
+                                    {product.specifications && product.specifications.length > 5 && (
                                         <div className="mt-3 d-flex justify-content-center">
                                             <button
                                                 className="btn btn-outline-primary rounded-3 d-flex align-items-center justify-content-center"

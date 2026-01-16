@@ -1,10 +1,12 @@
 using dotenv.net;
 using DTech.API.Hubs;
+using DTech.Infrastructure.Data;
 using DTech.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
-DotEnv.Load();
+//DotEnv.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -48,7 +50,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "https://localhost:5173", "https://dtech-api.vercel.app")
+        policy
+              .WithOrigins(
+                "http://localhost:5173",
+                "https://localhost:5173",
+                "https://www.dtech-iu.me",
+                "https://dtech-iu.me",
+                "https://dtech-api.vercel.app"
+              )
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -66,7 +75,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI(option =>
@@ -78,6 +87,22 @@ if (app.Environment.IsDevelopment())
         context.Response.Redirect("/swagger/v1/swagger.json");
         return Task.CompletedTask;
     });
+}
+
+// Apply migrations automatically on startup (for Docker deployment)
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DTechDbContext>();
+    try
+    {
+        await dbContext.Database.MigrateAsync();
+        await DbSeeder.SeedAsync(dbContext, scope.ServiceProvider);
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
 }
 
 app.UseHttpsRedirection();

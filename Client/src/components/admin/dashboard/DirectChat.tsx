@@ -51,7 +51,7 @@ const DirectChat: React.FC<DirectChatProps> = ({ messages, contacts }) => {
         <div className="card-body">
           {/* Messages */}
           <div className="direct-chat-messages">
-            {messages.map((msg) => (
+            {(messages || []).map((msg) => (
               <div
                 key={msg.id}
                 className={`direct-chat-msg ${msg.isOwn ? "end" : ""}`}
@@ -85,7 +85,7 @@ const DirectChat: React.FC<DirectChatProps> = ({ messages, contacts }) => {
           {/* Contacts */}
           <div className="direct-chat-contacts">
             <ul className="contacts-list">
-              {contacts.map((c) => (
+              {(contacts || []).map((c) => (
                 <li key={c.id}>
                   <a href="#">
                     <img

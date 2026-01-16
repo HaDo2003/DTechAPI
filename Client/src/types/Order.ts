@@ -111,7 +111,7 @@ interface OrderProduct {
 }
 
 interface Payment {
-    status?: number;
+    status?: string;
     paymentMethodName?: string;
 }
 

@@ -27,7 +27,7 @@ const ProductList: React.FC<RecentlyAddedProductsProps> = ({ products }) => {
       {/* Card Body */}
       <div className="card-body p-0">
         <div className="px-2">
-          {products.map((product) => (
+          {(products || []).map((product) => (
             <div className="d-flex border-top py-2 px-1" key={product.productId}>
               <div className="col-2">
                 <img

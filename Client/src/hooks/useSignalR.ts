@@ -21,7 +21,7 @@ const CLEANUP_DELAY = 100;
 export const useSignalR = (token?: string | null) => {
   const [_, setConnected] = useState(false);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
-  const hubUrl = "https://localhost:7094/hubs/chatsHub";
+  const hubUrl = import.meta.env.VITE_HUB_URL || "https://dtechapi.onrender.com/hubs/chatsHub";
 
   useEffect(() => {
     if (!token) {

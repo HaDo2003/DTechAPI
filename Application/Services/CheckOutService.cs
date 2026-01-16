@@ -21,7 +21,8 @@ namespace DTech.Application.Services
         IMapper mapper,
         IBackgroundTaskQueue backgroundTaskQueue,
         IEmailService emailService,
-        IUnitOfWorkService unitOfWorkService
+        IUnitOfWorkService unitOfWorkService,
+        IVnPayService vnPayService
     ) : ICheckOutService
     {
         // Main Methods
@@ -113,13 +114,25 @@ namespace DTech.Application.Services
                     cart = null;
                 }
 
-
-                if (model.PaymentMethod == 2)
-                    return new OrderResDto { Success = false, Message = "Momo payment is under development, please try another way" };
-
                 var (success, message, order) = await ProcessOrderAsync(customerId, model, cart);
                 if (!success || order == null)
                     return new OrderResDto { Success = false, Message = message };
+
+                if (order.Payment == null)
+                    return new OrderResDto { Success = false, Message = "Payment information not found" };
+
+                var paymentMethodEnum = MapPaymentMethod(order.Payment.PaymentMethodId);
+
+                string? paymentUrl = null;
+
+                if (paymentMethodEnum == PaymentMethodEnums.VNPay && order.FinalCost > 0)
+                {
+                    paymentUrl = vnPayService.CreateVnPayPaymentUrl(
+                        (long)order.FinalCost,
+                        $"ORDER_{order.OrderId}"
+                    );
+                    Console.WriteLine("Generated VNPay Payment URL: " + paymentUrl);
+                }
 
                 SendEmail(order);
 
@@ -135,6 +148,8 @@ namespace DTech.Application.Services
                     CostDiscount = order?.CostDiscount ?? 0,
                     TotalCost = order?.TotalCost ?? 0,
                     FinalCost = order?.FinalCost ?? 0,
+                    PaymentMethodEnum = paymentMethodEnum,
+                    PaymentUrl = paymentUrl,
                     PaymentMethod = order?.Payment?.PaymentMethod == null
                         ? null
                         : new PaymentMethodDto
@@ -160,8 +175,71 @@ namespace DTech.Application.Services
                 return result;
             }
             catch (Exception ex) {
+                Console.WriteLine($"Debug Error: {ex.Message}");
                 return new OrderResDto { Success = false, Message = ex.Message };
             }
+        }
+
+        public async Task<OrderResDto> GetOrderByIdAsync(string orderId, string customerId) {             
+            var order = await orderRepo.GetOrderByIdAsync(orderId);
+            if (order == null || order.CustomerId != customerId)
+                return new OrderResDto { Success = false, Message = "Order not found" };
+            OrderResDto result = new()
+            {
+                Success = true,
+                OrderId = order.OrderId,
+                Phone = order.Phone,
+                Email = order.Email,
+                Address = order.Address,
+                ShippingAddress = order.ShippingAddress,
+                ShippingCost = order.ShippingCost ?? 0,
+                CostDiscount = order.CostDiscount ?? 0,
+                TotalCost = order.TotalCost ?? 0,
+                FinalCost = order.FinalCost ?? 0,
+                PaymentMethodEnum = MapPaymentMethod(order.Payment?.PaymentMethodId),
+                OrderProducts = order.OrderProducts?
+                    .Where(op => op?.Product != null)
+                    .Select(op => new OrderProductDto
+                    {
+                        Id = op.Id,
+                        Name = op.Product.Name,
+                        Photo = op.Product.Photo,
+                        Quantity = op.Quantity,
+                        CostAtPurchase = op.CostAtPurchase,
+                        Price = op.Price,
+                        ProductColor = op.ColorId != null && op.Product.ProductColors != null
+                            ? mapper.Map<ProductColorDto>(op.Product.ProductColors.FirstOrDefault(pc => pc.ColorId == op.ColorId))
+                            : null
+                    }).ToList()
+            };
+            return result;
+        }
+
+        public async Task<OrderResDto> HandleVnPayCallback(string orderId)
+        {
+            var order = await orderRepo.GetOrderByIdAsync(orderId);
+            if (order == null)
+                return new OrderResDto { Success = false, Message = "Order not found" };
+            if (order.Payment == null)
+                return new OrderResDto { Success = false, Message = "Payment information not found" };
+
+            // Update payment status
+            order.Payment.Status = PaymentStatusEnums.Paid;
+            var paymentUpdateResult = await paymentRepo.UpdateAsync(order.Payment);
+
+            if (!paymentUpdateResult)
+                return new OrderResDto { Success = false, Message = "Failed to update payment status" };
+
+            SendEmail(order);
+
+            OrderResDto result = new()
+            {
+                Success = true,
+                Message = "Payment successful",
+                OrderId = order.OrderId,
+            };
+
+            return result;
         }
 
         // --- Helper Methods ---
@@ -390,6 +468,11 @@ namespace DTech.Application.Services
                 CreatedBy = model.BillingName
             };
 
+            if(model.PaymentMethod != 1)
+            {
+                payment.Status = PaymentStatusEnums.Pending;
+            }
+
             return await paymentRepo.AddAsync(payment);
         }
 
@@ -397,6 +480,7 @@ namespace DTech.Application.Services
         {
             var order = new Order
             {
+                OrderId = Guid.NewGuid().ToString(),
                 CustomerId = customerId,
                 ShippingId = shippingId,
                 PaymentId = paymentId,
@@ -549,6 +633,17 @@ namespace DTech.Application.Services
         {
             await unitOfWorkService.RollbackTransactionAsync();
             return (false, message, null);
+        }
+
+        private static PaymentMethodEnums MapPaymentMethod(int? paymentMethodId)
+        {
+            return paymentMethodId switch
+            {
+                1 => PaymentMethodEnums.COD,
+                2 => PaymentMethodEnums.VNPay,
+                3 => PaymentMethodEnums.PayPal,
+                _ => throw new Exception("Unsupported payment method")
+            };
         }
     }
 }

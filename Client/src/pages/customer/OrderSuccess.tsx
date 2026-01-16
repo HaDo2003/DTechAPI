@@ -1,15 +1,63 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import type { OrderSuccessModel } from "../../types/OrderSuccess";
+import { checkOutService } from "../../services/CheckOutService";
+import { useAuth } from "../../context/AuthContext";
 import NotFound from "./NotFound";
+import SkeletonOrderSuccess from "@/components/customer/skeleton/SkeletonOrderSuccess";
 
 const OrderSuccess: React.FC = () => {
   const location = useLocation();
-  const order: OrderSuccessModel = location.state;
   const { orderId } = useParams<{ orderId: string }>();
+  const { token } = useAuth();
+  const [order, setOrder] = useState<OrderSuccessModel | null>(location.state || null);
+  const [loading, setLoading] = useState<boolean>(!location.state);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch order data if not available in location state
+  useEffect(() => {
+    const fetchOrderData = async () => {
+      if (!location.state && orderId && token) {
+        try {
+          setLoading(true);
+          const data = await checkOutService.orderSuccessData(token, orderId);
+          if (data.success) {
+            setOrder(data);
+          } else {
+            setError(data.message || "Failed to fetch order data");
+          }
+        } catch (err) {
+          setError("An error occurred while fetching order data");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchOrderData();
+  }, [location.state, orderId, token]);
 
   if (orderId === undefined) {
-    return <NotFound />
+    return <NotFound />;
+  }
+
+  if (loading) {
+        return <SkeletonOrderSuccess />;
+    }
+
+  if (error || !order) {
+    return (
+      <div className="bg-light min-vh-100 d-flex justify-content-center align-items-center">
+        <div className="text-center">
+          <i className="fas fa-exclamation-circle text-danger" style={{ fontSize: "3rem" }}></i>
+          <h3 className="mt-3">Unable to Load Order</h3>
+          <p className="text-muted">{error || "Order not found"}</p>
+          <a href="/" className="btn btn-primary mt-3">
+            <i className="fas fa-home me-2"></i>Go to Home
+          </a>
+        </div>
+      </div>
+    );
   }
 
   return (

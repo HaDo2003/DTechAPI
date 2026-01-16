@@ -1,9 +1,12 @@
 ﻿using DTech.Application.DTOs.request;
 using DTech.Application.DTOs.response;
 using DTech.Application.Interfaces;
+using DTech.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using VNPAY;
+using VNPAY.Models.Exceptions;
 
 namespace DTech.API.Controllers
 {
@@ -97,6 +100,20 @@ namespace DTech.API.Controllers
             if (!response.Success)
                 return BadRequest(new { success = false, response.Message });
 
+            return Ok(response);
+        }
+
+        [HttpGet("order-success/{orderId}")]
+        public async Task<IActionResult> OrderSuccess(string orderId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+            var response = await checkOutService.GetOrderByIdAsync(orderId, userId);
+            if (response == null)
+                return NotFound(new { Message = "Order not found." });
+            if (!response.Success)
+                return BadRequest(new { response.Message });
             return Ok(response);
         }
     }

@@ -58,8 +58,6 @@ const CustomerAccount: React.FC = () => {
         fetchCustomer();
     }, [token]);
 
-
-
     return (
         <>
             <div className="app-content">
