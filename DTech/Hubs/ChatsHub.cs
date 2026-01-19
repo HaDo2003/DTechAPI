@@ -24,7 +24,7 @@ namespace DTech.API.Hubs
         {
             var senderId = Context.UserIdentifier ?? "guest";
 
-            const string defaultAdminId = "906e4bd0-61d0-4acf-8b96-36df1afe104b";
+            const string defaultAdminId = "7aede655-1203-45b4-a00e-a0f81a812ecb";
             receiverId ??= defaultAdminId;
 
             Console.WriteLine($"SendMessage called - SenderId: {senderId}, ReceiverId: {receiverId}");
