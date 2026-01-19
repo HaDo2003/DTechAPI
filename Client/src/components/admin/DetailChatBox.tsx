@@ -5,6 +5,7 @@ import type { ChatMessage, FullChat } from "../../types/ChatMessage";
 interface DetailChatBoxProps extends FullChat {
     currentUserId: string;
     connection: signalR.HubConnection;
+    onClose?: () => void;
 }
 
 const DetailChatBox: React.FC<DetailChatBoxProps> = ({
@@ -13,7 +14,8 @@ const DetailChatBox: React.FC<DetailChatBoxProps> = ({
     senderImageUrl,
     currentUserId,
     messages,
-    connection
+    connection,
+    onClose
 }) => {
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages || []);
     const [inputMessage, setInputMessage] = useState("");
@@ -74,14 +76,24 @@ const DetailChatBox: React.FC<DetailChatBoxProps> = ({
         <div className="card">
             {/* Header */}
             <div className="card-header">
-                <div className="d-flex align-items-center">
-                    <img
-                        alt={senderName ?? undefined}
-                        src={senderImageUrl ?? undefined}
-                        className="rounded-circle me-2"
-                        style={{ width: 40, height: 40, objectFit: "cover" }}
-                    />
-                    <h3 className="card-title mb-0">{senderName}</h3>
+                <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center">
+                        <img
+                            alt={senderName ?? undefined}
+                            src={senderImageUrl ?? undefined}
+                            className="rounded-circle me-2"
+                            style={{ width: 40, height: 40, objectFit: "cover" }}
+                        />
+                        <h3 className="card-title mb-0">{senderName}</h3>
+                    </div>
+                    {onClose && (
+                        <button
+                            type="button"
+                            className="btn-close"
+                            aria-label="Close"
+                            onClick={onClose}
+                        />
+                    )}
                 </div>
             </div>
 

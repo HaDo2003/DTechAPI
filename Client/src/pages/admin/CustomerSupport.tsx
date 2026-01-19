@@ -162,6 +162,7 @@ const CustomerSupport: React.FC = () => {
                                     currentUserId={token ? JSON.parse(atob(token.split('.')[1])).nameid : ""}
                                     messages={selectedChat.messages}
                                     connection={connection}
+                                    onClose={() => setSelectedChat(null)}
                                 />
                             ) : (
                                 <p className="text-muted">Select a chat to start</p>
