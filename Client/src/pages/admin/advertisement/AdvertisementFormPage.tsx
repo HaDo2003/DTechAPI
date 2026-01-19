@@ -6,7 +6,7 @@ import CardWrapped from "../../../components/admin/CardWrapped";
 import InputField from "../../../components/admin/InputField";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
-import { type AdvertisementForm } from "../../../types/Advertisment";
+import { type AdvertisementForm } from "../../../types/Advertisement";
 
 const AdvertisementFormPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();

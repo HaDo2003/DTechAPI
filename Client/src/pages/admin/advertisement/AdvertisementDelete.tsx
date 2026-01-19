@@ -5,7 +5,7 @@ import { adminService } from "../../../services/AdminService";
 import AlertForm from "../../../components/customer/AlertForm";
 import Loading from "../../../components/shared/Loading";
 import DeletePage from "../DeletePage";
-import type { AdvertisementForm } from "../../../types/Advertisment";
+import type { AdvertisementForm } from "../../../types/Advertisement";
 
 const AdvertisementDelete: React.FC = () => {
     const { id } = useParams<{ id: string }>();

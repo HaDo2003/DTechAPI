@@ -21,7 +21,7 @@ namespace DTech.API.Controllers.Admin
         }
 
         [HttpGet("get/{id}")]
-        public async Task<IActionResult> GetAdvertisement(string id)
+        public async Task<IActionResult> GetCustomerDetail(string id)
         {
             var (_, unauthorized) = ControllerHelper.HandleUnauthorized(User, this);
             if (unauthorized != null) return unauthorized;

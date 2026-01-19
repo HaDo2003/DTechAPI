@@ -6,21 +6,21 @@ using Xunit;
 
 namespace DTech.UnitTest.Services
 {
-    public class AdvertismentServiceTests
+    public class AdvertisementServiceTests
     {
         private readonly Mock<IAdminRepository> _adminRepoMock;
-        private readonly Mock<IAdvertisementRepository> _advertismentRepoMock;
+        private readonly Mock<IAdvertisementRepository> _advertisementRepoMock;
         private readonly Mock<ICloudinaryService> _cloudinaryServiceMock;
-        private readonly AdvertisementService _advertismentService;
+        private readonly AdvertisementService _advertisementService;
 
-        public AdvertismentServiceTests()
+        public AdvertisementServiceTests()
         {
             _adminRepoMock = new Mock<IAdminRepository>();
-            _advertismentRepoMock = new Mock<IAdvertisementRepository>();
+            _advertisementRepoMock = new Mock<IAdvertisementRepository>();
             _cloudinaryServiceMock = new Mock<ICloudinaryService>();
-            _advertismentService = new AdvertisementService(
+            _advertisementService = new AdvertisementService(
                 _adminRepoMock.Object,
-                _advertismentRepoMock.Object,
+                _advertisementRepoMock.Object,
                 _cloudinaryServiceMock.Object
             );
         }
@@ -29,11 +29,11 @@ namespace DTech.UnitTest.Services
         public async Task GetAdvertisementsAsync_NoAdvertisements_ReturnsFailureResponse()
         {
             // Arrange
-            _advertismentRepoMock
+            _advertisementRepoMock
                 .Setup(repo => repo.GetAllAdvertisementsAsync())
                 .ReturnsAsync([]);
             // Act
-            var result = await _advertismentService.GetAdvertisementsAsync();
+            var result = await _advertisementService.GetAdvertisementsAsync();
             // Assert
             Assert.False(result.Success);
             Assert.Equal("No advertisement found", result.Message);

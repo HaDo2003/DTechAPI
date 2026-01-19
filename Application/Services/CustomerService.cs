@@ -375,7 +375,7 @@ namespace DTech.Application.Services
                 return new IndexResDto<List<CustomerIndexDto>>
                 {
                     Success = false,
-                    Message = "No advertisement found"
+                    Message = "No customers found"
                 };
             }
 
@@ -402,7 +402,7 @@ namespace DTech.Application.Services
                 return new IndexResDto<CustomerDetailDto>
                 {
                     Success = false,
-                    Message = "Advertisement not found"
+                    Message = "Customer not found"
                 };
             }
             var customerDetail = new CustomerDetailDto

@@ -1,5 +1,5 @@
 import React from "react";
-import type { Advertisement } from "../../../types/Advertisment";
+import type { Advertisement } from "../../../types/Advertisement";
 
 interface SliderProps {
   advertisements: Advertisement[];
