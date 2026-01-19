@@ -27,7 +27,7 @@ namespace DTech.API.Hubs
             const string defaultAdminId = "7aede655-1203-45b4-a00e-a0f81a812ecb";
             receiverId ??= defaultAdminId;
 
-            Console.WriteLine($"SendMessage called - SenderId: {senderId}, ReceiverId: {receiverId}");
+            Console.WriteLine($"info: SendMessage called - SenderId: {senderId}, ReceiverId: {receiverId}");
 
             await chatService.SaveMessageAsync(senderId, receiverId, message);
 
