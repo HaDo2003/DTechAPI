@@ -24,6 +24,12 @@ namespace DTech.Infrastructure.Services
             };
             mailMessage.To.Add(email);
 
+            Console.WriteLine($"info: DTech.Infrastructure.Services.EmailService[10001]");
+            Console.WriteLine($"      Sending Email");
+            Console.WriteLine($"      [From=hadotaydo20@gmail.com, To={email}]");
+            Console.WriteLine($"      Subject: {subject}");
+            Console.WriteLine($"      IsBodyHtml: {true}");
+
             return client.SendMailAsync(mailMessage);
         }
     }

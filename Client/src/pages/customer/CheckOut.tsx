@@ -42,6 +42,7 @@ const Checkout: React.FC = () => {
     const [differenceAddress, setDifferenceAddress] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [alert, setAlert] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+    const usdToVndRate = 26000;
 
     useEffect(() => {
         if (token === null)
@@ -119,13 +120,13 @@ const Checkout: React.FC = () => {
 
         if (selectedPaymentMethod?.description?.toLowerCase().includes('vnpay')) {
             const usdAmount = formData.orderSummary?.total ?? 0;
-            const vndAmount = (usdAmount * 26000).toLocaleString('vi-VN');
+            const vndAmount = (usdAmount * usdToVndRate).toLocaleString('vi-VN');
 
             const confirmed = window.confirm(
                 "Payment Notice:\n\n" +
                 "You will be redirected to VNPay payment gateway.\n" +
                 `Amount: $${usdAmount.toFixed(2)} USD ≈ ${vndAmount} VND\n` +
-                "(Exchange rate: 1 USD = 26,000 VND)\n\n" +
+                `(Exchange rate: 1 USD = ${usdToVndRate} VND)\n\n` +
                 "Click OK to proceed with the payment."
             );
 
