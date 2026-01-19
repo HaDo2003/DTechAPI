@@ -81,7 +81,7 @@ const Dashboard: React.FC = () => {
                 <MonthlyRecap />
 
                 {/* Row: Visitor + Latest Orders */}
-                <div className="row">
+                <div className="row mb-4">
                   <div className="col-lg-6">
                     <Visitor visitorCounts={visitorCounts} />
                   </div>
