@@ -111,6 +111,29 @@ const Checkout: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Check if payment method is VNPay and show confirmation
+        const selectedPaymentMethod = formData.paymentMethods?.find(
+            pm => pm.paymentMethodId === formData.paymentMethod
+        );
+
+        if (selectedPaymentMethod?.description?.toLowerCase().includes('vnpay')) {
+            const usdAmount = formData.orderSummary?.total ?? 0;
+            const vndAmount = (usdAmount * 26000).toLocaleString('vi-VN');
+
+            const confirmed = window.confirm(
+                "Payment Notice:\n\n" +
+                "You will be redirected to VNPay payment gateway.\n" +
+                `Amount: $${usdAmount.toFixed(2)} USD ≈ ${vndAmount} VND\n` +
+                "(Exchange rate: 1 USD = 26,000 VND)\n\n" +
+                "Click OK to proceed with the payment."
+            );
+
+            if (!confirmed) {
+                return;
+            }
+        }
+
         setLoading(true);
         try {
             const res = await checkOutService.placeOrder(

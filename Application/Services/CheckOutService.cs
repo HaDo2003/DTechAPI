@@ -25,6 +25,7 @@ namespace DTech.Application.Services
         IVnPayService vnPayService
     ) : ICheckOutService
     {
+        private const long usdToVndRate = 26000;
         // Main Methods
         public async Task<CheckOutDto> GetCheckOutAsync(string customerId)
         {
@@ -127,8 +128,9 @@ namespace DTech.Application.Services
 
                 if (paymentMethodEnum == PaymentMethodEnums.VNPay && order.FinalCost > 0)
                 {
+                    var vndCurrencyFinalCost = (long)(order.FinalCost * usdToVndRate);
                     paymentUrl = vnPayService.CreateVnPayPaymentUrl(
-                        (long)order.FinalCost,
+                        vndCurrencyFinalCost,
                         $"ORDER_{order.OrderId}"
                     );
                     Console.WriteLine("Generated VNPay Payment URL: " + paymentUrl);
@@ -180,7 +182,7 @@ namespace DTech.Application.Services
             }
         }
 
-        public async Task<OrderResDto> GetOrderByIdAsync(string orderId, string customerId) {             
+        public async Task<OrderResDto> GetOrderByIdAsync(string orderId, string customerId) {
             var order = await orderRepo.GetOrderByIdAsync(orderId);
             if (order == null || order.CustomerId != customerId)
                 return new OrderResDto { Success = false, Message = "Order not found" };
