@@ -110,6 +110,9 @@ const ProductFormPage: React.FC = () => {
 
             if (info.productColors && info.productColors.length > 0) {
                 info.productColors.forEach((color, index) => {
+                    if (color.colorId) {
+                        fd.append(`ProductColors[${index}].ColorId`, color.colorId.toString());
+                    }
                     fd.append(`ProductColors[${index}].ColorName`, color.colorName);
                     fd.append(`ProductColors[${index}].ColorCode`, color.colorCode);
                 });
