@@ -52,12 +52,8 @@ namespace DTech.Application.Services
                     Message = string.Join("; ", result.Errors.Select(e => e.Description))
                 };
             }
-            var role = await roleManager.FindByIdAsync(user.RoleId);
-            if (role != null)
-            {
-                // Assign the role to the user
-                await userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
-            }
+
+            await userManager.AddToRoleAsync(user, "Customer");
 
             CustomerAddress address = new()
             {
@@ -144,7 +140,7 @@ namespace DTech.Application.Services
                     FullName = payload.Name,
                     Image = payload.Picture,
                     EmailConfirmed = true,
-                    RoleId = "dc11b0b4-44c2-457f-a890-fce0d077dbe0",
+                    RoleId = "279b7b3b-4b47-46c1-98b8-8d52bf415103",
                     CreateDate = DateTime.UtcNow,
                     CreatedBy = payload.Name
                 };
@@ -203,7 +199,7 @@ namespace DTech.Application.Services
                     Email = email,
                     FullName = name,
                     Image = picture,
-                    RoleId = "dc11b0b4-44c2-457f-a890-fce0d077dbe0",
+                    RoleId = "279b7b3b-4b47-46c1-98b8-8d52bf415103",
                     CreateDate = DateTime.UtcNow,
                     CreatedBy = name
                 };

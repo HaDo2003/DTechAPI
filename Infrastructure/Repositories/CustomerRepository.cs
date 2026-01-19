@@ -29,7 +29,7 @@ namespace DTech.Infrastructure.Repositories
         {
             return await context.Users.AnyAsync(e => e.Email == email);
         }
-     
+
         public async Task<bool> CheckPhoneAsync(string? phone)
         {
             return await context.Users.AnyAsync(e => e.PhoneNumber == phone);
