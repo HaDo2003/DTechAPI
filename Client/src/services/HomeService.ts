@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Advertisement } from "../types/Advertisment";
+import type { Advertisement } from "../types/Advertisement";
 import type { Product } from "../types/Product";
 
 export interface HomePageData {

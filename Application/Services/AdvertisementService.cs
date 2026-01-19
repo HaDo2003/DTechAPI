@@ -176,7 +176,7 @@ namespace DTech.Application.Services
                     return new IndexResDto<object?>
                     {
                         Success = false,
-                        Message = "Advertisment with the same name already exists",
+                        Message = "Advertisement with the same name already exists",
                         Data = null
                     };
                 }
@@ -227,7 +227,7 @@ namespace DTech.Application.Services
                 return new IndexResDto<object?>
                 {
                     Success = true,
-                    Message = "Advertisment updated successfully",
+                    Message = "Advertisement updated successfully",
                     Data = null
                 };
             }
@@ -258,7 +258,7 @@ namespace DTech.Application.Services
                 return new IndexResDto<object?>
                 {
                     Success = true,
-                    Message = "Advertisment deleted successfully",
+                    Message = "Advertisement deleted successfully",
                     Data = null
                 };
             }
