@@ -91,6 +91,15 @@ namespace DTech.Infrastructure.Repositories
             if (customer == null)
                 return false;
 
+            // Detach any existing tracked entity with the same ID
+            var trackedEntity = context.ChangeTracker.Entries<ApplicationUser>()
+                .FirstOrDefault(e => e.Entity.Id == customer.Id);
+
+            if (trackedEntity != null)
+            {
+                trackedEntity.State = EntityState.Detached;
+            }
+
             var existingUser = await context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == customer.Id);
