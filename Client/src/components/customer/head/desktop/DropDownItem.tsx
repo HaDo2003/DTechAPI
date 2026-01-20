@@ -34,11 +34,12 @@ const DropDownItem: React.FC<DropDownItemProps> = ({
     };
 
     return (
-        <li className="dropdown-item-container">
+        <li className="dropdown-item-container" style={{ borderBottom: 'none' }}>
             <button
                 onClick={handleClick}
                 className="dropdown-item btn border-0 bg-transparent text-start w-100"
                 onMouseEnter={onMouseEnter}
+                style={{ textDecoration: 'none', borderBottom: 'none' }}
             >
                 {label}
             </button>
@@ -46,10 +47,11 @@ const DropDownItem: React.FC<DropDownItemProps> = ({
             {activeSubDropdown === label.toLowerCase() && (
                 <ul className="dropdown-menu show position-absolute ul-position">
                     {subItems.map((subItem, idx) => (
-                        <li key={subItem.label + idx}>
+                        <li key={subItem.label + idx} style={{ borderBottom: 'none' }}>
                             <button
                                 onClick={() => navigate(subItem.path)}
                                 className="dropdown-item btn border-0 bg-transparent text-start"
+                                style={{ textDecoration: 'none', borderBottom: 'none' }}
                             >
                                 {subItem.label}
                             </button>

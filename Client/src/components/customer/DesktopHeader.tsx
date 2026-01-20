@@ -286,6 +286,7 @@ const DesktopHeader: React.FC<HeaderProps> = ({
                                     <button
                                         className="nav-link dropdown-toggle text-light btn border-0 bg-transparent"
                                         onClick={() => navigate('/accessory')}
+                                        style={{ boxShadow: 'none', padding: '0.5rem 1rem' }}
                                     >
                                         Accessory
                                     </button>
