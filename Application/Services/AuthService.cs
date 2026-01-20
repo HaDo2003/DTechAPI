@@ -140,7 +140,7 @@ namespace DTech.Application.Services
                     FullName = payload.Name,
                     Image = payload.Picture,
                     EmailConfirmed = true,
-                    RoleId = "279b7b3b-4b47-46c1-98b8-8d52bf415103",
+                    RoleId = "dc11b0b4-44c2-457f-a890-fce0d077dbe0",
                     CreateDate = DateTime.UtcNow,
                     CreatedBy = payload.Name
                 };
@@ -199,7 +199,7 @@ namespace DTech.Application.Services
                     Email = email,
                     FullName = name,
                     Image = picture,
-                    RoleId = "279b7b3b-4b47-46c1-98b8-8d52bf415103",
+                    RoleId = "dc11b0b4-44c2-457f-a890-fce0d077dbe0",
                     CreateDate = DateTime.UtcNow,
                     CreatedBy = name
                 };
