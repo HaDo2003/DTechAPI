@@ -9,6 +9,8 @@ namespace DTech.Application.DTOs.Response.Admin.Post
         public string? Name { get; set; }
         public string? Description { get; set; }
         public StatusEnums Status { get; set; } = StatusEnums.Available;
+        public bool IsFeatured { get; set; } = false;
+        public bool IsMain { get; set; } = false;
         public DateTime? PostDate { get; set; }
         public string? PostBy { get; set; }
         public int? PostCategoryId { get; set; }

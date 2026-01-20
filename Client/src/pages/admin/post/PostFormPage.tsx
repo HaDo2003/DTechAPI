@@ -24,6 +24,8 @@ const PostFormPage: React.FC = () => {
         description: "",
         image: "",
         status: "Available",
+        isFeatured: false,
+        isMain: false,
         postCategoryId: 0,
         postCategory: ""
     });
@@ -62,7 +64,11 @@ const PostFormPage: React.FC = () => {
         const { name, value } = e.target;
         setForm({
             ...form,
-            [name]: name === "postCategoryId" ? (value ? Number(value) : null) : value,
+            [name]: name === "postCategoryId" 
+                ? (value ? Number(value) : null) 
+                : (name === "isFeatured" || name === "isMain")
+                ? value === "true"
+                : value,
         });
     };
 
@@ -81,6 +87,9 @@ const PostFormPage: React.FC = () => {
         formData.append("Name", form.name ?? "");
         formData.append("Description", form.description ?? "");
         formData.append("Image", form.image ?? "");
+        formData.append("Status", form.status ?? "Available");
+        formData.append("IsFeatured", String(form.isFeatured ?? false));
+        formData.append("IsMain", String(form.isMain ?? false));
 
         if (form.postCategoryId) {
             formData.append("PostCategoryId", String(form.postCategoryId));
@@ -211,6 +220,42 @@ const PostFormPage: React.FC = () => {
                                         >
                                             <option value="Available">Available</option>
                                             <option value="Unavailable">Unavailable</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                <div className="col">
+                                    <div className="form-group">
+                                        <label htmlFor="isFeatured-select">Feature Post</label>
+                                        <select
+                                            id="isFeatured-select"
+                                            name="isFeatured"
+                                            value={String(form.isFeatured ?? false)}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                        >
+                                            <option value="">Select Feature Post</option>
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="col">
+                                    <div className="form-group">
+                                        <label htmlFor="isMain-select">Main Post</label>
+                                        <select
+                                            id="isMain-select"
+                                            name="isMain"
+                                            value={String(form.isMain ?? false)}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                            title="Status"
+                                        >
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
                                         </select>
                                     </div>
                                 </div>

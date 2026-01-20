@@ -90,6 +90,8 @@ namespace DTech.Application.Services
                 {
                     Name = model.Name,
                     Status = model.Status,
+                    IsFeatured = model.IsFeatured,
+                    IsMain = model.IsMain,
                     PostDate = DateTime.UtcNow,
                     PostBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                     Description = sanitizer.Sanitize(model.Description ?? string.Empty),
@@ -168,6 +170,8 @@ namespace DTech.Application.Services
                     Name = model.Name,
                     Description = model.Description,
                     Status = model.Status,
+                    IsFeatured = model.IsFeatured,
+                    IsMain = model.IsMain,
                     PostDate = DateTime.UtcNow,
                     PostBy = await adminRepo.GetAdminFullNameAsync(currentUserId),
                     Image = model.Image,

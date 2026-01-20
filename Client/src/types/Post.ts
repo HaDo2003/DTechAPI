@@ -3,6 +3,8 @@ export interface PostForm {
     name?: string;
     description?: string;
     status?: string;
+    isFeatured?: boolean;
+    isMain?: boolean;
     postCategoryId?: number | null;
     postCategory?: string;
     image?: string;
