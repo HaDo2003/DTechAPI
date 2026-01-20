@@ -95,7 +95,7 @@ const Login: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="d-flex flex-column my-2 mx-3 gap-2">
+                    <div className="d-flex justify-content-between my-2 mx-3 gap-3">
                         <GoogleButton />
                         <FacebookButton />
                     </div>
