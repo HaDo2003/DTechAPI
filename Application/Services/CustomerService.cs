@@ -33,21 +33,26 @@ namespace DTech.Application.Services
 
         public async Task<MessageResponse> UpdateCustomerProfile(string customerId, UpdateProfileDto model)
         {
-            var customer = await customerRepo.GetCustomerByIdAsync(customerId);
-            if (customer == null)
+            // Just check if customer exists - don't load related entities
+            var customerExists = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customerExists)
                 return new MessageResponse { Success = false, Message = "Customer not found" };
 
             // Check email existed
-            var existingEmail = await customerRepo.CheckEmailAsync(model.Email, customer.Id);
+            var existingEmail = await customerRepo.CheckEmailAsync(model.Email, customerId);
             if (existingEmail)
                 return new MessageResponse { Success = false, Message = "Email already exists." };
 
 
             // Check phone existed
-            var existingPhone = await customerRepo.CheckPhoneAsync(model.PhoneNumber, customer.Id);
+            var existingPhone = await customerRepo.CheckPhoneAsync(model.PhoneNumber, customerId);
             if (existingPhone)
                 return new MessageResponse { Success = false, Message = "Phone number already exists." };
 
+            // Get only the user entity without related collections
+            var customer = await customerRepo.GetOnlyCustomerByIdAsync(customerId);
+            if (customer == null)
+                return new MessageResponse { Success = false, Message = "Customer not found" };
 
             // Handle image change
             if (model.ImageUpload != null && model.ImageUpload.Length > 0)
@@ -78,11 +83,12 @@ namespace DTech.Application.Services
 
         public async Task<MessageResponse> UpdateNewPasswordAsync(string customerId, ChangePasswordDto model)
         {
-            var customer = await customerRepo.GetCustomerByIdAsync(customerId);
-            if (customer == null)
+            // Just check if customer exists - don't load related entities
+            var customerExists = await customerRepo.CheckCustomerAsync(customerId);
+            if (!customerExists)
                 return new MessageResponse { Success = false, Message = "Customer not found" };
 
-            var isUpdated = await customerRepo.UpdateCustomerPasswordAsync(customer, model.OldPassword, model.NewPassword);
+            var isUpdated = await customerRepo.UpdateCustomerPasswordAsync(customerId, model.OldPassword, model.NewPassword);
             if (!isUpdated)
                 return new MessageResponse { Success = false, Message = "Failed to change password" };
 

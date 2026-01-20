@@ -18,7 +18,7 @@ namespace DTech.Domain.Interfaces
         Task<bool> CheckPhoneAsync(string? phone, string? Id);
         Task<ApplicationUser> GetCustomerByIdAsync(string? customerId);
         Task<bool> UpdateCustomerAsync(ApplicationUser customer);
-        Task<bool> UpdateCustomerPasswordAsync(ApplicationUser customer, string? oldPassword, string? newPassword);
+        Task<bool> UpdateCustomerPasswordAsync(string customerId, string? oldPassword, string? newPassword);
         Task<bool> CheckCustomerAsync(string? customerId);
 
         //For CustomerAddress table

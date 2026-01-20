@@ -124,7 +124,7 @@ namespace DTech.Infrastructure.Repositories
             return true;
         }
 
-        public async Task<bool> UpdateCustomerPasswordAsync(ApplicationUser customer, string? oldPassword, string? newPassword)
+        public async Task<bool> UpdateCustomerPasswordAsync(string customerId, string? oldPassword, string? newPassword)
         {
             if (string.IsNullOrEmpty(oldPassword) || string.IsNullOrEmpty(newPassword))
             {
@@ -132,7 +132,7 @@ namespace DTech.Infrastructure.Repositories
             }
 
             // Get fresh user instance without tracked entities
-            var freshUser = await userManager.FindByIdAsync(customer.Id);
+            var freshUser = await userManager.FindByIdAsync(customerId);
             if (freshUser == null)
                 return false;
 
