@@ -18,8 +18,6 @@ const OrderSummaryComponent: React.FC<OrderSummaryProps> = ({
   onApplyDiscount,
   onSubmit
 }) => {
-  const [discount] = React.useState<number>(0);
-
   if (!orderSummary) {
     return <Loading />;
   }
@@ -106,11 +104,11 @@ const OrderSummaryComponent: React.FC<OrderSummaryProps> = ({
                     : "Free Ship"}
                 </span>
               </div>
-              {discount > 0 && (
+              {orderSummary.discountAmount && orderSummary.discountAmount > 0 && (
                 <div className="d-flex justify-content-between mb-2" id="discount-row">
                   <span>Discount:</span>
                   <span id="discount-amount" className="text-success">
-                    -{discount.toLocaleString()}
+                    -{orderSummary.discountAmount.toLocaleString()}
                   </span>
                 </div>
               )}
@@ -118,9 +116,7 @@ const OrderSummaryComponent: React.FC<OrderSummaryProps> = ({
               <div className="d-flex justify-content-between mb-3">
                 <strong>Final Price:</strong>
                 <strong className="text-primary" id="total-price">
-                  {(
-                    orderSummary.total - discount
-                  ).toLocaleString()}
+                  {orderSummary.total.toLocaleString()}
                 </strong>
               </div>
 
