@@ -173,7 +173,7 @@ namespace DTech.UnitTest.Services
 
             _customerRepoMock.Setup(r => r.CheckPhoneAsync(model.PhoneNumber)).ReturnsAsync(false);
 
-            var roleId = "dc11b0b4-44c2-457f-a890-fce0d077dbe0";
+            var roleId = "279b7b3b-4b47-46c1-98b8-8d52bf415103";
             var user = new ApplicationUser { Id = "user1", RoleId = roleId };
             _mapperMock.Setup(m => m.Map<ApplicationUser>(model)).Returns(user);
 

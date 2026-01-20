@@ -207,7 +207,7 @@ namespace DTech.Infrastructure.DependencyInjection
             // Parse DATABASE_URL format: postgresql://user:password@host:port/database
             var uri = new Uri(databaseUrl);
             var userInfo = uri.UserInfo.Split(':');
-            
+
             // Use default PostgreSQL port (5432) if not specified
             var port = uri.Port > 0 ? uri.Port : 5432;
 
