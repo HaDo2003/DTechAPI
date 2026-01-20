@@ -81,7 +81,7 @@ const Dashboard: React.FC = () => {
                 <MonthlyRecap />
 
                 {/* Row: Visitor + Latest Orders */}
-                <div className="row">
+                <div className="row mb-2">
                   <div className="col-lg-6">
                     <Visitor visitorCounts={visitorCounts} />
                   </div>
@@ -91,7 +91,7 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Row: Chat + Users + Products */}
-                <div className="row">
+                <div className="row mt-2">
                   <div className="col-md-8">
                     <div className="row g-4 mb-4">
                       <DirectChat messages={[]} contacts={[]} />
