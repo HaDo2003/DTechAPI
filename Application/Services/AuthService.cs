@@ -19,7 +19,7 @@ namespace DTech.Application.Services
         IBackgroundTaskQueue backgroundTaskQueue,
         IMapper mapper,
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager,
+        // RoleManager<IdentityRole> roleManager,
         IHttpClientFactory httpClientFactory
     ) : IAuthService
     {
@@ -149,11 +149,12 @@ namespace DTech.Application.Services
                 if (!result.Succeeded)
                     throw new Exception("Failed to create user");
 
-                var role = await roleManager.FindByIdAsync(user.RoleId);
-                if (role != null)
-                {
-                    await userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
-                }
+                // var role = await roleManager.FindByIdAsync(user.RoleId);
+                // if (role != null)
+                // {
+                //     await userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
+                // }
+                await userManager.AddToRoleAsync(user, "Customer");
 
                 Cart cart = new()
                 {
@@ -208,11 +209,12 @@ namespace DTech.Application.Services
                 if (!result.Succeeded)
                     throw new Exception("Failed to create user");
 
-                var role = await roleManager.FindByIdAsync(user.RoleId);
-                if (role != null)
-                {
-                    await userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
-                }
+                // var role = await roleManager.FindByIdAsync(user.RoleId);
+                // if (role != null)
+                // {
+                //     await userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
+                // }
+                await userManager.AddToRoleAsync(user, "Customer");
 
                 Cart cart = new()
                 {
