@@ -91,18 +91,34 @@ namespace DTech.Infrastructure.Repositories
             if (customer == null)
                 return false;
 
-            var existingUser = await context.Users.FindAsync(customer.Id);
+            var existingUser = await context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == customer.Id);
 
             if (existingUser == null)
                 return false;
 
-            // Update only allowed fields
-            existingUser.FullName = customer.FullName;
-            existingUser.Email = customer.Email;
-            existingUser.PhoneNumber = customer.PhoneNumber;
-            existingUser.Image = customer.Image;
-            existingUser.Gender = customer.Gender;
-            existingUser.DateOfBirth = customer.DateOfBirth;
+            // Create a new entity with only the fields we want to update
+            var userToUpdate = new ApplicationUser
+            {
+                Id = customer.Id,
+                FullName = customer.FullName,
+                Email = customer.Email,
+                PhoneNumber = customer.PhoneNumber,
+                Image = customer.Image,
+                Gender = customer.Gender,
+                DateOfBirth = customer.DateOfBirth,
+                ConcurrencyStamp = existingUser.ConcurrencyStamp
+            };
+
+            // Attach and mark only specific properties as modified
+            context.Users.Attach(userToUpdate);
+            context.Entry(userToUpdate).Property(u => u.FullName).IsModified = true;
+            context.Entry(userToUpdate).Property(u => u.Email).IsModified = true;
+            context.Entry(userToUpdate).Property(u => u.PhoneNumber).IsModified = true;
+            context.Entry(userToUpdate).Property(u => u.Image).IsModified = true;
+            context.Entry(userToUpdate).Property(u => u.Gender).IsModified = true;
+            context.Entry(userToUpdate).Property(u => u.DateOfBirth).IsModified = true;
 
             await context.SaveChangesAsync();
             return true;
@@ -115,7 +131,12 @@ namespace DTech.Infrastructure.Repositories
                 return false;
             }
 
-            var result = await userManager.ChangePasswordAsync(customer, oldPassword, newPassword);
+            // Get fresh user instance without tracked entities
+            var freshUser = await userManager.FindByIdAsync(customer.Id);
+            if (freshUser == null)
+                return false;
+
+            var result = await userManager.ChangePasswordAsync(freshUser, oldPassword, newPassword);
             return result.Succeeded;
         }
 
