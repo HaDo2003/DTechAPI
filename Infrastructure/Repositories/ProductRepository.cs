@@ -482,6 +482,8 @@ namespace DTech.Infrastructure.Repositories
             existingProduct.PromotionalGift = product.PromotionalGift;
             existingProduct.Photo = product.Photo;
             existingProduct.Description = product.Description;
+            existingProduct.CategoryId = product.CategoryId;
+            existingProduct.BrandId = product.BrandId;
             existingProduct.UpdateDate = DateTime.UtcNow;
             existingProduct.UpdatedBy = product.UpdatedBy;
             existingProduct.Status = product.Status;
