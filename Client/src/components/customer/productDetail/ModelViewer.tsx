@@ -133,6 +133,7 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({
               intensity={0.15}
             />
 
+            {/* Main light source + shadows */}
             <directionalLight
               position={[3, 5, 2]}
               intensity={0.5}
@@ -175,11 +176,12 @@ const ThreeDModelViewer: React.FC<ThreeDModelViewerProps> = ({
               position={[0, -1, 0]}
               receiveShadow
             >
+              {/* Orbit Controls (user interaction) */}
               <planeGeometry args={[20, 20]} />
               <shadowMaterial opacity={0.3} />
             </mesh>
 
-            {/* Orbit Controls */}
+            {/* Shadow Catcher */}
             {controlsEnabled && (
               <OrbitControls
                 enablePan={true}
