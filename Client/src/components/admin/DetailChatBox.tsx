@@ -61,15 +61,24 @@ const DetailChatBox: React.FC<DetailChatBoxProps> = ({
         e.preventDefault();
         if (!inputMessage.trim() || !senderId) return;
 
-        // Admin sends to customer (senderId is the customer's ID)
-        await connection.invoke("SendMessage", senderId, inputMessage);
+        const messageToSend = inputMessage;
+        setInputMessage(""); // Clear input immediately for better UX
 
-        setChatMessages(prev => [
-            ...prev,
-            { senderId: currentUserId, receiverId: senderId, message: inputMessage, timestamp: new Date().toISOString() }
-        ]);
+        try {
+            // Admin sends to customer (senderId is the customer's ID)
+            await connection.invoke("SendMessage", senderId, messageToSend);
 
-        setInputMessage("");
+            // Message will be added via ReceiveMessage event with server timestamp
+            // No need to add it locally here
+        } catch (error) {
+            console.error("Failed to send message:", error);
+            
+            // Restore the message to input on failure
+            setInputMessage(messageToSend);
+            
+            // Show error notification
+            alert("Failed to send message. Please check your connection and try again.");
+        }
     };
 
     return (
