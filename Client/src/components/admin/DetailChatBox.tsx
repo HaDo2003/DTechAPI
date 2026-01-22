@@ -39,12 +39,18 @@ const DetailChatBox: React.FC<DetailChatBoxProps> = ({
 
     // Receive real-time messages
     useEffect(() => {
-        const handler = (incomingSenderId: string | null, message: string, timestamp: string) => {
-            // Accept messages from the customer or from self (admin)
-            if (incomingSenderId === senderId || incomingSenderId === currentUserId) {
+        const handler = (incomingSenderId: string | null, incomingReceiverId: string | null, message: string, timestamp: string) => {
+            // Accept messages where either:
+            // 1. Customer sends to admin (incomingSenderId = customer, incomingReceiverId = admin)
+            // 2. Admin sends to customer (incomingSenderId = admin, incomingReceiverId = customer)
+            const isMessageForThisChat = 
+                (incomingSenderId === senderId && incomingReceiverId === currentUserId) ||
+                (incomingSenderId === currentUserId && incomingReceiverId === senderId);
+
+            if (isMessageForThisChat) {
                 setChatMessages(prev => [
                     ...prev,
-                    { senderId: incomingSenderId, receiverId: incomingSenderId === senderId ? currentUserId : senderId, message, timestamp: timestamp || new Date().toISOString() }
+                    { senderId: incomingSenderId, receiverId: incomingReceiverId, message, timestamp: timestamp || new Date().toISOString() }
                 ]);
             }
         };

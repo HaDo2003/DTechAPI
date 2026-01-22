@@ -33,11 +33,11 @@ namespace DTech.API.Hubs
 
             // Send to receiver
             await Clients.User(receiverId)
-                .SendAsync("ReceiveMessage", senderId, message, timestamp);
+                .SendAsync("ReceiveMessage", senderId, receiverId, message, timestamp);
 
             // Send back to sender so they see their own message
             await Clients.Caller
-                .SendAsync("ReceiveMessage", senderId, message, timestamp);
+                .SendAsync("ReceiveMessage", senderId, receiverId, message, timestamp);
         }
     }
 }

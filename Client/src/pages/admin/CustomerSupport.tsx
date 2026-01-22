@@ -23,14 +23,20 @@ const CustomerSupport: React.FC = () => {
     useEffect(() => {
         if (!connection) return;
 
-        const handler = (senderId: string | null, message: string, timestamp: string) => {
-            if (!senderId) return;
+        const handler = (senderId: string | null, receiverId: string | null, message: string, timestamp: string) => {
+            if (!senderId || !receiverId) return;
+
+            // Determine which customer this message is for
+            // If admin sent it, the customer is the receiver
+            // If customer sent it, the customer is the sender
+            const currentUserId = token ? JSON.parse(atob(token.split('.')[1])).nameid : "";
+            const customerId = senderId === currentUserId ? receiverId : senderId;
 
             // Update chat list with new message
             setChatList(prev => {
-                const existingIndex = prev.findIndex(chat => chat.senderId === senderId);
+                const existingIndex = prev.findIndex(chat => chat.senderId === customerId);
                 const updatedChat: ChatList = {
-                    senderId,
+                    senderId: customerId,
                     senderName: existingIndex >= 0 ? prev[existingIndex].senderName : "Unknown",
                     avatarUrl: existingIndex >= 0 ? prev[existingIndex].avatarUrl : null,
                     message,
@@ -49,8 +55,8 @@ const CustomerSupport: React.FC = () => {
             });
 
             // Mark as unread if not currently selected
-            if (selectedChat?.senderId !== senderId) {
-                setUnreadChats(prev => new Set(prev).add(senderId));
+            if (selectedChat?.senderId !== customerId) {
+                setUnreadChats(prev => new Set(prev).add(customerId));
             }
         };
 
@@ -59,7 +65,7 @@ const CustomerSupport: React.FC = () => {
         return () => {
             connection.off("ReceiveMessage", handler);
         };
-    }, [connection, selectedChat]);
+    }, [connection, selectedChat, token]);
 
     // Click → load full chat
     const loadChat = async (senderId: string) => {
