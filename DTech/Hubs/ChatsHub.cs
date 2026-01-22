@@ -31,7 +31,12 @@ namespace DTech.API.Hubs
 
             var timestamp = await chatService.SaveMessageAsync(senderId, receiverId, message);
 
+            // Send to receiver
             await Clients.User(receiverId)
+                .SendAsync("ReceiveMessage", senderId, message, timestamp);
+
+            // Send back to sender so they see their own message
+            await Clients.Caller
                 .SendAsync("ReceiveMessage", senderId, message, timestamp);
         }
     }

@@ -118,10 +118,10 @@ const ChatBox: React.FC = () => {
       // No need to add it locally here
     } catch (error) {
       console.error("Failed to send message:", error);
-      
+
       // Restore the message to input on failure
       setInputValue(messageToSend);
-      
+
       // Show error notification
       alert("Failed to send message. Please check your connection and try again.");
     }
