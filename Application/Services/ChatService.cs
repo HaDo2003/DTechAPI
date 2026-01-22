@@ -12,24 +12,21 @@ namespace DTech.Application.Services
         IChatRepository chatRepository
     ) : IChatService
     {
-        public async Task<DateTime> SaveMessageAsync(string? senderId, string? receiverId, string message)
+        public async Task SaveMessageAsync(string? senderId, string? receiverId, string message)
         {
             try
             {
-                var timestamp = DateTime.UtcNow;
                 await chatRepository.AddChatAsync(new Chat
                 {
                     SenderId = senderId,
                     ReceiverId = receiverId,
                     Message = message,
-                    Timestamp = timestamp
+                    Timestamp = DateTime.UtcNow
                 });
-                return timestamp;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("An error occurred while saving the chat message: " + ex.Message);
-                return DateTime.UtcNow;
             }
         }
 

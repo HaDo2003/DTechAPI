@@ -23,24 +23,18 @@ const CustomerSupport: React.FC = () => {
     useEffect(() => {
         if (!connection) return;
 
-        const handler = (senderId: string | null, receiverId: string | null, message: string, timestamp: string) => {
-            if (!senderId || !receiverId) return;
-
-            // Determine which customer this message is for
-            // If admin sent it, the customer is the receiver
-            // If customer sent it, the customer is the sender
-            const currentUserId = token ? JSON.parse(atob(token.split('.')[1])).nameid : "";
-            const customerId = senderId === currentUserId ? receiverId : senderId;
+        const handler = (senderId: string | null, message: string) => {
+            if (!senderId) return;
 
             // Update chat list with new message
             setChatList(prev => {
-                const existingIndex = prev.findIndex(chat => chat.senderId === customerId);
+                const existingIndex = prev.findIndex(chat => chat.senderId === senderId);
                 const updatedChat: ChatList = {
-                    senderId: customerId,
+                    senderId,
                     senderName: existingIndex >= 0 ? prev[existingIndex].senderName : "Unknown",
                     avatarUrl: existingIndex >= 0 ? prev[existingIndex].avatarUrl : null,
                     message,
-                    timestamp: timestamp || new Date().toISOString()
+                    timestamp: new Date().toISOString()
                 };
 
                 if (existingIndex >= 0) {
@@ -55,8 +49,8 @@ const CustomerSupport: React.FC = () => {
             });
 
             // Mark as unread if not currently selected
-            if (selectedChat?.senderId !== customerId) {
-                setUnreadChats(prev => new Set(prev).add(customerId));
+            if (selectedChat?.senderId !== senderId) {
+                setUnreadChats(prev => new Set(prev).add(senderId));
             }
         };
 
@@ -65,7 +59,7 @@ const CustomerSupport: React.FC = () => {
         return () => {
             connection.off("ReceiveMessage", handler);
         };
-    }, [connection, selectedChat, token]);
+    }, [connection, selectedChat]);
 
     // Click → load full chat
     const loadChat = async (senderId: string) => {

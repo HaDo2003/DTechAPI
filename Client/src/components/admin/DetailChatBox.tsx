@@ -39,18 +39,12 @@ const DetailChatBox: React.FC<DetailChatBoxProps> = ({
 
     // Receive real-time messages
     useEffect(() => {
-        const handler = (incomingSenderId: string | null, incomingReceiverId: string | null, message: string, timestamp: string) => {
-            // Accept messages where either:
-            // 1. Customer sends to admin (incomingSenderId = customer, incomingReceiverId = admin)
-            // 2. Admin sends to customer (incomingSenderId = admin, incomingReceiverId = customer)
-            const isMessageForThisChat = 
-                (incomingSenderId === senderId && incomingReceiverId === currentUserId) ||
-                (incomingSenderId === currentUserId && incomingReceiverId === senderId);
-
-            if (isMessageForThisChat) {
+        const handler = (incomingSenderId: string | null, message: string) => {
+            // Accept messages from the customer or from self (admin)
+            if (incomingSenderId === senderId || incomingSenderId === currentUserId) {
                 setChatMessages(prev => [
                     ...prev,
-                    { senderId: incomingSenderId, receiverId: incomingReceiverId, message, timestamp: timestamp || new Date().toISOString() }
+                    { senderId: incomingSenderId, receiverId: incomingSenderId === senderId ? currentUserId : senderId, message, timestamp: new Date().toISOString() }
                 ]);
             }
         };
@@ -67,24 +61,15 @@ const DetailChatBox: React.FC<DetailChatBoxProps> = ({
         e.preventDefault();
         if (!inputMessage.trim() || !senderId) return;
 
-        const messageToSend = inputMessage;
-        setInputMessage(""); // Clear input immediately for better UX
+        // Admin sends to customer (senderId is the customer's ID)
+        await connection.invoke("SendMessage", senderId, inputMessage);
 
-        try {
-            // Admin sends to customer (senderId is the customer's ID)
-            await connection.invoke("SendMessage", senderId, messageToSend);
+        setChatMessages(prev => [
+            ...prev,
+            { senderId: currentUserId, receiverId: senderId, message: inputMessage, timestamp: new Date().toISOString() }
+        ]);
 
-            // Message will be added via ReceiveMessage event with server timestamp
-            // No need to add it locally here
-        } catch (error) {
-            console.error("Failed to send message:", error);
-            
-            // Restore the message to input on failure
-            setInputMessage(messageToSend);
-            
-            // Show error notification
-            alert("Failed to send message. Please check your connection and try again.");
-        }
+        setInputMessage("");
     };
 
     return (

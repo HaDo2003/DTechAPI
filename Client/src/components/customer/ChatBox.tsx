@@ -85,14 +85,13 @@ const ChatBox: React.FC = () => {
   useEffect(() => {
     if (!connection) return;
 
-    connection.on("ReceiveMessage", (senderId: string | null, receiverId: string | null, message: string, timestamp: string) => {
+    connection.on("ReceiveMessage", (senderId: string | null, message: string) => {
       setChatMessages(prev => [
         ...prev,
         {
           senderId: senderId || "guest",
-          receiverId: receiverId || undefined,
           message,
-          timestamp: timestamp || new Date().toISOString()
+          timestamp: new Date().toISOString()
         }
       ]);
     });
@@ -108,24 +107,18 @@ const ChatBox: React.FC = () => {
   const handleSend = async () => {
     if (!inputValue.trim() || !connection) return;
 
-    const messageToSend = inputValue;
-    setInputValue(""); // Clear input immediately for better UX
+    // Server handles the admin ID
+    // await connection.invoke("SendMessage", null, inputValue);
+    await chatService.sendMessage(inputValue, connection);
 
-    try {
-      // Server handles the admin ID
-      await chatService.sendMessage(messageToSend, connection);
+    const newMessage: ChatMessage = {
+      senderId: currentUserId,
+      message: inputValue,
+      timestamp: new Date().toISOString()
+    };
 
-      // Message will be added via ReceiveMessage event with server timestamp
-      // No need to add it locally here
-    } catch (error) {
-      console.error("Failed to send message:", error);
-
-      // Restore the message to input on failure
-      setInputValue(messageToSend);
-
-      // Show error notification
-      alert("Failed to send message. Please check your connection and try again.");
-    }
+    setChatMessages(prev => [...prev, newMessage]);
+    setInputValue("");
   };
 
   return (
