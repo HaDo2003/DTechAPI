@@ -23,7 +23,7 @@ const CustomerSupport: React.FC = () => {
     useEffect(() => {
         if (!connection) return;
 
-        const handler = (senderId: string | null, message: string) => {
+        const handler = (senderId: string | null, message: string, timestamp: string) => {
             if (!senderId) return;
 
             // Update chat list with new message
@@ -34,7 +34,7 @@ const CustomerSupport: React.FC = () => {
                     senderName: existingIndex >= 0 ? prev[existingIndex].senderName : "Unknown",
                     avatarUrl: existingIndex >= 0 ? prev[existingIndex].avatarUrl : null,
                     message,
-                    timestamp: new Date().toISOString()
+                    timestamp: timestamp || new Date().toISOString()
                 };
 
                 if (existingIndex >= 0) {

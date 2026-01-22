@@ -85,13 +85,13 @@ const ChatBox: React.FC = () => {
   useEffect(() => {
     if (!connection) return;
 
-    connection.on("ReceiveMessage", (senderId: string | null, message: string) => {
+    connection.on("ReceiveMessage", (senderId: string | null, message: string, timestamp: string) => {
       setChatMessages(prev => [
         ...prev,
         {
           senderId: senderId || "guest",
           message,
-          timestamp: new Date().toISOString()
+          timestamp: timestamp || new Date().toISOString()
         }
       ]);
     });

@@ -29,10 +29,10 @@ namespace DTech.API.Hubs
 
             Console.WriteLine($"SendMessage called - SenderId: {senderId}, ReceiverId: {receiverId}");
 
-            await chatService.SaveMessageAsync(senderId, receiverId, message);
+            var timestamp = await chatService.SaveMessageAsync(senderId, receiverId, message);
 
             await Clients.User(receiverId)
-                .SendAsync("ReceiveMessage", senderId, message);
+                .SendAsync("ReceiveMessage", senderId, message, timestamp);
         }
     }
 }

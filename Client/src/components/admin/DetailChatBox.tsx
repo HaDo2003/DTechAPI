@@ -39,12 +39,12 @@ const DetailChatBox: React.FC<DetailChatBoxProps> = ({
 
     // Receive real-time messages
     useEffect(() => {
-        const handler = (incomingSenderId: string | null, message: string) => {
+        const handler = (incomingSenderId: string | null, message: string, timestamp: string) => {
             // Accept messages from the customer or from self (admin)
             if (incomingSenderId === senderId || incomingSenderId === currentUserId) {
                 setChatMessages(prev => [
                     ...prev,
-                    { senderId: incomingSenderId, receiverId: incomingSenderId === senderId ? currentUserId : senderId, message, timestamp: new Date().toISOString() }
+                    { senderId: incomingSenderId, receiverId: incomingSenderId === senderId ? currentUserId : senderId, message, timestamp: timestamp || new Date().toISOString() }
                 ]);
             }
         };
